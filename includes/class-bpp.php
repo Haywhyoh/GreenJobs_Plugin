@@ -81,6 +81,9 @@ class BPP {
      * - BPP_Public. Defines all hooks for the public side of the site.
      * - BPP_Post_Types. Registers custom post types and taxonomies.
      * - BPP_Shortcodes. Registers shortcodes.
+     * - BPP_Form_Handler. Handles form submissions.
+     * - BPP_Admin_Ajax. Handles admin AJAX requests.
+     * - BPP_Email_Manager. Handles email notifications.
      *
      * @since    1.0.0
      * @access   private
@@ -110,6 +113,21 @@ class BPP {
         require_once BPP_PLUGIN_DIR . 'includes/class-bpp-shortcodes.php';
 
         /**
+         * The class responsible for handling form submissions.
+         */
+        require_once BPP_PLUGIN_DIR . 'includes/class-bpp-form-handler.php';
+
+        /**
+         * The class responsible for handling admin AJAX requests.
+         */
+        require_once BPP_PLUGIN_DIR . 'includes/class-bpp-admin-ajax.php';
+
+        /**
+         * The class responsible for handling email notifications.
+         */
+        require_once BPP_PLUGIN_DIR . 'includes/class-bpp-email-manager.php';
+
+        /**
          * The class responsible for defining all actions that occur in the admin area.
          */
         require_once BPP_PLUGIN_DIR . 'admin/class-bpp-admin.php';
@@ -119,6 +137,16 @@ class BPP {
          * side of the site.
          */
         require_once BPP_PLUGIN_DIR . 'public/class-bpp-public.php';
+
+        /**
+         * WordPress functions compatibility file.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bpp-functions.php';
+
+        /**
+         * The email manager class handles all email notifications for the plugin.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bpp-email-manager.php';
 
         $this->loader = new BPP_Loader();
     }
@@ -144,6 +172,8 @@ class BPP {
      */
     private function define_admin_hooks() {
         $plugin_admin = new BPP_Admin($this->get_plugin_name(), $this->get_version());
+        $admin_ajax = new BPP_Admin_Ajax($this->get_plugin_name(), $this->get_version());
+        $email_manager = new BPP_Email_Manager($this->get_plugin_name(), $this->get_version());
 
         // Admin scripts and styles
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
@@ -156,9 +186,9 @@ class BPP {
         $this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
         $this->loader->add_action('admin_notices', $plugin_admin, 'admin_notices');
 
-        // Ajax handlers for admin
-        $this->loader->add_action('wp_ajax_bpp_approve_applicant', $plugin_admin, 'ajax_approve_applicant');
-        $this->loader->add_action('wp_ajax_bpp_reject_applicant', $plugin_admin, 'ajax_reject_applicant');
+        // Initialize admin AJAX handler
+        $this->loader->add_action('wp_ajax_bpp_approve_applicant', $admin_ajax, 'approve_applicant');
+        $this->loader->add_action('wp_ajax_bpp_reject_applicant', $admin_ajax, 'reject_applicant');
     }
 
     /**
@@ -169,32 +199,34 @@ class BPP {
      * @access   private
      */
     private function define_public_hooks() {
-        $plugin_public = new BPP_Public($this->get_plugin_name(), $this->get_version());
+        $plugin_public = new BPP_Public( $this->get_plugin_name(), $this->get_version() );
+        $form_handler = new BPP_Form_Handler( $this->get_plugin_name(), $this->get_version() );
+        $email_manager = new BPP_Email_Manager( $this->get_plugin_name(), $this->get_version() );
 
-        // Public scripts and styles
-        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
-        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
-
-        // Form submission handling
-        $this->loader->add_action('wp_ajax_bpp_submit_application', $plugin_public, 'process_application_submission');
-        $this->loader->add_action('wp_ajax_nopriv_bpp_submit_application', $plugin_public, 'process_application_submission');
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+        
+        // Form handler hooks
+        $this->loader->add_action( 'wp_ajax_bpp_submit_application', $form_handler, 'handle_application_submission' );
+        $this->loader->add_action( 'wp_ajax_nopriv_bpp_submit_application', $form_handler, 'handle_application_submission' );
+        
+        // Register shortcodes
+        $this->loader->add_action( 'init', $this, 'register_shortcodes' );
     }
 
     /**
-     * Register the shortcodes.
+     * Register all shortcodes used by the plugin.
      *
      * @since    1.0.0
-     * @access   private
      */
-    private function register_shortcodes() {
-        $plugin_shortcodes = new BPP_Shortcodes($this->get_plugin_name(), $this->get_version());
+    public function register_shortcodes() {
+        $plugin_public = new BPP_Public( $this->get_plugin_name(), $this->get_version() );
         
-        // Register shortcodes with WordPress
-        add_shortcode('black_potential_pipeline_form', array($plugin_shortcodes, 'render_submission_form'));
-        add_shortcode('black_potential_pipeline_directory', array($plugin_shortcodes, 'render_directory'));
-        add_shortcode('black_potential_pipeline_category', array($plugin_shortcodes, 'render_category_directory'));
-        add_shortcode('black_potential_pipeline_featured', array($plugin_shortcodes, 'render_featured_candidates'));
-        add_shortcode('black_potential_pipeline_stats', array($plugin_shortcodes, 'render_statistics'));
+        add_shortcode( 'bpp_submission_form', array( $plugin_public, 'display_submission_form' ) );
+        add_shortcode( 'bpp_directory', array( $plugin_public, 'display_directory' ) );
+        add_shortcode( 'bpp_category_directory', array( $plugin_public, 'display_category_directory' ) );
+        add_shortcode( 'bpp_featured', array( $plugin_public, 'display_featured_applicants' ) );
+        add_shortcode( 'bpp_stats', array( $plugin_public, 'display_statistics' ) );
     }
 
     /**
