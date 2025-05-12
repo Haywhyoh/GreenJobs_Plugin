@@ -112,6 +112,13 @@ The plugin settings are organized into several sections:
 
 ## Developer Information
 
+### Documentation
+
+The plugin includes detailed documentation for developers:
+
+- [Email Notification System](docs/email-notifications.md) - Overview of the email notification system
+- [Developer Hooks and Filters](docs/developer-hooks.md) - Available hooks and filters for customization
+
 ### Hooks and Filters
 
 The plugin provides several hooks and filters for developers to extend its functionality:
