@@ -1,8 +1,9 @@
 <?php
 /**
- * Provide a public-facing view for a single professional's profile
+ * Template for displaying a single professional profile
  *
- * This file displays the full profile for an individual professional
+ * This template displays detailed information about an individual professional
+ * in the Black Potential Pipeline database.
  *
  * @link       https://example.com
  * @since      1.0.0
@@ -30,7 +31,8 @@ $website = get_post_meta($post_id, 'bpp_website', true);
 $linkedin = get_post_meta($post_id, 'bpp_linkedin', true);
 $email = get_post_meta($post_id, 'bpp_email', true);
 $phone = get_post_meta($post_id, 'bpp_phone', true);
-$resume_url = get_post_meta($post_id, 'bpp_resume_url', true);
+$resume_id = get_post_meta($post_id, 'bpp_resume', true);
+$resume_url = !empty($resume_id) ? wp_get_attachment_url($resume_id) : '';
 $featured = (bool) get_post_meta($post_id, 'bpp_featured', true);
 
 // Get industry from taxonomy
@@ -43,18 +45,21 @@ $related_args = array(
     'post_status' => 'publish',
     'posts_per_page' => 3,
     'post__not_in' => array($post_id),
-    'orderby' => 'rand',
-);
-
-if (!empty($industry_terms)) {
-    $related_args['tax_query'] = array(
+    'tax_query' => array(
         array(
             'taxonomy' => 'bpp_industry',
-            'field' => 'names',
-            'terms' => $industry_terms,
+            'field' => 'name',
+            'terms' => $industry,
         ),
-    );
-}
+    ),
+    'meta_query' => array(
+        array(
+            'key' => 'bpp_approved',
+            'value' => '1',
+            'compare' => '=',
+        ),
+    ),
+);
 
 $related_query = new WP_Query($related_args);
 
@@ -79,7 +84,7 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                     </div>
                 <?php else : ?>
                     <div class="bpp-profile-photo bpp-no-photo">
-                        <span class="dashicons dashicons-businessperson"></span>
+                        <span class="dashicons dashicons-admin-users"></span>
                     </div>
                 <?php endif; ?>
             </div>
@@ -135,8 +140,8 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
         </div>
     </div>
     
-    <div class="bpp-profile-body">
-        <div class="bpp-profile-main-content">
+    <div class="bpp-profile-content">
+        <div class="bpp-profile-main">
             <?php if (!empty($bio)) : ?>
                 <div class="bpp-profile-section bpp-profile-bio">
                     <h3><?php _e('Professional Bio', 'black-potential-pipeline'); ?></h3>
@@ -220,7 +225,7 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                                 </div>
                             <?php else : ?>
                                 <div class="bpp-related-profile-photo bpp-no-photo">
-                                    <span class="dashicons dashicons-businessperson"></span>
+                                    <span class="dashicons dashicons-admin-users"></span>
                                 </div>
                             <?php endif; ?>
                             
@@ -250,7 +255,7 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
         </div>
     <?php endif; ?>
     
-    <div class="bpp-profile-actions">
+    <div class="bpp-profile-navigation">
         <a href="javascript:history.back();" class="bpp-back-button">
             <span class="dashicons dashicons-arrow-left-alt"></span>
             <?php _e('Back to Directory', 'black-potential-pipeline'); ?>
