@@ -164,6 +164,9 @@
                     // Reset form
                     $form[0].reset();
                     
+                    // Optionally hide the form to emphasize success
+                    $form.hide();
+                    
                     // Scroll to message
                     $('html, body').animate({
                         scrollTop: $formMessages.offset().top - 100

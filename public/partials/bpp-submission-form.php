@@ -29,10 +29,10 @@ $industries = get_terms(array(
 // If industries are not properly formatted, provide default industries
 if (empty($industries) || is_wp_error($industries)) {
     $industries = array(
-        array('term_id' => 'nature-based-work', 'name' => 'Nature-based work'),
-        array('term_id' => 'environmental-policy', 'name' => 'Environmental policy'),
-        array('term_id' => 'climate-science', 'name' => 'Climate science'),
-        array('term_id' => 'green-construction', 'name' => 'Green construction & infrastructure')
+        array('term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
+        array('term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
+        array('term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
+        array('term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
     );
 }
 
@@ -50,7 +50,7 @@ $nonce = wp_create_nonce('bpp_form_nonce');
         <p class="bpp-form-description"><?php echo esc_html($description); ?></p>
     </div>
     
-    <div id="bpp-form-messages"></div>
+    <div id="bpp-form-messages" class="bpp-form-messages"></div>
     
     <form id="bpp-submission-form" enctype="multipart/form-data" method="post">
         <?php wp_nonce_field('bpp_form_nonce', 'bpp_nonce'); ?>
@@ -139,9 +139,18 @@ $nonce = wp_create_nonce('bpp_form_nonce');
                     <select id="bpp_industry" name="bpp_industry" 
                             <?php echo in_array('industry', $required_fields) ? 'required' : ''; ?>>
                         <option value=""><?php _e('Select an industry', 'black-potential-pipeline'); ?></option>
-                        <?php foreach ($industries as $industry) : 
-                            $term_id = is_object($industry) ? $industry->term_id : $industry['term_id'];
-                            $name = is_object($industry) ? $industry->name : $industry['name'];
+                        <?php 
+                        foreach ($industries as $industry) : 
+                            // Determine if we're dealing with a term object or a simple array
+                            if (is_object($industry) && isset($industry->term_id) && isset($industry->name)) {
+                                $term_id = $industry->term_id;
+                                $name = $industry->name;
+                            } elseif (is_array($industry) && isset($industry['term_id']) && isset($industry['name'])) {
+                                $term_id = $industry['term_id'];
+                                $name = $industry['name'];
+                            } else {
+                                continue; // Skip if neither format is valid
+                            }
                         ?>
                             <option value="<?php echo esc_attr($term_id); ?>">
                                 <?php echo esc_html($name); ?>
@@ -295,6 +304,24 @@ $nonce = wp_create_nonce('bpp_form_nonce');
         <p><?php _e('Your application has been submitted successfully. Our team will review your information and you\'ll be notified once your profile is approved.', 'black-potential-pipeline'); ?></p>
     </div>
 </div>
+
+<style>
+.bpp-form-messages {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 4px;
+}
+.bpp-form-messages.bpp-success {
+    background-color: #dff0d8;
+    border: 1px solid #d6e9c6;
+    color: #3c763d;
+}
+.bpp-form-messages.bpp-error {
+    background-color: #f2dede;
+    border: 1px solid #ebccd1;
+    color: #a94442;
+}
+</style>
 
 <!-- Include JavaScript for form validation and submission -->
 <script>

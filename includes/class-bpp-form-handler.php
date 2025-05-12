@@ -536,10 +536,19 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         
         // Validate required fields
         foreach ($required_fields as $field) {
-            if (empty($data[$field])) {
+            if ($field !== 'resume' && $field !== 'photo' && empty($data[$field])) {
                 $field_label = isset($form_fields[$field]['label']) ? $form_fields[$field]['label'] : $field;
                 $errors[$field] = sprintf(__('The %s field is required.', 'black-potential-pipeline'), $field_label);
             }
+        }
+        
+        // Validate file uploads separately (they're in $_FILES not $_POST)
+        if (in_array('resume', $required_fields) && (empty($_FILES['resume']) || $_FILES['resume']['error'] !== UPLOAD_ERR_OK)) {
+            $errors['resume'] = __('Resume file is required.', 'black-potential-pipeline');
+        }
+        
+        if (in_array('photo', $required_fields) && (empty($_FILES['photo']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK)) {
+            $errors['photo'] = __('Photo is required.', 'black-potential-pipeline');
         }
         
         // Validate email format
@@ -667,6 +676,9 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             } else {
                 $uploaded_files['resume'] = $resume_result;
             }
+        } elseif (!empty($files['resume']) && $files['resume']['error'] !== UPLOAD_ERR_NO_FILE) {
+            // Handle other upload errors
+            $errors['resume'] = $this->get_file_upload_error_message($files['resume']['error']);
         }
         
         // Process photo upload
@@ -681,6 +693,9 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             } else {
                 $uploaded_files['photo'] = $photo_result;
             }
+        } elseif (!empty($files['photo']) && $files['photo']['error'] !== UPLOAD_ERR_NO_FILE) {
+            // Handle other upload errors
+            $errors['photo'] = $this->get_file_upload_error_message($files['photo']['error']);
         }
         
         // Add errors if found
@@ -757,5 +772,33 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         wp_update_attachment_metadata($attachment_id, $attachment_data);
         
         return $attachment_id;
+    }
+
+    /**
+     * Get the error message for file upload errors
+     *
+     * @since    1.0.0
+     * @param    int    $error_code    The error code from the upload
+     * @return   string                 The human-readable error message
+     */
+    private function get_file_upload_error_message($error_code) {
+        switch ($error_code) {
+            case UPLOAD_ERR_INI_SIZE:
+                return __('The uploaded file exceeds the upload_max_filesize directive in php.ini.', 'black-potential-pipeline');
+            case UPLOAD_ERR_FORM_SIZE:
+                return __('The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.', 'black-potential-pipeline');
+            case UPLOAD_ERR_PARTIAL:
+                return __('The uploaded file was only partially uploaded.', 'black-potential-pipeline');
+            case UPLOAD_ERR_NO_FILE:
+                return __('No file was uploaded.', 'black-potential-pipeline');
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return __('Missing a temporary folder.', 'black-potential-pipeline');
+            case UPLOAD_ERR_CANT_WRITE:
+                return __('Failed to write file to disk.', 'black-potential-pipeline');
+            case UPLOAD_ERR_EXTENSION:
+                return __('A PHP extension stopped the file upload.', 'black-potential-pipeline');
+            default:
+                return __('Unknown upload error.', 'black-potential-pipeline');
+        }
     }
 } 
