@@ -1,0 +1,125 @@
+# Product Requirements Document: Black Potential Pipeline WordPress Plugin
+
+## Overview
+The Black Potential Pipeline plugin is designed to create a curated database of Black professionals seeking green jobs. The plugin will provide a submission form for candidates, an admin screening interface, and a public-facing directory organized by industry categories.
+
+## Target Users
+1. **Applicants**: Black professionals seeking opportunities in green industries
+2. **Administrators**: Staff who will screen and approve applicant profiles
+3. **Employers**: Organizations looking to hire diverse talent in green sectors
+4. **Website Visitors**: General audience interested in diversity in green sectors
+
+## Core Features
+
+### 1. Applicant Submission Form
+- Custom form accessible via shortcode
+- Fields:
+  - Full name (First and Last)
+  - Email address
+  - Phone number (optional)
+  - Resume/CV upload
+  - Cover letter/personal statement
+  - Photograph upload
+  - Industry category selection (Nature-based work, Environmental policy, Climate science, Green construction & infrastructure)
+  - Relevant skills/expertise
+  - Current job title
+  - Years of experience
+  - LinkedIn profile (optional)
+  - Preferred job type (full-time, part-time, contract)
+  - Consent for featuring profile publicly
+  - Location/willingness to relocate
+
+### 2. Admin Dashboard
+- Customized WordPress admin area for managing applications
+- Features:
+  - Review new submissions
+  - Approve/reject applications with one-click actions
+  - Add notes to applications
+  - Edit applications
+  - Sort applications by category, submission date, approval status
+  - Email notifications for new submissions
+  - Export functionality for application data
+  - Analytics section (number of submissions, approval rate, views per profile)
+  - Custom branding for the admin interface
+
+### 3. Public Directory Display
+- Sortable and filterable directory of approved professionals
+- Organized into four main categories:
+  1. Nature-based work
+  2. Environmental policy
+  3. Climate science
+  4. Green construction & infrastructure
+- Features:
+  - Responsive grid/list view of candidates
+  - Search functionality
+  - Filtering by expertise, experience level, location
+  - Individual profile pages for each professional
+  - Contact form for employers to reach out through the platform
+  - Social sharing options for profiles
+
+### 4. Shortcodes
+- `[black_potential_pipeline_form]` - Displays the application form
+- `[black_potential_pipeline_directory]` - Displays the full directory with all categories
+- `[black_potential_pipeline_category category="nature"]` - Displays specific category directory
+- `[black_potential_pipeline_featured]` - Displays featured candidates
+- `[black_potential_pipeline_stats]` - Displays statistics about the pipeline
+
+### 5. Security & Privacy
+- GDPR compliance
+- Secure file storage for resumes
+- Privacy controls for applicant information
+- Anti-spam measures
+- Data export and deletion options
+
+## Technical Requirements
+1. WordPress 5.7+
+2. PHP 7.4+
+3. MySQL 5.6+
+4. Support for file uploads (resume, photos)
+5. Custom post types and taxonomies
+6. Custom admin pages
+7. Front-end submission forms
+8. Database for storing applicant information
+9. Email notification system
+
+## Development Phases
+
+### Phase 1: Setup and Basic Structure
+- Plugin initialization files
+- Database schema
+- Custom post types
+- Admin menu integration
+
+### Phase 2: Backend Implementation
+- Admin dashboard customization
+- Application review system
+- Email notification system
+- Admin filtering and search
+
+### Phase 3: Frontend Implementation
+- Submission form
+- Directory display
+- Shortcodes implementation
+- Profile templates
+
+### Phase 4: Polish and Testing
+- Security review
+- User testing
+- Performance optimization
+- Documentation
+
+## Success Metrics
+- Number of quality submissions
+- Engagement from employers
+- Success stories (placements)
+- User feedback (both applicants and employers)
+- Admin efficiency in screening candidates
+
+## Future Enhancements
+- Integration with job boards
+- Automated initial screening
+- Employer accounts
+- Application tracking system
+- Interview scheduling
+- Newsletter for new candidates
+- Success stories showcase 

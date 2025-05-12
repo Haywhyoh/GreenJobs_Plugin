@@ -1,0 +1,631 @@
+/**
+ * All of the CSS for your public-facing functionality should be
+ * included in this file.
+ */
+
+/* Common Styles */
+.bpp-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.bpp-section-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.bpp-section-description {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+/* Form Styles */
+.bpp-submission-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.bpp-form-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.bpp-form-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.bpp-form-description {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.bpp-form-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.bpp-form-section h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.bpp-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px 15px;
+}
+
+.bpp-form-field {
+    flex: 1 0 300px;
+    padding: 0 10px;
+    margin-bottom: 15px;
+}
+
+.bpp-form-field.bpp-full-width {
+    flex: 1 0 100%;
+}
+
+.bpp-form-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.bpp-form-field label .required {
+    color: #dc3232;
+}
+
+.bpp-form-field input[type="text"],
+.bpp-form-field input[type="email"],
+.bpp-form-field input[type="tel"],
+.bpp-form-field input[type="url"],
+.bpp-form-field input[type="number"],
+.bpp-form-field select,
+.bpp-form-field textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.bpp-form-field textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.bpp-field-description {
+    font-size: 12px;
+    color: #777;
+    margin-top: 5px;
+}
+
+.bpp-checkbox-field {
+    display: flex;
+    align-items: flex-start;
+}
+
+.bpp-checkbox-field input[type="checkbox"] {
+    margin-top: 3px;
+    margin-right: 10px;
+}
+
+.bpp-form-notice {
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.bpp-form-success {
+    background-color: #dff0d8;
+    border: 1px solid #d6e9c6;
+    color: #3c763d;
+}
+
+.bpp-form-error {
+    background-color: #f2dede;
+    border: 1px solid #ebccd1;
+    color: #a94442;
+}
+
+.bpp-form-actions {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.bpp-submit-button {
+    background-color: #0073aa;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.bpp-submit-button:hover {
+    background-color: #005f8b;
+}
+
+/* Directory Styles */
+.bpp-directory-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.bpp-directory-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.bpp-directory-title {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.bpp-directory-description {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.bpp-directory-filters {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.bpp-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin: 0 -10px;
+}
+
+.bpp-filter-field {
+    flex: 1 0 200px;
+    padding: 0 10px;
+    margin-bottom: 10px;
+}
+
+.bpp-filter-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+}
+
+.bpp-filter-field select,
+.bpp-filter-field input[type="text"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.bpp-filter-actions {
+    flex: 0 0 auto;
+    padding: 0 10px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.bpp-filter-button {
+    background-color: #0073aa;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.bpp-reset-button {
+    background-color: #f7f7f7;
+    color: #555;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 15px;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.bpp-directory-layout-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.bpp-layout-button {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.bpp-layout-button.active {
+    background-color: #0073aa;
+    border-color: #0073aa;
+    color: #fff;
+}
+
+.bpp-layout-button .dashicons {
+    margin-right: 5px;
+}
+
+.bpp-directory-results {
+    margin-bottom: 20px;
+}
+
+.bpp-results-count {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Grid Layout */
+.bpp-directory-content.bpp-layout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* List Layout */
+.bpp-directory-content.bpp-layout-list .bpp-professional-card {
+    margin-bottom: 20px;
+}
+
+/* Professional Card */
+.bpp-professional-card {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.bpp-professional-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.bpp-professional-header {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+.bpp-professional-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.bpp-professional-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bpp-professional-photo.bpp-no-photo {
+    background-color: #f7f7f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bpp-professional-photo.bpp-no-photo .dashicons {
+    font-size: 30px;
+    color: #ddd;
+}
+
+.bpp-professional-info {
+    flex: 1;
+}
+
+.bpp-professional-name {
+    margin: 0 0 5px;
+    font-size: 18px;
+    color: #333;
+}
+
+.bpp-professional-title {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.bpp-professional-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12px;
+    color: #777;
+}
+
+.bpp-professional-meta span {
+    display: flex;
+    align-items: center;
+}
+
+.bpp-professional-meta .dashicons {
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.bpp-professional-content {
+    padding: 15px;
+}
+
+.bpp-professional-excerpt {
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.bpp-professional-skills h4 {
+    margin: 0 0 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+.bpp-professional-skills p {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
+}
+
+.bpp-professional-footer {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.bpp-view-profile {
+    display: inline-block;
+    background-color: #0073aa;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.bpp-view-profile:hover {
+    background-color: #005f8b;
+}
+
+.bpp-directory-pagination {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.bpp-directory-pagination .page-numbers {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 2px;
+    border: 1px solid #ddd;
+    color: #0073aa;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.bpp-directory-pagination .page-numbers.current {
+    background-color: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+.bpp-no-results {
+    text-align: center;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    color: #555;
+}
+
+/* Featured Candidates */
+.bpp-featured-container {
+    margin-bottom: 40px;
+}
+
+.bpp-featured-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.bpp-featured-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.bpp-featured-description {
+    font-size: 16px;
+    color: #555;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.bpp-featured-carousel {
+    position: relative;
+}
+
+.bpp-carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.bpp-carousel-prev {
+    left: -20px;
+}
+
+.bpp-carousel-next {
+    right: -20px;
+}
+
+/* Statistics Display */
+.bpp-stats-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+.bpp-stats-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.bpp-stats-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.bpp-stats-description {
+    font-size: 16px;
+    color: #555;
+}
+
+.bpp-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.bpp-stat-box {
+    text-align: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+.bpp-stat-number {
+    font-size: 36px;
+    font-weight: bold;
+    color: #0073aa;
+    margin-bottom: 10px;
+}
+
+.bpp-stat-label {
+    font-size: 14px;
+    color: #555;
+}
+
+.bpp-category-stats {
+    margin-top: 30px;
+}
+
+.bpp-category-stats h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #333;
+}
+
+.bpp-category-chart {
+    height: 300px;
+    margin-top: 20px;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
+    .bpp-form-field {
+        flex: 1 0 100%;
+    }
+    
+    .bpp-directory-content.bpp-layout-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .bpp-professional-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .bpp-professional-photo {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .bpp-professional-meta {
+        justify-content: center;
+    }
+    
+    .bpp-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .bpp-directory-content.bpp-layout-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bpp-filter-row {
+        flex-direction: column;
+    }
+    
+    .bpp-filter-field {
+        flex: 1 0 100%;
+    }
+    
+    .bpp-filter-actions {
+        flex: 1 0 100%;
+        justify-content: space-between;
+    }
+    
+    .bpp-stats-grid {
+        grid-template-columns: 1fr;
+    }
+} 
