@@ -1,8 +1,9 @@
 <?php
 /**
- * Provide a public-facing view for statistics display
+ * Template for displaying statistics about the Black Potential Pipeline
  *
- * This file displays aggregated statistics about the professionals in the database
+ * This template displays various statistics and metrics about the professionals
+ * in the Black Potential Pipeline database.
  *
  * @link       https://example.com
  * @since      1.0.0
@@ -31,78 +32,89 @@ $industries = get_terms(array(
     'hide_empty' => true,
 ));
 
-// Setup industry data array
+// Prepare industry data
 $industry_data = array();
+$max_industry = 0;
+
 foreach ($industries as $industry) {
-    $industry_data[$industry->name] = $industry->count;
+    $count = $industry->count;
+    $industry_data[$industry->name] = $count;
+    $max_industry = max($max_industry, $count);
 }
 
-// Get experience levels counts
+// Prepare experience level data
 $experience_levels = array(
     '0-2' => 0,
     '3-5' => 0,
     '6-10' => 0,
-    '10+' => 0
+    '10+' => 0,
 );
 
 $experience_query = new WP_Query(array(
     'post_type' => 'bpp_applicant',
     'post_status' => 'publish',
     'posts_per_page' => -1,
-    'fields' => 'ids',
 ));
 
 if ($experience_query->have_posts()) {
-    foreach ($experience_query->posts as $post_id) {
-        $experience = get_post_meta($post_id, 'bpp_years_experience', true);
+    foreach ($experience_query->posts as $post) {
+        $experience = get_post_meta($post->ID, 'bpp_years_experience', true);
         if (!empty($experience) && isset($experience_levels[$experience])) {
             $experience_levels[$experience]++;
         }
     }
 }
 
-// Get monthly growth data for the past 6 months
+$max_experience = max($experience_levels);
+
+// Prepare growth data (last 6 months)
 $growth_data = array();
+$max_growth = 0;
+
+// Get current month and year
 $current_month = date('n');
 $current_year = date('Y');
 
-for ($i = 5; $i >= 0; $i--) {
+// Calculate data for the last 6 months
+for ($i = 0; $i < 6; $i++) {
     $month = $current_month - $i;
     $year = $current_year;
     
     if ($month <= 0) {
         $month += 12;
-        $year -= 1;
+        $year--;
     }
     
-    $month_name = date('M', mktime(0, 0, 0, $month, 1, $year));
+    $month_name = date('M Y', mktime(0, 0, 0, $month, 1, $year));
+    
+    // Start and end dates for this month
+    $start_date = date('Y-m-01', mktime(0, 0, 0, $month, 1, $year));
+    $end_date = date('Y-m-t', mktime(0, 0, 0, $month, 1, $year));
     
     $args = array(
         'post_type' => 'bpp_applicant',
         'post_status' => 'publish',
         'date_query' => array(
             array(
-                'year' => $year,
-                'month' => $month,
+                'after' => $start_date,
+                'before' => $end_date,
+                'inclusive' => true,
             ),
         ),
-        'posts_per_page' => -1,
-        'fields' => 'ids',
     );
     
     $monthly_query = new WP_Query($args);
     $growth_data[$month_name] = $monthly_query->found_posts;
+    $max_growth = max($max_growth, $monthly_query->found_posts);
 }
 
-// Get fields to display based on the 'show' attribute
+// Reverse the growth data to show oldest to newest
+$growth_data = array_reverse($growth_data);
+
+// Determine which sections to show
 $show_industries = ($show === 'all' || $show === 'industries');
 $show_experience = ($show === 'all' || $show === 'experience');
 $show_growth = ($show === 'all' || $show === 'growth');
-
-// Find max values for percentage calculations
-$max_industry = !empty($industry_data) ? max($industry_data) : 1;
-$max_experience = !empty($experience_levels) ? max($experience_levels) : 1;
-$max_growth = !empty($growth_data) ? max($growth_data) : 1;
 ?>
 
 <div class="bpp-statistics-container">
@@ -119,8 +131,7 @@ $max_growth = !empty($growth_data) ? max($growth_data) : 1;
     </div>
     
     <?php if ($style === 'cards') : ?>
-        <div class="bpp-statistics-grid">
-            <!-- Industries Distribution -->
+        <div class="bpp-statistics-cards">
             <?php if ($show_industries && !empty($industry_data)) : ?>
                 <div class="bpp-stat-card bpp-industries-card">
                     <h3><?php _e('Industries', 'black-potential-pipeline'); ?></h3>
@@ -140,7 +151,6 @@ $max_growth = !empty($growth_data) ? max($growth_data) : 1;
                 </div>
             <?php endif; ?>
             
-            <!-- Experience Levels -->
             <?php if ($show_experience && !empty($experience_levels)) : ?>
                 <div class="bpp-stat-card bpp-experience-card">
                     <h3><?php _e('Experience Levels', 'black-potential-pipeline'); ?></h3>
@@ -177,7 +187,6 @@ $max_growth = !empty($growth_data) ? max($growth_data) : 1;
                 </div>
             <?php endif; ?>
             
-            <!-- Growth Over Time -->
             <?php if ($show_growth && !empty($growth_data)) : ?>
                 <div class="bpp-stat-card bpp-growth-card">
                     <h3><?php _e('Monthly Growth', 'black-potential-pipeline'); ?></h3>
@@ -198,9 +207,7 @@ $max_growth = !empty($growth_data) ? max($growth_data) : 1;
             <?php endif; ?>
         </div>
     <?php else : ?>
-        <!-- Bar Chart Style -->
-        <div class="bpp-statistics-charts">
-            <!-- Industries Distribution -->
+        <div class="bpp-statistics-bars">
             <?php if ($show_industries && !empty($industry_data)) : ?>
                 <div class="bpp-chart-section">
                     <h3><?php _e('Industries', 'black-potential-pipeline'); ?></h3>
@@ -219,7 +226,6 @@ $max_growth = !empty($growth_data) ? max($growth_data) : 1;
                 </div>
             <?php endif; ?>
             
-            <!-- Experience Levels -->
             <?php if ($show_experience && !empty($experience_levels)) : ?>
                 <div class="bpp-chart-section">
                     <h3><?php _e('Experience Levels', 'black-potential-pipeline'); ?></h3>
@@ -255,7 +261,6 @@ $max_growth = !empty($growth_data) ? max($growth_data) : 1;
                 </div>
             <?php endif; ?>
             
-            <!-- Growth Over Time -->
             <?php if ($show_growth && !empty($growth_data)) : ?>
                 <div class="bpp-chart-section">
                     <h3><?php _e('Monthly Growth', 'black-potential-pipeline'); ?></h3>
