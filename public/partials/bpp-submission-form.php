@@ -26,6 +26,16 @@ $industries = get_terms(array(
     'hide_empty' => false,
 ));
 
+// If industries are not properly formatted, provide default industries
+if (empty($industries) || is_wp_error($industries)) {
+    $industries = array(
+        array('term_id' => 'nature-based-work', 'name' => 'Nature-based work'),
+        array('term_id' => 'environmental-policy', 'name' => 'Environmental policy'),
+        array('term_id' => 'climate-science', 'name' => 'Climate science'),
+        array('term_id' => 'green-construction', 'name' => 'Green construction & infrastructure')
+    );
+}
+
 // Get form fields configuration from settings (or use defaults)
 $required_fields = get_option('bpp_required_fields', array('first_name', 'last_name', 'email', 'industry', 'resume'));
 $optional_fields = get_option('bpp_optional_fields', array('phone', 'website', 'linkedin', 'years_experience', 'skills', 'photo', 'bio'));
@@ -129,9 +139,12 @@ $nonce = wp_create_nonce('bpp_submission_nonce');
                     <select id="bpp_industry" name="bpp_industry" 
                             <?php echo in_array('industry', $required_fields) ? 'required' : ''; ?>>
                         <option value=""><?php _e('Select an industry', 'black-potential-pipeline'); ?></option>
-                        <?php foreach ($industries as $industry) : ?>
-                            <option value="<?php echo esc_attr($industry->term_id); ?>">
-                                <?php echo esc_html($industry->name); ?>
+                        <?php foreach ($industries as $industry) : 
+                            $term_id = is_object($industry) ? $industry->term_id : $industry['term_id'];
+                            $name = is_object($industry) ? $industry->name : $industry['name'];
+                        ?>
+                            <option value="<?php echo esc_attr($term_id); ?>">
+                                <?php echo esc_html($name); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
