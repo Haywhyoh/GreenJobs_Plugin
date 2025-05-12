@@ -149,4 +149,4 @@ For support, please contact [your support email or website].
 
 ## Credits
 
-Developed by [Your Name or Organization]. 
+Developed by [Adedayo Ayomide Samuel]. 
