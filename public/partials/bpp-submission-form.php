@@ -19,6 +19,7 @@ if (!defined('WPINC')) {
 // Set default values for attributes
 $title = isset($atts['title']) ? sanitize_text_field($atts['title']) : __('Apply to the Black Potential Pipeline', 'black-potential-pipeline');
 $description = isset($atts['description']) ? sanitize_text_field($atts['description']) : __('Submit your information to be included in our database of Black professionals seeking green jobs.', 'black-potential-pipeline');
+$use_bootstrap = isset($atts['use_bootstrap']) ? $atts['use_bootstrap'] === 'yes' : true;
 
 // Get industries from taxonomy
 $industries = get_terms(array(
@@ -42,269 +43,422 @@ $optional_fields = get_option('bpp_optional_fields', array('phone', 'website', '
 
 // Generate nonce for form submission
 $nonce = wp_create_nonce('bpp_form_nonce');
+
+// Define CSS classes based on whether Bootstrap is enabled
+$container_class = $use_bootstrap ? 'container py-4 bpp-submission-form' : 'bpp-form-container';
+$form_class = $use_bootstrap ? 'needs-validation' : '';
+$form_group_class = $use_bootstrap ? 'mb-3' : 'bpp-form-group';
+$form_row_class = $use_bootstrap ? 'row g-3' : 'bpp-form-row';
+$input_class = $use_bootstrap ? 'form-control' : '';
+$select_class = $use_bootstrap ? 'form-select' : '';
+$label_class = $use_bootstrap ? 'form-label' : '';
+$check_class = $use_bootstrap ? 'form-check' : 'bpp-terms-group';
+$check_input_class = $use_bootstrap ? 'form-check-input' : '';
+$check_label_class = $use_bootstrap ? 'form-check-label' : '';
+$button_class = $use_bootstrap ? 'btn btn-primary' : 'bpp-button bpp-button-primary';
+$required_class = $use_bootstrap ? 'text-danger' : 'required';
+$section_class = $use_bootstrap ? 'mb-4' : 'bpp-form-section';
+$col_class = $use_bootstrap ? 'col-md-6' : '';
+$card_class = $use_bootstrap ? 'card mb-4' : '';
+$card_header_class = $use_bootstrap ? 'card-header bg-primary text-white' : '';
+$card_body_class = $use_bootstrap ? 'card-body' : '';
+$alert_success_class = $use_bootstrap ? 'alert alert-success' : 'bpp-form-messages bpp-success';
+$alert_error_class = $use_bootstrap ? 'alert alert-danger' : 'bpp-form-messages bpp-error';
+$error_feedback_class = $use_bootstrap ? 'invalid-feedback' : 'bpp-field-error';
+$help_text_class = $use_bootstrap ? 'form-text text-muted' : 'bpp-field-help';
+$spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light ms-2' : 'bpp-spinner';
 ?>
 
-<div class="bpp-form-container">
-    <div class="bpp-form-header">
-        <h2 class="bpp-form-title"><?php echo esc_html($title); ?></h2>
-        <p class="bpp-form-description"><?php echo esc_html($description); ?></p>
-    </div>
+<div class="<?php echo esc_attr($container_class); ?>">
+    <?php if ($use_bootstrap): ?>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+    <?php endif; ?>
     
-    <div id="bpp-form-messages" class="bpp-form-messages"></div>
-    
-    <form id="bpp-submission-form" enctype="multipart/form-data" method="post">
-        <?php wp_nonce_field('bpp_form_nonce', 'bpp_nonce'); ?>
-        
-        <div class="bpp-form-section">
-            <h3><?php _e('Personal Information', 'black-potential-pipeline'); ?></h3>
-            
-            <div class="bpp-form-row">
-                <div class="bpp-form-group">
-                    <label for="bpp_first_name">
-                        <?php _e('First Name', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('first_name', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <input type="text" id="bpp_first_name" name="bpp_first_name" 
-                           <?php echo in_array('first_name', $required_fields) ? 'required' : ''; ?>>
-                    <span class="bpp-field-error" id="bpp_first_name_error"></span>
+            <?php if ($use_bootstrap): ?>
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="m-0"><?php echo esc_html($title); ?></h2>
                 </div>
-                
-                <div class="bpp-form-group">
-                    <label for="bpp_last_name">
-                        <?php _e('Last Name', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('last_name', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <input type="text" id="bpp_last_name" name="bpp_last_name" 
-                           <?php echo in_array('last_name', $required_fields) ? 'required' : ''; ?>>
-                    <span class="bpp-field-error" id="bpp_last_name_error"></span>
+                <div class="card-body">
+                    <p class="lead"><?php echo esc_html($description); ?></p>
                 </div>
             </div>
-            
-            <div class="bpp-form-row">
-                <div class="bpp-form-group">
-                    <label for="bpp_email">
-                        <?php _e('Email Address', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('email', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <input type="email" id="bpp_email" name="bpp_email" 
-                           <?php echo in_array('email', $required_fields) ? 'required' : ''; ?>>
-                    <span class="bpp-field-error" id="bpp_email_error"></span>
-                </div>
+            <?php else: ?>
+            <div class="bpp-form-header">
+                <h2 class="bpp-form-title"><?php echo esc_html($title); ?></h2>
+                <p class="bpp-form-description"><?php echo esc_html($description); ?></p>
+            </div>
+            <?php endif; ?>
+    
+            <div id="bpp-form-messages" class="d-none"></div>
+    
+            <form id="bpp-submission-form" enctype="multipart/form-data" method="post" class="<?php echo esc_attr($form_class); ?>" novalidate>
+                <?php wp_nonce_field('bpp_form_nonce', 'bpp_nonce'); ?>
                 
-                <?php if (in_array('phone', array_merge($required_fields, $optional_fields))) : ?>
-                    <div class="bpp-form-group">
-                        <label for="bpp_phone">
-                            <?php _e('Phone Number', 'black-potential-pipeline'); ?>
-                            <?php if (in_array('phone', $required_fields)) : ?>
-                                <span class="required">*</span>
-                            <?php endif; ?>
-                        </label>
-                        <input type="tel" id="bpp_phone" name="bpp_phone" 
-                               <?php echo in_array('phone', $required_fields) ? 'required' : ''; ?>>
-                        <span class="bpp-field-error" id="bpp_phone_error"></span>
+                <?php if ($use_bootstrap): ?>
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h5 m-0"><?php _e('Personal Information', 'black-potential-pipeline'); ?></h3>
                     </div>
+                    <div class="card-body">
+                <?php else: ?>
+                <div class="bpp-form-section">
+                    <h3><?php _e('Personal Information', 'black-potential-pipeline'); ?></h3>
                 <?php endif; ?>
-            </div>
-        </div>
-        
-        <div class="bpp-form-section">
-            <h3><?php _e('Professional Information', 'black-potential-pipeline'); ?></h3>
-            
-            <div class="bpp-form-row">
-                <div class="bpp-form-group">
-                    <label for="bpp_job_title">
-                        <?php _e('Job Title', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('job_title', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <input type="text" id="bpp_job_title" name="bpp_job_title" 
-                           <?php echo in_array('job_title', $required_fields) ? 'required' : ''; ?>>
-                    <span class="bpp-field-error" id="bpp_job_title_error"></span>
-                </div>
                 
-                <div class="bpp-form-group">
-                    <label for="bpp_industry">
-                        <?php _e('Industry', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('industry', $required_fields)) : ?>
-                            <span class="required">*</span>
+                    <div class="<?php echo esc_attr($form_row_class); ?>">
+                        <div class="<?php echo esc_attr($col_class); ?>">
+                            <div class="<?php echo esc_attr($form_group_class); ?>">
+                                <label for="bpp_first_name" class="<?php echo esc_attr($label_class); ?>">
+                                    <?php _e('First Name', 'black-potential-pipeline'); ?>
+                                    <?php if (in_array('first_name', $required_fields)) : ?>
+                                        <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                    <?php endif; ?>
+                                </label>
+                                <input type="text" id="bpp_first_name" name="bpp_first_name" 
+                                       class="<?php echo esc_attr($input_class); ?>"
+                                       <?php echo in_array('first_name', $required_fields) ? 'required' : ''; ?>>
+                                <div id="bpp_first_name_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="<?php echo esc_attr($col_class); ?>">
+                            <div class="<?php echo esc_attr($form_group_class); ?>">
+                                <label for="bpp_last_name" class="<?php echo esc_attr($label_class); ?>">
+                                    <?php _e('Last Name', 'black-potential-pipeline'); ?>
+                                    <?php if (in_array('last_name', $required_fields)) : ?>
+                                        <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                    <?php endif; ?>
+                                </label>
+                                <input type="text" id="bpp_last_name" name="bpp_last_name" 
+                                       class="<?php echo esc_attr($input_class); ?>"
+                                       <?php echo in_array('last_name', $required_fields) ? 'required' : ''; ?>>
+                                <div id="bpp_last_name_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="<?php echo esc_attr($form_row_class); ?>">
+                        <div class="<?php echo esc_attr($col_class); ?>">
+                            <div class="<?php echo esc_attr($form_group_class); ?>">
+                                <label for="bpp_email" class="<?php echo esc_attr($label_class); ?>">
+                                    <?php _e('Email Address', 'black-potential-pipeline'); ?>
+                                    <?php if (in_array('email', $required_fields)) : ?>
+                                        <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                    <?php endif; ?>
+                                </label>
+                                <input type="email" id="bpp_email" name="bpp_email" 
+                                       class="<?php echo esc_attr($input_class); ?>"
+                                       <?php echo in_array('email', $required_fields) ? 'required' : ''; ?>>
+                                <div id="bpp_email_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                            </div>
+                        </div>
+                        
+                        <?php if (in_array('phone', array_merge($required_fields, $optional_fields))) : ?>
+                            <div class="<?php echo esc_attr($col_class); ?>">
+                                <div class="<?php echo esc_attr($form_group_class); ?>">
+                                    <label for="bpp_phone" class="<?php echo esc_attr($label_class); ?>">
+                                        <?php _e('Phone Number', 'black-potential-pipeline'); ?>
+                                        <?php if (in_array('phone', $required_fields)) : ?>
+                                            <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                        <?php endif; ?>
+                                    </label>
+                                    <input type="tel" id="bpp_phone" name="bpp_phone" 
+                                           class="<?php echo esc_attr($input_class); ?>"
+                                           <?php echo in_array('phone', $required_fields) ? 'required' : ''; ?>>
+                                    <div id="bpp_phone_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                                </div>
+                            </div>
                         <?php endif; ?>
-                    </label>
-                    <select id="bpp_industry" name="bpp_industry" 
-                            <?php echo in_array('industry', $required_fields) ? 'required' : ''; ?>>
-                        <option value=""><?php _e('Select an industry', 'black-potential-pipeline'); ?></option>
-                        <?php 
-                        foreach ($industries as $industry) : 
-                            // Determine if we're dealing with a term object or a simple array
-                            if (is_object($industry) && isset($industry->term_id) && isset($industry->name)) {
-                                $term_id = $industry->term_id;
-                                $name = $industry->name;
-                            } elseif (is_array($industry) && isset($industry['term_id']) && isset($industry['name'])) {
-                                $term_id = $industry['term_id'];
-                                $name = $industry['name'];
-                            } else {
-                                continue; // Skip if neither format is valid
-                            }
-                        ?>
-                            <option value="<?php echo esc_attr($term_id); ?>">
-                                <?php echo esc_html($name); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <span class="bpp-field-error" id="bpp_industry_error"></span>
+                    </div>
+                <?php if ($use_bootstrap): ?>
+                    </div>
                 </div>
+                <?php else: ?>
+                </div>
+                <?php endif; ?>
+                
+                <?php if ($use_bootstrap): ?>
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h5 m-0"><?php _e('Professional Information', 'black-potential-pipeline'); ?></h3>
+                    </div>
+                    <div class="card-body">
+                <?php else: ?>
+                <div class="bpp-form-section">
+                    <h3><?php _e('Professional Information', 'black-potential-pipeline'); ?></h3>
+                <?php endif; ?>
+                
+                    <div class="<?php echo esc_attr($form_row_class); ?>">
+                        <div class="<?php echo esc_attr($col_class); ?>">
+                            <div class="<?php echo esc_attr($form_group_class); ?>">
+                                <label for="bpp_job_title" class="<?php echo esc_attr($label_class); ?>">
+                                    <?php _e('Job Title', 'black-potential-pipeline'); ?>
+                                    <?php if (in_array('job_title', $required_fields)) : ?>
+                                        <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                    <?php endif; ?>
+                                </label>
+                                <input type="text" id="bpp_job_title" name="bpp_job_title" 
+                                       class="<?php echo esc_attr($input_class); ?>"
+                                       <?php echo in_array('job_title', $required_fields) ? 'required' : ''; ?>>
+                                <div id="bpp_job_title_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="<?php echo esc_attr($col_class); ?>">
+                            <div class="<?php echo esc_attr($form_group_class); ?>">
+                                <label for="bpp_industry" class="<?php echo esc_attr($label_class); ?>">
+                                    <?php _e('Industry', 'black-potential-pipeline'); ?>
+                                    <?php if (in_array('industry', $required_fields)) : ?>
+                                        <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                    <?php endif; ?>
+                                </label>
+                                <select id="bpp_industry" name="bpp_industry" 
+                                        class="<?php echo esc_attr($select_class); ?>"
+                                        <?php echo in_array('industry', $required_fields) ? 'required' : ''; ?>>
+                                    <option value=""><?php _e('Select an industry', 'black-potential-pipeline'); ?></option>
+                                    <?php 
+                                    foreach ($industries as $industry) : 
+                                        // Determine if we're dealing with a term object or a simple array
+                                        if (is_object($industry) && isset($industry->term_id) && isset($industry->name)) {
+                                            $term_id = $industry->term_id;
+                                            $name = $industry->name;
+                                        } elseif (is_array($industry) && isset($industry['term_id']) && isset($industry['name'])) {
+                                            $term_id = $industry['term_id'];
+                                            $name = $industry['name'];
+                                        } else {
+                                            continue; // Skip if neither format is valid
+                                        }
+                                    ?>
+                                        <option value="<?php echo esc_attr($term_id); ?>">
+                                            <?php echo esc_html($name); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div id="bpp_industry_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <?php if (in_array('years_experience', array_merge($required_fields, $optional_fields))) : ?>
+                        <div class="<?php echo esc_attr($form_group_class); ?>">
+                            <label for="bpp_years_experience" class="<?php echo esc_attr($label_class); ?>">
+                                <?php _e('Years of Experience', 'black-potential-pipeline'); ?>
+                                <?php if (in_array('years_experience', $required_fields)) : ?>
+                                    <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <select id="bpp_years_experience" name="bpp_years_experience" 
+                                    class="<?php echo esc_attr($select_class); ?>"
+                                    <?php echo in_array('years_experience', $required_fields) ? 'required' : ''; ?>>
+                                <option value=""><?php _e('Select years of experience', 'black-potential-pipeline'); ?></option>
+                                <option value="0-2"><?php _e('0-2 years', 'black-potential-pipeline'); ?></option>
+                                <option value="3-5"><?php _e('3-5 years', 'black-potential-pipeline'); ?></option>
+                                <option value="6-10"><?php _e('6-10 years', 'black-potential-pipeline'); ?></option>
+                                <option value="10+"><?php _e('10+ years', 'black-potential-pipeline'); ?></option>
+                            </select>
+                            <div id="bpp_years_experience_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if (in_array('skills', array_merge($required_fields, $optional_fields))) : ?>
+                        <div class="<?php echo esc_attr($form_group_class); ?>">
+                            <label for="bpp_skills" class="<?php echo esc_attr($label_class); ?>">
+                                <?php _e('Skills', 'black-potential-pipeline'); ?>
+                                <?php if (in_array('skills', $required_fields)) : ?>
+                                    <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <textarea id="bpp_skills" name="bpp_skills" rows="3" 
+                                      class="<?php echo esc_attr($input_class); ?>"
+                                      placeholder="<?php _e('List your skills separated by commas', 'black-potential-pipeline'); ?>"
+                                      <?php echo in_array('skills', $required_fields) ? 'required' : ''; ?>></textarea>
+                            <div id="bpp_skills_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                        </div>
+                    <?php endif; ?>
+                <?php if ($use_bootstrap): ?>
+                    </div>
+                </div>
+                <?php else: ?>
+                </div>
+                <?php endif; ?>
+                
+                <?php if (in_array('website', array_merge($required_fields, $optional_fields)) || in_array('linkedin', array_merge($required_fields, $optional_fields))): ?>
+                <?php if ($use_bootstrap): ?>
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h5 m-0"><?php _e('Online Presence', 'black-potential-pipeline'); ?></h3>
+                    </div>
+                    <div class="card-body">
+                <?php else: ?>
+                <div class="bpp-form-section">
+                    <h3><?php _e('Online Presence', 'black-potential-pipeline'); ?></h3>
+                <?php endif; ?>
+                
+                    <?php if (in_array('website', array_merge($required_fields, $optional_fields))) : ?>
+                        <div class="<?php echo esc_attr($form_group_class); ?>">
+                            <label for="bpp_website" class="<?php echo esc_attr($label_class); ?>">
+                                <?php _e('Website', 'black-potential-pipeline'); ?>
+                                <?php if (in_array('website', $required_fields)) : ?>
+                                    <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <input type="url" id="bpp_website" name="bpp_website" 
+                                   class="<?php echo esc_attr($input_class); ?>"
+                                   placeholder="https://" 
+                                   <?php echo in_array('website', $required_fields) ? 'required' : ''; ?>>
+                            <div id="bpp_website_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if (in_array('linkedin', array_merge($required_fields, $optional_fields))) : ?>
+                        <div class="<?php echo esc_attr($form_group_class); ?>">
+                            <label for="bpp_linkedin" class="<?php echo esc_attr($label_class); ?>">
+                                <?php _e('LinkedIn Profile', 'black-potential-pipeline'); ?>
+                                <?php if (in_array('linkedin', $required_fields)) : ?>
+                                    <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <input type="url" id="bpp_linkedin" name="bpp_linkedin" 
+                                   class="<?php echo esc_attr($input_class); ?>"
+                                   placeholder="https://linkedin.com/in/yourprofile" 
+                                   <?php echo in_array('linkedin', $required_fields) ? 'required' : ''; ?>>
+                            <div id="bpp_linkedin_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                        </div>
+                    <?php endif; ?>
+                <?php if ($use_bootstrap): ?>
+                    </div>
+                </div>
+                <?php else: ?>
+                </div>
+                <?php endif; ?>
+                <?php endif; ?>
+                
+                <?php if ($use_bootstrap): ?>
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h5 m-0"><?php _e('Additional Information', 'black-potential-pipeline'); ?></h3>
+                    </div>
+                    <div class="card-body">
+                <?php else: ?>
+                <div class="bpp-form-section">
+                    <h3><?php _e('Additional Information', 'black-potential-pipeline'); ?></h3>
+                <?php endif; ?>
+                
+                    <?php if (in_array('bio', array_merge($required_fields, $optional_fields))) : ?>
+                        <div class="<?php echo esc_attr($form_group_class); ?>">
+                            <label for="bpp_bio" class="<?php echo esc_attr($label_class); ?>">
+                                <?php _e('Professional Bio', 'black-potential-pipeline'); ?>
+                                <?php if (in_array('bio', $required_fields)) : ?>
+                                    <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <textarea id="bpp_bio" name="bpp_bio" rows="5" 
+                                      class="<?php echo esc_attr($input_class); ?>"
+                                      placeholder="<?php _e('Tell us about yourself and your professional background', 'black-potential-pipeline'); ?>"
+                                      <?php echo in_array('bio', $required_fields) ? 'required' : ''; ?>></textarea>
+                            <div id="bpp_bio_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if (in_array('resume', array_merge($required_fields, $optional_fields))) : ?>
+                        <div class="<?php echo esc_attr($form_group_class); ?>">
+                            <label for="bpp_resume" class="<?php echo esc_attr($label_class); ?>">
+                                <?php _e('Resume/CV (PDF format)', 'black-potential-pipeline'); ?>
+                                <?php if (in_array('resume', $required_fields)) : ?>
+                                    <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <input type="file" id="bpp_resume" name="bpp_resume" 
+                                   class="<?php echo $use_bootstrap ? 'form-control' : ''; ?>"
+                                   accept=".pdf" 
+                                   <?php echo in_array('resume', $required_fields) ? 'required' : ''; ?>>
+                            <div id="bpp_resume_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                            <small class="<?php echo esc_attr($help_text_class); ?>">
+                                <?php _e('Maximum file size: 5MB', 'black-potential-pipeline'); ?>
+                            </small>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if (in_array('photo', array_merge($required_fields, $optional_fields))) : ?>
+                        <div class="<?php echo esc_attr($form_group_class); ?>">
+                            <label for="bpp_photo" class="<?php echo esc_attr($label_class); ?>">
+                                <?php _e('Professional Photo', 'black-potential-pipeline'); ?>
+                                <?php if (in_array('photo', $required_fields)) : ?>
+                                    <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <input type="file" id="bpp_photo" name="bpp_photo" 
+                                   class="<?php echo $use_bootstrap ? 'form-control' : ''; ?>"
+                                   accept="image/*" 
+                                   <?php echo in_array('photo', $required_fields) ? 'required' : ''; ?>>
+                            <div id="bpp_photo_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                            <small class="<?php echo esc_attr($help_text_class); ?>">
+                                <?php _e('Maximum file size: 2MB. Recommended dimensions: 400x400px', 'black-potential-pipeline'); ?>
+                            </small>
+                        </div>
+                    <?php endif; ?>
+                <?php if ($use_bootstrap): ?>
+                    </div>
+                </div>
+                <?php else: ?>
+                </div>
+                <?php endif; ?>
+                
+                <?php if ($use_bootstrap): ?>
+                <div class="card mb-4">
+                    <div class="card-body">
+                <?php else: ?>
+                <div class="bpp-form-section">
+                <?php endif; ?>
+                    <div class="<?php echo esc_attr($check_class); ?>">
+                        <input type="checkbox" id="bpp_terms" name="bpp_terms" required 
+                               class="<?php echo esc_attr($check_input_class); ?>">
+                        <label for="bpp_terms" class="<?php echo esc_attr($check_label_class); ?>">
+                            <?php _e('I agree to the terms and conditions and consent to having my information stored in the Black Potential Pipeline database.', 'black-potential-pipeline'); ?>
+                            <span class="<?php echo esc_attr($required_class); ?>">*</span>
+                        </label>
+                        <div id="bpp_terms_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
+                    </div>
+                <?php if ($use_bootstrap): ?>
+                    </div>
+                </div>
+                <?php else: ?>
+                </div>
+                <?php endif; ?>
+                
+                <?php if ($use_bootstrap): ?>
+                <div class="text-center mb-4">
+                <?php else: ?>
+                <div class="bpp-form-actions">
+                <?php endif; ?>
+                    <button type="submit" id="bpp-submit-button" class="<?php echo esc_attr($button_class); ?>">
+                        <?php _e('Submit Application', 'black-potential-pipeline'); ?>
+                        <span id="bpp-submit-spinner" class="<?php echo esc_attr($spinner_class); ?>" style="display: none;"></span>
+                    </button>
+                </div>
+            </form>
+            
+            <?php if ($use_bootstrap): ?>
+            <div id="bpp-success-message" class="alert alert-success" style="display: none;">
+                <h3 class="h4"><?php _e('Thank You!', 'black-potential-pipeline'); ?></h3>
+                <p><?php _e('Your application has been submitted successfully. Our team will review your information and you\'ll be notified once your profile is approved.', 'black-potential-pipeline'); ?></p>
             </div>
-            
-            <?php if (in_array('years_experience', array_merge($required_fields, $optional_fields))) : ?>
-                <div class="bpp-form-group">
-                    <label for="bpp_years_experience">
-                        <?php _e('Years of Experience', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('years_experience', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <select id="bpp_years_experience" name="bpp_years_experience" 
-                            <?php echo in_array('years_experience', $required_fields) ? 'required' : ''; ?>>
-                        <option value=""><?php _e('Select years of experience', 'black-potential-pipeline'); ?></option>
-                        <option value="0-2"><?php _e('0-2 years', 'black-potential-pipeline'); ?></option>
-                        <option value="3-5"><?php _e('3-5 years', 'black-potential-pipeline'); ?></option>
-                        <option value="6-10"><?php _e('6-10 years', 'black-potential-pipeline'); ?></option>
-                        <option value="10+"><?php _e('10+ years', 'black-potential-pipeline'); ?></option>
-                    </select>
-                    <span class="bpp-field-error" id="bpp_years_experience_error"></span>
-                </div>
-            <?php endif; ?>
-            
-            <?php if (in_array('skills', array_merge($required_fields, $optional_fields))) : ?>
-                <div class="bpp-form-group">
-                    <label for="bpp_skills">
-                        <?php _e('Skills', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('skills', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <textarea id="bpp_skills" name="bpp_skills" rows="3" 
-                              placeholder="<?php _e('List your skills separated by commas', 'black-potential-pipeline'); ?>"
-                              <?php echo in_array('skills', $required_fields) ? 'required' : ''; ?>></textarea>
-                    <span class="bpp-field-error" id="bpp_skills_error"></span>
-                </div>
-            <?php endif; ?>
-        </div>
-        
-        <div class="bpp-form-section">
-            <h3><?php _e('Online Presence', 'black-potential-pipeline'); ?></h3>
-            
-            <?php if (in_array('website', array_merge($required_fields, $optional_fields))) : ?>
-                <div class="bpp-form-group">
-                    <label for="bpp_website">
-                        <?php _e('Website', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('website', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <input type="url" id="bpp_website" name="bpp_website" 
-                           placeholder="https://" 
-                           <?php echo in_array('website', $required_fields) ? 'required' : ''; ?>>
-                    <span class="bpp-field-error" id="bpp_website_error"></span>
-                </div>
-            <?php endif; ?>
-            
-            <?php if (in_array('linkedin', array_merge($required_fields, $optional_fields))) : ?>
-                <div class="bpp-form-group">
-                    <label for="bpp_linkedin">
-                        <?php _e('LinkedIn Profile', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('linkedin', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <input type="url" id="bpp_linkedin" name="bpp_linkedin" 
-                           placeholder="https://linkedin.com/in/yourprofile" 
-                           <?php echo in_array('linkedin', $required_fields) ? 'required' : ''; ?>>
-                    <span class="bpp-field-error" id="bpp_linkedin_error"></span>
-                </div>
-            <?php endif; ?>
-        </div>
-        
-        <div class="bpp-form-section">
-            <h3><?php _e('Additional Information', 'black-potential-pipeline'); ?></h3>
-            
-            <?php if (in_array('bio', array_merge($required_fields, $optional_fields))) : ?>
-                <div class="bpp-form-group">
-                    <label for="bpp_bio">
-                        <?php _e('Professional Bio', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('bio', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <textarea id="bpp_bio" name="bpp_bio" rows="5" 
-                              placeholder="<?php _e('Tell us about yourself and your professional background', 'black-potential-pipeline'); ?>"
-                              <?php echo in_array('bio', $required_fields) ? 'required' : ''; ?>></textarea>
-                    <span class="bpp-field-error" id="bpp_bio_error"></span>
-                </div>
-            <?php endif; ?>
-            
-            <?php if (in_array('resume', array_merge($required_fields, $optional_fields))) : ?>
-                <div class="bpp-form-group">
-                    <label for="bpp_resume">
-                        <?php _e('Resume/CV (PDF format)', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('resume', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <input type="file" id="bpp_resume" name="bpp_resume" accept=".pdf" 
-                           <?php echo in_array('resume', $required_fields) ? 'required' : ''; ?>>
-                    <span class="bpp-field-error" id="bpp_resume_error"></span>
-                    <span class="bpp-field-help"><?php _e('Maximum file size: 5MB', 'black-potential-pipeline'); ?></span>
-                </div>
-            <?php endif; ?>
-            
-            <?php if (in_array('photo', array_merge($required_fields, $optional_fields))) : ?>
-                <div class="bpp-form-group">
-                    <label for="bpp_photo">
-                        <?php _e('Professional Photo', 'black-potential-pipeline'); ?>
-                        <?php if (in_array('photo', $required_fields)) : ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    <input type="file" id="bpp_photo" name="bpp_photo" accept="image/*" 
-                           <?php echo in_array('photo', $required_fields) ? 'required' : ''; ?>>
-                    <span class="bpp-field-error" id="bpp_photo_error"></span>
-                    <span class="bpp-field-help"><?php _e('Maximum file size: 2MB. Recommended dimensions: 400x400px', 'black-potential-pipeline'); ?></span>
-                </div>
-            <?php endif; ?>
-        </div>
-        
-        <div class="bpp-form-section">
-            <div class="bpp-form-group bpp-terms-group">
-                <label for="bpp_terms">
-                    <input type="checkbox" id="bpp_terms" name="bpp_terms" required>
-                    <?php _e('I agree to the terms and conditions and consent to having my information stored in the Black Potential Pipeline database.', 'black-potential-pipeline'); ?>
-                    <span class="required">*</span>
-                </label>
-                <span class="bpp-field-error" id="bpp_terms_error"></span>
+            <?php else: ?>
+            <div id="bpp-success-message" class="bpp-success-message" style="display: none;">
+                <h3><?php _e('Thank You!', 'black-potential-pipeline'); ?></h3>
+                <p><?php _e('Your application has been submitted successfully. Our team will review your information and you\'ll be notified once your profile is approved.', 'black-potential-pipeline'); ?></p>
             </div>
+            <?php endif; ?>
+
+    <?php if ($use_bootstrap): ?>
         </div>
-        
-        <div class="bpp-form-actions">
-            <button type="submit" id="bpp-submit-button" class="bpp-button bpp-button-primary">
-                <?php _e('Submit Application', 'black-potential-pipeline'); ?>
-            </button>
-            <div id="bpp-submit-spinner" class="bpp-spinner" style="display: none;"></div>
-        </div>
-    </form>
-    
-    <div id="bpp-success-message" class="bpp-success-message" style="display: none;">
-        <h3><?php _e('Thank You!', 'black-potential-pipeline'); ?></h3>
-        <p><?php _e('Your application has been submitted successfully. Our team will review your information and you\'ll be notified once your profile is approved.', 'black-potential-pipeline'); ?></p>
     </div>
+    <?php endif; ?>
 </div>
 
+<?php if (!$use_bootstrap): ?>
 <style>
 .bpp-form-messages {
     margin-bottom: 20px;
@@ -322,6 +476,7 @@ $nonce = wp_create_nonce('bpp_form_nonce');
     color: #a94442;
 }
 </style>
+<?php endif; ?>
 
 <!-- Include JavaScript for form validation and submission -->
 <script>

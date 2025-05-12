@@ -1,0 +1,219 @@
+/**
+ * Custom styles for the Bootstrap version of the Black Potential Pipeline submission form
+ */
+
+/* Card Styling */
+.bpp-submission-form .card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    border: none;
+}
+
+.bpp-submission-form .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.bpp-submission-form .card-header {
+    border-bottom: none;
+    padding: 1.25rem;
+}
+
+.bpp-submission-form .card-header.bg-primary {
+    background-color: #2c6ebc !important;
+}
+
+.bpp-submission-form .card-body {
+    padding: 1.5rem;
+}
+
+/* Form Control Styling */
+.bpp-submission-form .form-control,
+.bpp-submission-form .form-select {
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.bpp-submission-form .form-control:focus,
+.bpp-submission-form .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.bpp-submission-form .form-control.is-invalid,
+.bpp-submission-form .form-select.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3E%3Ccircle cx='6' cy='6' r='4.5'/%3E%3Cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3E%3Ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.bpp-submission-form .form-control.is-invalid:focus,
+.bpp-submission-form .form-select.is-invalid:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+/* File Input Styling */
+.bpp-submission-form input[type="file"].form-control {
+    padding: 0.5rem;
+}
+
+.bpp-submission-form input[type="file"].form-control::file-selector-button {
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.bpp-submission-form input[type="file"].form-control::file-selector-button:hover {
+    background-color: #e9ecef;
+}
+
+/* Label Styling */
+.bpp-submission-form .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Required Field Indicator */
+.bpp-submission-form .text-danger {
+    font-weight: bold;
+    padding-left: 0.25rem;
+}
+
+/* Form Check Styling */
+.bpp-submission-form .form-check {
+    padding-left: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.bpp-submission-form .form-check-input {
+    margin-left: -1.75rem;
+    margin-top: 0.35em;
+    width: 1.25em;
+    height: 1.25em;
+}
+
+.bpp-submission-form .form-check-input:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.bpp-submission-form .form-check-input:checked {
+    background-color: #2c6ebc;
+    border-color: #2c6ebc;
+}
+
+.bpp-submission-form .form-check-label {
+    color: #495057;
+}
+
+/* Help Text Styling */
+.bpp-submission-form .form-text {
+    margin-top: 0.375rem;
+    font-style: italic;
+    color: #6c757d;
+}
+
+/* Button Styling */
+.bpp-submission-form .btn-primary {
+    background-color: #2c6ebc;
+    border-color: #2c6ebc;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.bpp-submission-form .btn-primary:hover {
+    background-color: #215ba0;
+    border-color: #215ba0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.bpp-submission-form .btn-primary:focus {
+    box-shadow: 0 0 0 0.25rem rgba(44, 110, 188, 0.25);
+}
+
+.bpp-submission-form .btn-primary:active {
+    background-color: #1d5393;
+    border-color: #1d5393;
+    transform: translateY(0);
+}
+
+.bpp-submission-form .btn-primary:disabled {
+    background-color: #6c99d0;
+    border-color: #6c99d0;
+}
+
+/* Spinner */
+.bpp-submission-form .spinner-border {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-width: 0.15em;
+}
+
+/* Success Message Styling */
+.bpp-submission-form .alert-success {
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+    color: #0f5132;
+    padding: 1.5rem;
+    border-radius: 0.375rem;
+    margin-top: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.bpp-submission-form .alert-success h3 {
+    color: #0f5132;
+    margin-bottom: 1rem;
+}
+
+/* Error Message Styling */
+.bpp-submission-form .alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+    color: #842029;
+    padding: 1.5rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .bpp-submission-form .card-body {
+        padding: 1rem;
+    }
+    
+    .bpp-submission-form .form-control,
+    .bpp-submission-form .form-select {
+        padding: 0.625rem;
+    }
+    
+    .bpp-submission-form .btn-primary {
+        padding: 0.625rem 1.25rem;
+    }
+}
+
+/* Animation for success message */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 40px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.bpp-submission-form #bpp-success-message {
+    animation: fadeInUp 0.4s ease-out;
+} 

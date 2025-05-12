@@ -101,6 +101,24 @@ class BPP_Public {
             $this->version,
             'all'
         );
+        
+        // Register Bootstrap for forms
+        wp_register_style(
+            'bpp-bootstrap-style',
+            'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+            array(),
+            '5.3.0',
+            'all'
+        );
+        
+        // Register custom Bootstrap styles
+        wp_register_style(
+            'bpp-bootstrap-custom-style',
+            BPP_PLUGIN_URL . 'public/css/bpp-bootstrap.css',
+            array('bpp-bootstrap-style'),
+            $this->version,
+            'all'
+        );
     }
 
     /**
@@ -124,6 +142,15 @@ class BPP_Public {
             BPP_PLUGIN_URL . 'public/js/bpp-form.js',
             array('jquery', $this->plugin_name),
             $this->version,
+            true
+        );
+        
+        // Register Bootstrap JS for forms
+        wp_register_script(
+            'bpp-bootstrap-script',
+            'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+            array('jquery'),
+            '5.3.0',
             true
         );
 
@@ -471,13 +498,23 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             array(
                 'title' => __('Join the Black Potential Pipeline', 'black-potential-pipeline'),
                 'success_message' => __('Thank you for your submission! We will review your application shortly.', 'black-potential-pipeline'),
+                'use_bootstrap' => 'yes',
             ),
             $atts,
             'black_potential_pipeline_form'
         );
 
-        // Enqueue form-specific scripts and styles
-        wp_enqueue_style('bpp-form-style');
+        // Check if Bootstrap styling is enabled
+        if (isset($atts['use_bootstrap']) && $atts['use_bootstrap'] === 'yes') {
+            wp_enqueue_style('bpp-bootstrap-style');
+            wp_enqueue_style('bpp-bootstrap-custom-style');
+            wp_enqueue_script('bpp-bootstrap-script');
+        } else {
+            // Enqueue regular form-specific styles
+            wp_enqueue_style('bpp-form-style');
+        }
+        
+        // Enqueue form script
         wp_enqueue_script('bpp-form-script');
 
         // Start output buffering
