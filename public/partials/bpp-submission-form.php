@@ -91,7 +91,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
             </div>
             <?php endif; ?>
     
-            <div id="bpp-form-messages" class="d-none"></div>
+            <div id="bpp-form-messages" class="<?php echo esc_attr($alert_error_class); ?>" style="display: none;"></div>
     
             <form id="bpp-submission-form" enctype="multipart/form-data" method="post" class="<?php echo esc_attr($form_class); ?>" novalidate>
                 <?php wp_nonce_field('bpp_form_nonce', 'bpp_nonce'); ?>
@@ -116,7 +116,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                         <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                     <?php endif; ?>
                                 </label>
-                                <input type="text" id="bpp_first_name" name="bpp_first_name" 
+                                <input type="text" id="bpp_first_name" name="first_name" 
                                        class="<?php echo esc_attr($input_class); ?>"
                                        <?php echo in_array('first_name', $required_fields) ? 'required' : ''; ?>>
                                 <div id="bpp_first_name_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
@@ -131,7 +131,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                         <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                     <?php endif; ?>
                                 </label>
-                                <input type="text" id="bpp_last_name" name="bpp_last_name" 
+                                <input type="text" id="bpp_last_name" name="last_name" 
                                        class="<?php echo esc_attr($input_class); ?>"
                                        <?php echo in_array('last_name', $required_fields) ? 'required' : ''; ?>>
                                 <div id="bpp_last_name_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
@@ -148,7 +148,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                         <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                     <?php endif; ?>
                                 </label>
-                                <input type="email" id="bpp_email" name="bpp_email" 
+                                <input type="email" id="bpp_email" name="email" 
                                        class="<?php echo esc_attr($input_class); ?>"
                                        <?php echo in_array('email', $required_fields) ? 'required' : ''; ?>>
                                 <div id="bpp_email_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
@@ -164,7 +164,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                             <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                         <?php endif; ?>
                                     </label>
-                                    <input type="tel" id="bpp_phone" name="bpp_phone" 
+                                    <input type="tel" id="bpp_phone" name="phone" 
                                            class="<?php echo esc_attr($input_class); ?>"
                                            <?php echo in_array('phone', $required_fields) ? 'required' : ''; ?>>
                                     <div id="bpp_phone_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
@@ -199,7 +199,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                         <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                     <?php endif; ?>
                                 </label>
-                                <input type="text" id="bpp_job_title" name="bpp_job_title" 
+                                <input type="text" id="bpp_job_title" name="job_title" 
                                        class="<?php echo esc_attr($input_class); ?>"
                                        <?php echo in_array('job_title', $required_fields) ? 'required' : ''; ?>>
                                 <div id="bpp_job_title_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
@@ -214,7 +214,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                         <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                     <?php endif; ?>
                                 </label>
-                                <select id="bpp_industry" name="bpp_industry" 
+                                <select id="bpp_industry" name="industry" 
                                         class="<?php echo esc_attr($select_class); ?>"
                                         <?php echo in_array('industry', $required_fields) ? 'required' : ''; ?>>
                                     <option value=""><?php _e('Select an industry', 'black-potential-pipeline'); ?></option>
@@ -249,7 +249,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                     <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                 <?php endif; ?>
                             </label>
-                            <select id="bpp_years_experience" name="bpp_years_experience" 
+                            <select id="bpp_years_experience" name="years_experience" 
                                     class="<?php echo esc_attr($select_class); ?>"
                                     <?php echo in_array('years_experience', $required_fields) ? 'required' : ''; ?>>
                                 <option value=""><?php _e('Select years of experience', 'black-potential-pipeline'); ?></option>
@@ -270,7 +270,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                     <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                 <?php endif; ?>
                             </label>
-                            <textarea id="bpp_skills" name="bpp_skills" rows="3" 
+                            <textarea id="bpp_skills" name="skills" rows="3" 
                                       class="<?php echo esc_attr($input_class); ?>"
                                       placeholder="<?php _e('List your skills separated by commas', 'black-potential-pipeline'); ?>"
                                       <?php echo in_array('skills', $required_fields) ? 'required' : ''; ?>></textarea>
@@ -304,7 +304,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                     <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                 <?php endif; ?>
                             </label>
-                            <input type="url" id="bpp_website" name="bpp_website" 
+                            <input type="url" id="bpp_website" name="website" 
                                    class="<?php echo esc_attr($input_class); ?>"
                                    placeholder="https://" 
                                    <?php echo in_array('website', $required_fields) ? 'required' : ''; ?>>
@@ -320,7 +320,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                     <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                 <?php endif; ?>
                             </label>
-                            <input type="url" id="bpp_linkedin" name="bpp_linkedin" 
+                            <input type="url" id="bpp_linkedin" name="linkedin" 
                                    class="<?php echo esc_attr($input_class); ?>"
                                    placeholder="https://linkedin.com/in/yourprofile" 
                                    <?php echo in_array('linkedin', $required_fields) ? 'required' : ''; ?>>
@@ -354,7 +354,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                     <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                 <?php endif; ?>
                             </label>
-                            <textarea id="bpp_bio" name="bpp_bio" rows="5" 
+                            <textarea id="bpp_bio" name="cover_letter" rows="5" 
                                       class="<?php echo esc_attr($input_class); ?>"
                                       placeholder="<?php _e('Tell us about yourself and your professional background', 'black-potential-pipeline'); ?>"
                                       <?php echo in_array('bio', $required_fields) ? 'required' : ''; ?>></textarea>
@@ -370,7 +370,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                     <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                 <?php endif; ?>
                             </label>
-                            <input type="file" id="bpp_resume" name="bpp_resume" 
+                            <input type="file" id="bpp_resume" name="resume" 
                                    class="<?php echo $use_bootstrap ? 'form-control' : ''; ?>"
                                    accept=".pdf" 
                                    <?php echo in_array('resume', $required_fields) ? 'required' : ''; ?>>
@@ -389,7 +389,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                     <span class="<?php echo esc_attr($required_class); ?>">*</span>
                                 <?php endif; ?>
                             </label>
-                            <input type="file" id="bpp_photo" name="bpp_photo" 
+                            <input type="file" id="bpp_photo" name="photo" 
                                    class="<?php echo $use_bootstrap ? 'form-control' : ''; ?>"
                                    accept="image/*" 
                                    <?php echo in_array('photo', $required_fields) ? 'required' : ''; ?>>
@@ -413,7 +413,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                 <div class="bpp-form-section">
                 <?php endif; ?>
                     <div class="<?php echo esc_attr($check_class); ?>">
-                        <input type="checkbox" id="bpp_terms" name="bpp_terms" required 
+                        <input type="checkbox" id="bpp_terms" name="consent" required 
                                class="<?php echo esc_attr($check_input_class); ?>">
                         <label for="bpp_terms" class="<?php echo esc_attr($check_label_class); ?>">
                             <?php _e('I agree to the terms and conditions and consent to having my information stored in the Black Potential Pipeline database.', 'black-potential-pipeline'); ?>
@@ -475,11 +475,21 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
     border: 1px solid #ebccd1;
     color: #a94442;
 }
+/* When shown, make sure the display is block */
+.bpp-form-messages.bpp-success:not([style*="display: none"]),
+.bpp-form-messages.bpp-error:not([style*="display: none"]) {
+    display: block !important;
+}
 </style>
 <?php endif; ?>
 
 <!-- Include JavaScript for form validation and submission -->
 <script>
+    // For debugging purposes
+    console.log('Form template loaded');
+    console.log('Bootstrap enabled:', <?php echo json_encode($use_bootstrap); ?>);
+    console.log('Required fields:', <?php echo json_encode($required_fields); ?>);
+    
     // The form submission logic is handled by bpp-form.js
     // See the script enqueue in the main plugin file
 </script> 

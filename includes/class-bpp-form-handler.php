@@ -543,12 +543,30 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         }
         
         // Validate file uploads separately (they're in $_FILES not $_POST)
-        if (in_array('resume', $required_fields) && (empty($_FILES['resume']) || $_FILES['resume']['error'] !== UPLOAD_ERR_OK)) {
-            $errors['resume'] = __('Resume file is required.', 'black-potential-pipeline');
+        if (in_array('resume', $required_fields)) {
+            // Error only if no file was uploaded at all
+            if (empty($_FILES['resume']) || 
+                !isset($_FILES['resume']['tmp_name']) || 
+                empty($_FILES['resume']['tmp_name'])) {
+                $errors['resume'] = __('Resume file is required.', 'black-potential-pipeline');
+            } 
+            // If there was an error other than no file uploaded
+            elseif ($_FILES['resume']['error'] !== UPLOAD_ERR_OK) {
+                $errors['resume'] = $this->get_file_upload_error_message($_FILES['resume']['error']);
+            }
         }
         
-        if (in_array('photo', $required_fields) && (empty($_FILES['photo']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK)) {
-            $errors['photo'] = __('Photo is required.', 'black-potential-pipeline');
+        if (in_array('photo', $required_fields)) {
+            // Error only if no file was uploaded at all
+            if (empty($_FILES['photo']) || 
+                !isset($_FILES['photo']['tmp_name']) || 
+                empty($_FILES['photo']['tmp_name'])) {
+                $errors['photo'] = __('Photo is required.', 'black-potential-pipeline');
+            }
+            // If there was an error other than no file uploaded
+            elseif ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
+                $errors['photo'] = $this->get_file_upload_error_message($_FILES['photo']['error']);
+            }
         }
         
         // Validate email format

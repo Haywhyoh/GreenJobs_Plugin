@@ -207,8 +207,8 @@ class BPP {
         $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
         
         // Form handler hooks
-        $this->loader->add_action( 'wp_ajax_bpp_submit_application', $form_handler, 'handle_application_submission' );
-        $this->loader->add_action( 'wp_ajax_nopriv_bpp_submit_application', $form_handler, 'handle_application_submission' );
+        $this->loader->add_action( 'wp_ajax_bpp_submit_application', $form_handler, 'process_application_submission' );
+        $this->loader->add_action( 'wp_ajax_nopriv_bpp_submit_application', $form_handler, 'process_application_submission' );
         
         // Register shortcodes
         $this->loader->add_action( 'init', $this, 'register_shortcodes' );

@@ -104,37 +104,49 @@
             
             // Validate resume file
             const resumeInput = document.getElementById('bpp_resume');
-            if (resumeInput && resumeInput.hasAttribute('required') && resumeInput.files.length) {
-                const resumeFile = resumeInput.files[0];
-                
-                // Max size: 5MB
-                if (!validateFileSize(resumeFile, 5 * 1024 * 1024)) {
-                    showFieldError('bpp_resume', bpp_form_obj.i18n.file_size_error);
+            if (resumeInput && resumeInput.hasAttribute('required')) {
+                if (!resumeInput.files.length) {
+                    // No file selected, but it's required
+                    showFieldError('bpp_resume', bpp_form_obj.i18n.required_field || 'Resume file is required.');
                     isValid = false;
-                }
-                
-                // Allowed file types: pdf, doc, docx
-                if (!validateFileType(resumeFile, ['pdf', 'doc', 'docx'])) {
-                    showFieldError('bpp_resume', bpp_form_obj.i18n.file_type_error);
-                    isValid = false;
+                } else {
+                    const resumeFile = resumeInput.files[0];
+                    
+                    // Max size: 5MB
+                    if (!validateFileSize(resumeFile, 5 * 1024 * 1024)) {
+                        showFieldError('bpp_resume', bpp_form_obj.i18n.file_size_error);
+                        isValid = false;
+                    }
+                    
+                    // Allowed file types: pdf, doc, docx
+                    if (!validateFileType(resumeFile, ['pdf', 'doc', 'docx'])) {
+                        showFieldError('bpp_resume', bpp_form_obj.i18n.file_type_error);
+                        isValid = false;
+                    }
                 }
             }
             
             // Validate photo file
             const photoInput = document.getElementById('bpp_photo');
-            if (photoInput && photoInput.hasAttribute('required') && photoInput.files.length) {
-                const photoFile = photoInput.files[0];
-                
-                // Max size: 2MB
-                if (!validateFileSize(photoFile, 2 * 1024 * 1024)) {
-                    showFieldError('bpp_photo', bpp_form_obj.i18n.file_size_error);
+            if (photoInput && photoInput.hasAttribute('required')) {
+                if (!photoInput.files.length) {
+                    // No file selected, but it's required
+                    showFieldError('bpp_photo', bpp_form_obj.i18n.required_field || 'Photo is required.');
                     isValid = false;
-                }
-                
-                // Allowed file types: jpg, jpeg, png, gif
-                if (!validateFileType(photoFile, ['jpg', 'jpeg', 'png', 'gif'])) {
-                    showFieldError('bpp_photo', bpp_form_obj.i18n.file_type_error);
-                    isValid = false;
+                } else {
+                    const photoFile = photoInput.files[0];
+                    
+                    // Max size: 2MB
+                    if (!validateFileSize(photoFile, 2 * 1024 * 1024)) {
+                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_size_error);
+                        isValid = false;
+                    }
+                    
+                    // Allowed file types: jpg, jpeg, png, gif
+                    if (!validateFileType(photoFile, ['jpg', 'jpeg', 'png', 'gif'])) {
+                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_type_error);
+                        isValid = false;
+                    }
                 }
             }
             
@@ -182,6 +194,49 @@
             formData.append('action', 'bpp_submit_application');
             formData.append('nonce', bpp_form_obj.nonce);
             
+            // Debug: Log form data being submitted
+            console.log('Form submission started');
+            console.log('AJAX URL:', bpp_form_obj.ajax_url);
+            console.log('Action:', 'bpp_submit_application');
+            console.log('Nonce:', bpp_form_obj.nonce);
+            
+            // Debug file inputs
+            const resumeInput = document.getElementById('bpp_resume');
+            const photoInput = document.getElementById('bpp_photo');
+            
+            console.log('File Input Debug:');
+            if (resumeInput) {
+                console.log('Resume Input: Found');
+                console.log('Resume Required:', resumeInput.hasAttribute('required'));
+                console.log('Resume Files Selected:', resumeInput.files.length > 0);
+                if (resumeInput.files.length > 0) {
+                    console.log('Resume File Name:', resumeInput.files[0].name);
+                    console.log('Resume File Size:', resumeInput.files[0].size, 'bytes');
+                    console.log('Resume File Type:', resumeInput.files[0].type);
+                }
+            } else {
+                console.log('Resume Input: Not found in DOM');
+            }
+            
+            if (photoInput) {
+                console.log('Photo Input: Found');
+                console.log('Photo Required:', photoInput.hasAttribute('required'));
+                console.log('Photo Files Selected:', photoInput.files.length > 0);
+                if (photoInput.files.length > 0) {
+                    console.log('Photo File Name:', photoInput.files[0].name);
+                    console.log('Photo File Size:', photoInput.files[0].size, 'bytes');
+                    console.log('Photo File Type:', photoInput.files[0].type);
+                }
+            } else {
+                console.log('Photo Input: Not found in DOM');
+            }
+            
+            // Log all form fields for debugging
+            console.log('Form data being submitted:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + (pair[0] === 'nonce' ? '[HIDDEN]' : pair[1]));
+            }
+            
             // Send AJAX request
             $.ajax({
                 type: 'POST',
@@ -193,6 +248,8 @@
                     // Re-enable submit button and hide spinner
                     $submitButton.prop('disabled', false);
                     $spinner.hide();
+                    
+                    console.log('AJAX Response:', response);
                     
                     if (response.success) {
                         // Show success message
@@ -211,7 +268,11 @@
                         }, 500);
                     } else {
                         // Show error message
-                        displayMessage(response.message, false);
+                        if (response.message) {
+                            displayMessage(response.message, false);
+                        } else {
+                            displayMessage(bpp_form_obj.i18n.submit_error, false);
+                        }
                         
                         // Show field-specific errors if available
                         if (response.errors) {
@@ -226,7 +287,11 @@
                         }, 500);
                     }
                 },
-                error: function() {
+                error: function(xhr, status, error) {
+                    // Log error details to console
+                    console.error('AJAX Error:', status, error);
+                    console.log('Response Text:', xhr.responseText);
+                    
                     // Re-enable submit button and hide spinner
                     $submitButton.prop('disabled', false);
                     $spinner.hide();
