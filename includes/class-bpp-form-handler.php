@@ -442,7 +442,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
      */
     public function handle_application_submission() {
         // Check nonce for security
-        check_ajax_referer('bpp_submission_nonce', 'security');
+        check_ajax_referer('bpp_form_nonce', 'nonce');
         
         // Initialize response array
         $response = array(
@@ -506,5 +506,256 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         
         // Send notification to admin
         $email_manager->send_admin_notification($applicant_id);
+    }
+
+    /**
+     * Validate the submission fields
+     *
+     * @since    1.0.0
+     * @param    array    $data    The submission data
+     * @return   array             Array of errors
+     */
+    private function validate_submission_fields($data) {
+        $errors = array();
+        
+        // Get form fields configuration
+        $form_fields = get_option('bpp_form_fields', array());
+        
+        // Determine required fields
+        $required_fields = array();
+        foreach ($form_fields as $field_id => $field) {
+            if (isset($field['required']) && $field['required'] && isset($field['enabled']) && $field['enabled']) {
+                $required_fields[] = $field_id;
+            }
+        }
+        
+        // If no configuration is found, use default required fields
+        if (empty($required_fields)) {
+            $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter');
+        }
+        
+        // Validate required fields
+        foreach ($required_fields as $field) {
+            if (empty($data[$field])) {
+                $field_label = isset($form_fields[$field]['label']) ? $form_fields[$field]['label'] : $field;
+                $errors[$field] = sprintf(__('The %s field is required.', 'black-potential-pipeline'), $field_label);
+            }
+        }
+        
+        // Validate email format
+        if (!empty($data['email']) && !is_email($data['email'])) {
+            $errors['email'] = __('Please provide a valid email address.', 'black-potential-pipeline');
+        }
+        
+        // Check if email already exists
+        if (!empty($data['email']) && !isset($errors['email'])) {
+            $existing_email_query = new WP_Query(array(
+                'post_type' => 'bpp_applicant',
+                'posts_per_page' => 1,
+                'meta_query' => array(
+                    array(
+                        'key' => 'bpp_email',
+                        'value' => $data['email'],
+                        'compare' => '='
+                    )
+                )
+            ));
+            
+            if ($existing_email_query->have_posts()) {
+                $errors['email'] = __('An application with this email address already exists.', 'black-potential-pipeline');
+            }
+        }
+        
+        return $errors;
+    }
+
+    /**
+     * Create a new applicant post with the submitted data
+     *
+     * @since    1.0.0
+     * @param    array    $data           The submission form data
+     * @param    array    $uploaded_files Array of uploaded files
+     * @return   int|bool                 The post ID on success, false on failure
+     */
+    private function create_applicant_post($data, $uploaded_files = array()) {
+        // Sanitize input data
+        $first_name = sanitize_text_field($data['first_name']);
+        $last_name = sanitize_text_field($data['last_name']);
+        $email = sanitize_email($data['email']);
+        $phone = isset($data['phone']) ? sanitize_text_field($data['phone']) : '';
+        $industry = isset($data['industry']) ? sanitize_text_field($data['industry']) : '';
+        $job_title = isset($data['job_title']) ? sanitize_text_field($data['job_title']) : '';
+        $years_experience = isset($data['years_experience']) ? sanitize_text_field($data['years_experience']) : '';
+        $linkedin = isset($data['linkedin']) ? esc_url_raw($data['linkedin']) : '';
+        $website = isset($data['website']) ? esc_url_raw($data['website']) : '';
+        $skills = isset($data['skills']) ? sanitize_textarea_field($data['skills']) : '';
+        $cover_letter = isset($data['cover_letter']) ? sanitize_textarea_field($data['cover_letter']) : '';
+        $job_type = isset($data['job_type']) ? sanitize_text_field($data['job_type']) : '';
+        $location = isset($data['location']) ? sanitize_text_field($data['location']) : '';
+        $consent = isset($data['consent']) && $data['consent'] === 'yes';
+        
+        // Prepare post data
+        $applicant_data = array(
+            'post_title' => $first_name . ' ' . $last_name,
+            'post_content' => $cover_letter,
+            'post_status' => 'draft', // Start as draft until approved
+            'post_type' => 'bpp_applicant',
+            'comment_status' => 'closed'
+        );
+        
+        // Insert the post into the database
+        $applicant_id = wp_insert_post($applicant_data);
+        
+        if (!$applicant_id || is_wp_error($applicant_id)) {
+            return false;
+        }
+        
+        // Save meta data
+        update_post_meta($applicant_id, 'bpp_email', $email);
+        update_post_meta($applicant_id, 'bpp_phone', $phone);
+        update_post_meta($applicant_id, 'bpp_job_title', $job_title);
+        update_post_meta($applicant_id, 'bpp_years_experience', $years_experience);
+        update_post_meta($applicant_id, 'bpp_linkedin', $linkedin);
+        update_post_meta($applicant_id, 'bpp_website', $website);
+        update_post_meta($applicant_id, 'bpp_skills', $skills);
+        update_post_meta($applicant_id, 'bpp_job_type', $job_type);
+        update_post_meta($applicant_id, 'bpp_location', $location);
+        update_post_meta($applicant_id, 'bpp_consent', $consent ? 'yes' : 'no');
+        update_post_meta($applicant_id, 'bpp_submission_date', current_time('mysql'));
+        
+        // Set the industry taxonomy
+        if (!empty($industry)) {
+            wp_set_object_terms($applicant_id, intval($industry), 'bpp_industry');
+        }
+        
+        // Handle resume attachment if uploaded
+        if (isset($uploaded_files['resume'])) {
+            update_post_meta($applicant_id, 'bpp_resume', $uploaded_files['resume']);
+        }
+        
+        // Handle photo attachment if uploaded
+        if (isset($uploaded_files['photo'])) {
+            update_post_meta($applicant_id, 'bpp_photo', $uploaded_files['photo']);
+            
+            // Set as featured image if available
+            set_post_thumbnail($applicant_id, $uploaded_files['photo']);
+        }
+        
+        return $applicant_id;
+    }
+
+    /**
+     * Process file uploads for the application
+     *
+     * @since    1.0.0
+     * @param    array    $files    The $_FILES array
+     * @return   array              Array of uploaded file IDs and any errors
+     */
+    private function process_file_uploads($files) {
+        $uploaded_files = array();
+        $errors = array();
+        
+        // Process resume upload
+        if (!empty($files['resume']) && $files['resume']['error'] === UPLOAD_ERR_OK) {
+            $resume_result = $this->process_single_file_upload('resume', $files['resume'], array(
+                'allowed_types' => array('application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+                'max_size' => 5 * 1024 * 1024 // 5MB
+            ));
+            
+            if (is_wp_error($resume_result)) {
+                $errors['resume'] = $resume_result->get_error_message();
+            } else {
+                $uploaded_files['resume'] = $resume_result;
+            }
+        }
+        
+        // Process photo upload
+        if (!empty($files['photo']) && $files['photo']['error'] === UPLOAD_ERR_OK) {
+            $photo_result = $this->process_single_file_upload('photo', $files['photo'], array(
+                'allowed_types' => array('image/jpeg', 'image/png', 'image/gif'),
+                'max_size' => 2 * 1024 * 1024 // 2MB
+            ));
+            
+            if (is_wp_error($photo_result)) {
+                $errors['photo'] = $photo_result->get_error_message();
+            } else {
+                $uploaded_files['photo'] = $photo_result;
+            }
+        }
+        
+        // Add errors if found
+        if (!empty($errors)) {
+            $uploaded_files['errors'] = $errors;
+        }
+        
+        return $uploaded_files;
+    }
+    
+    /**
+     * Handle individual file upload
+     *
+     * @since    1.0.0
+     * @param    string    $file_key       The file key (resume or photo)
+     * @param    array     $file           The file data from $_FILES
+     * @param    array     $options        Options for file upload
+     * @return   int|WP_Error              Attachment ID on success, WP_Error on failure
+     */
+    private function process_single_file_upload($file_key, $file, $options = array()) {
+        // Default options
+        $defaults = array(
+            'allowed_types' => array(),
+            'max_size' => 0
+        );
+        
+        $options = wp_parse_args($options, $defaults);
+        
+        // Check if the upload is valid
+        if (!function_exists('wp_handle_upload')) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+        
+        // Verify file type
+        $file_type = wp_check_filetype(basename($file['name']));
+        if (!empty($options['allowed_types']) && !in_array($file_type['type'], $options['allowed_types'])) {
+            return new WP_Error('invalid_type', __('Invalid file type.', 'black-potential-pipeline'));
+        }
+        
+        // Verify file size
+        if ($options['max_size'] > 0 && $file['size'] > $options['max_size']) {
+            return new WP_Error('invalid_size', __('File is too large.', 'black-potential-pipeline'));
+        }
+        
+        // Upload the file
+        $upload_overrides = array('test_form' => false);
+        $uploaded_file = wp_handle_upload($file, $upload_overrides);
+        
+        if (isset($uploaded_file['error'])) {
+            return new WP_Error('upload_error', $uploaded_file['error']);
+        }
+        
+        // Create attachment
+        if (!function_exists('wp_generate_attachment_metadata')) {
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
+        }
+        
+        $attachment = array(
+            'guid' => $uploaded_file['url'],
+            'post_mime_type' => $uploaded_file['type'],
+            'post_title' => preg_replace('/\.[^.]+$/', '', basename($file['name'])),
+            'post_content' => '',
+            'post_status' => 'inherit'
+        );
+        
+        $attachment_id = wp_insert_attachment($attachment, $uploaded_file['file']);
+        
+        if (is_wp_error($attachment_id)) {
+            return $attachment_id;
+        }
+        
+        // Generate metadata
+        $attachment_data = wp_generate_attachment_metadata($attachment_id, $uploaded_file['file']);
+        wp_update_attachment_metadata($attachment_id, $attachment_data);
+        
+        return $attachment_id;
     }
 } 

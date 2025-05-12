@@ -41,7 +41,7 @@ $required_fields = get_option('bpp_required_fields', array('first_name', 'last_n
 $optional_fields = get_option('bpp_optional_fields', array('phone', 'website', 'linkedin', 'years_experience', 'skills', 'photo', 'bio'));
 
 // Generate nonce for form submission
-$nonce = wp_create_nonce('bpp_submission_nonce');
+$nonce = wp_create_nonce('bpp_form_nonce');
 ?>
 
 <div class="bpp-form-container">
@@ -53,7 +53,7 @@ $nonce = wp_create_nonce('bpp_submission_nonce');
     <div id="bpp-form-messages"></div>
     
     <form id="bpp-submission-form" enctype="multipart/form-data" method="post">
-        <?php wp_nonce_field('bpp_submission_nonce', 'bpp_nonce'); ?>
+        <?php wp_nonce_field('bpp_form_nonce', 'bpp_nonce'); ?>
         
         <div class="bpp-form-section">
             <h3><?php _e('Personal Information', 'black-potential-pipeline'); ?></h3>
