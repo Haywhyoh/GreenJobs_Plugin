@@ -222,11 +222,11 @@ class BPP {
     public function register_shortcodes() {
         $plugin_public = new BPP_Public( $this->get_plugin_name(), $this->get_version() );
         
-        add_shortcode( 'bpp_submission_form', array( $plugin_public, 'display_submission_form' ) );
-        add_shortcode( 'bpp_directory', array( $plugin_public, 'display_directory' ) );
-        add_shortcode( 'bpp_category_directory', array( $plugin_public, 'display_category_directory' ) );
-        add_shortcode( 'bpp_featured', array( $plugin_public, 'display_featured_applicants' ) );
-        add_shortcode( 'bpp_stats', array( $plugin_public, 'display_statistics' ) );
+        add_shortcode( 'black_potential_pipeline_form', array( $plugin_public, 'display_submission_form' ) );
+        add_shortcode( 'black_potential_pipeline_directory', array( $plugin_public, 'display_directory' ) );
+        add_shortcode( 'black_potential_pipeline_category', array( $plugin_public, 'display_category_directory' ) );
+        add_shortcode( 'black_potential_pipeline_featured', array( $plugin_public, 'display_featured_applicants' ) );
+        add_shortcode( 'black_potential_pipeline_stats', array( $plugin_public, 'display_statistics' ) );
     }
 
     /**

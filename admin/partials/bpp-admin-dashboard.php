@@ -48,9 +48,10 @@ if (!defined('WPINC')) {
             <div class="bpp-card-body">
                 <?php
                 // Get application counts
-                $new_count = wp_count_posts('bpp_applicant')->draft;
-                $approved_count = wp_count_posts('bpp_applicant')->publish;
-                $rejected_count = wp_count_posts('bpp_applicant')->private;
+                $post_counts = wp_count_posts('bpp_applicant');
+                $new_count = isset($post_counts->draft) ? $post_counts->draft : 0;
+                $approved_count = isset($post_counts->publish) ? $post_counts->publish : 0;
+                $rejected_count = isset($post_counts->private) ? $post_counts->private : 0;
                 $total_count = $new_count + $approved_count + $rejected_count;
                 
                 // Get industry counts

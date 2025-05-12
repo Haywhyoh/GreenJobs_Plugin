@@ -457,4 +457,190 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         
         wp_mail($email, $subject, $message, $headers);
     }
+
+    /**
+     * Display the submission form via shortcode.
+     *
+     * @since    1.0.0
+     * @param    array    $atts    Shortcode attributes.
+     * @return   string    HTML content to display the form.
+     */
+    public function display_submission_form($atts) {
+        // Extract shortcode attributes
+        $atts = shortcode_atts(
+            array(
+                'title' => __('Join the Black Potential Pipeline', 'black-potential-pipeline'),
+                'success_message' => __('Thank you for your submission! We will review your application shortly.', 'black-potential-pipeline'),
+            ),
+            $atts,
+            'black_potential_pipeline_form'
+        );
+
+        // Enqueue form-specific scripts and styles
+        wp_enqueue_style('bpp-form-style');
+        wp_enqueue_script('bpp-form-script');
+
+        // Start output buffering
+        ob_start();
+
+        // Include the form template
+        include(plugin_dir_path(dirname(__FILE__)) . 'public/partials/bpp-submission-form.php');
+
+        // Get the buffered content
+        $output = ob_get_clean();
+
+        return $output;
+    }
+
+    /**
+     * Display the directory of all approved applicants via shortcode.
+     *
+     * @since    1.0.0
+     * @param    array    $atts    Shortcode attributes.
+     * @return   string    HTML content to display the directory.
+     */
+    public function display_directory($atts) {
+        // Extract shortcode attributes
+        $atts = shortcode_atts(
+            array(
+                'title' => __('Black Potential Pipeline Directory', 'black-potential-pipeline'),
+                'per_page' => 12,
+                'layout' => 'grid', // grid or list
+            ),
+            $atts,
+            'black_potential_pipeline_directory'
+        );
+
+        // Enqueue directory-specific scripts and styles
+        wp_enqueue_style('bpp-directory-style');
+        wp_enqueue_script('bpp-directory-script');
+
+        // Start output buffering
+        ob_start();
+
+        // Include the directory template
+        include(plugin_dir_path(dirname(__FILE__)) . 'public/partials/bpp-directory.php');
+
+        // Get the buffered content
+        $output = ob_get_clean();
+
+        return $output;
+    }
+
+    /**
+     * Display the directory of applicants in a specific category via shortcode.
+     *
+     * @since    1.0.0
+     * @param    array    $atts    Shortcode attributes.
+     * @return   string    HTML content to display the category directory.
+     */
+    public function display_category_directory($atts) {
+        // Extract shortcode attributes
+        $atts = shortcode_atts(
+            array(
+                'category' => '',
+                'title' => '',
+                'per_page' => 12,
+                'layout' => 'grid', // grid or list
+            ),
+            $atts,
+            'black_potential_pipeline_category'
+        );
+
+        // Validate category
+        if (empty($atts['category'])) {
+            return '<p>' . __('Error: No category specified.', 'black-potential-pipeline') . '</p>';
+        }
+
+        // Set default title based on category
+        if (empty($atts['title'])) {
+            $category_term = get_term_by('slug', $atts['category'], 'bpp_industry');
+            $atts['title'] = sprintf(__('Black Professionals in %s', 'black-potential-pipeline'), $category_term ? $category_term->name : $atts['category']);
+        }
+
+        // Enqueue directory-specific scripts and styles
+        wp_enqueue_style('bpp-directory-style');
+        wp_enqueue_script('bpp-directory-script');
+
+        // Start output buffering
+        ob_start();
+
+        // Include the category directory template
+        include(plugin_dir_path(dirname(__FILE__)) . 'public/partials/bpp-category-directory.php');
+
+        // Get the buffered content
+        $output = ob_get_clean();
+
+        return $output;
+    }
+
+    /**
+     * Display featured candidates via shortcode.
+     *
+     * @since    1.0.0
+     * @param    array    $atts    Shortcode attributes.
+     * @return   string    HTML content to display featured candidates.
+     */
+    public function display_featured_applicants($atts) {
+        // Extract shortcode attributes
+        $atts = shortcode_atts(
+            array(
+                'title' => __('Featured Black Professionals', 'black-potential-pipeline'),
+                'count' => 4,
+                'layout' => 'carousel', // carousel, grid, or list
+            ),
+            $atts,
+            'black_potential_pipeline_featured'
+        );
+
+        // Enqueue featured-specific scripts and styles
+        wp_enqueue_style('bpp-featured-style');
+        wp_enqueue_script('bpp-featured-script');
+
+        // Start output buffering
+        ob_start();
+
+        // Include the featured candidates template
+        include(plugin_dir_path(dirname(__FILE__)) . 'public/partials/bpp-featured.php');
+
+        // Get the buffered content
+        $output = ob_get_clean();
+
+        return $output;
+    }
+
+    /**
+     * Display statistics via shortcode.
+     *
+     * @since    1.0.0
+     * @param    array    $atts    Shortcode attributes.
+     * @return   string    HTML content to display statistics.
+     */
+    public function display_statistics($atts) {
+        // Extract shortcode attributes
+        $atts = shortcode_atts(
+            array(
+                'title' => __('Black Potential Pipeline Statistics', 'black-potential-pipeline'),
+                'show_categories' => 'yes',
+                'show_total' => 'yes',
+            ),
+            $atts,
+            'black_potential_pipeline_stats'
+        );
+
+        // Enqueue statistics-specific scripts and styles
+        wp_enqueue_style('bpp-stats-style');
+        wp_enqueue_script('bpp-stats-script');
+
+        // Start output buffering
+        ob_start();
+
+        // Include the statistics template
+        include(plugin_dir_path(dirname(__FILE__)) . 'public/partials/bpp-statistics.php');
+
+        // Get the buffered content
+        $output = ob_get_clean();
+
+        return $output;
+    }
 } 
