@@ -87,13 +87,22 @@ class BPP_Form_Handler {
         
         // If no configuration is found, use default required fields
         if (empty($required_fields)) {
-            $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter');
+            $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume');
         }
 
         // Validate required fields
         foreach ($required_fields as $field) {
             if (empty($_POST[$field])) {
                 $field_label = isset($form_fields[$field]['label']) ? $form_fields[$field]['label'] : $field;
+                $this->send_error_response(sprintf(__('Missing required field: %s', 'black-potential-pipeline'), $field_label));
+                return;
+            }
+        }
+        
+        // Special validation for file uploads since they're in $_FILES not $_POST
+        if (in_array('resume', $required_fields)) {
+            if (empty($_FILES['resume']) || $_FILES['resume']['error'] !== UPLOAD_ERR_OK || empty($_FILES['resume']['tmp_name'])) {
+                $field_label = isset($form_fields['resume']['label']) ? $form_fields['resume']['label'] : __('Resume/CV', 'black-potential-pipeline');
                 $this->send_error_response(sprintf(__('Missing required field: %s', 'black-potential-pipeline'), $field_label));
                 return;
             }
@@ -531,7 +540,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         
         // If no configuration is found, use default required fields
         if (empty($required_fields)) {
-            $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter');
+            $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume');
         }
         
         // Validate required fields

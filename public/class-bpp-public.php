@@ -216,10 +216,19 @@ class BPP_Public {
         );
 
         // Validate required fields
-        $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter');
+        $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume');
         foreach ($required_fields as $field) {
             if (empty($_POST[$field])) {
                 $response['message'] = sprintf(__('Missing required field: %s', 'black-potential-pipeline'), $field);
+                wp_send_json($response);
+                return;
+            }
+        }
+        
+        // Special check for resume file upload
+        if (in_array('resume', $required_fields)) {
+            if (empty($_FILES['resume']) || $_FILES['resume']['error'] !== UPLOAD_ERR_OK || empty($_FILES['resume']['tmp_name'])) {
+                $response['message'] = __('Missing required field: Resume/CV', 'black-potential-pipeline');
                 wp_send_json($response);
                 return;
             }
