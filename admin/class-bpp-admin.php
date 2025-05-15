@@ -49,6 +49,10 @@ class BPP_Admin {
     public function __construct($plugin_name, $version) {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
+
+        // Add these in your admin class constructor or init method
+        add_action('wp_ajax_bpp_approve_applicant', array($this, 'approve_applicant'));
+        add_action('wp_ajax_bpp_reject_applicant', array($this, 'reject_applicant'));
     }
 
     /**
@@ -88,10 +92,9 @@ class BPP_Admin {
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('bpp_admin_nonce'),
                 'i18n' => array(
-                    'approve_confirm' => __('Are you sure you want to approve this applicant?', 'black-potential-pipeline'),
-                    'reject_confirm' => __('Are you sure you want to reject this applicant?', 'black-potential-pipeline'),
-                    'success' => __('Success!', 'black-potential-pipeline'),
-                    'error' => __('Error occurred. Please try again.', 'black-potential-pipeline'),
+                    'approve_confirm' => __('Are you sure you want to approve this application?', 'black-potential-pipeline'),
+                    'error' => __('An error occurred. Please try again.', 'black-potential-pipeline'),
+                    'no_applications' => __('No new applications at this time.', 'black-potential-pipeline'),
                 ),
             )
         );
@@ -352,15 +355,15 @@ class BPP_Admin {
      *
      * @since    1.0.0
      */
-    public function ajax_approve_applicant() {
-        // Check nonce
+    public function approve_applicant() {
+        // Check nonce for security
         check_ajax_referer('bpp_admin_nonce', 'nonce');
-
-        // Check permissions
+        
+        // Check if user has permission
         if (!current_user_can('manage_options')) {
-            wp_send_json_error('Permission denied');
+            wp_send_json_error(array('message' => __('You do not have permission to perform this action.', 'black-potential-pipeline')));
         }
-
+        
         // Get applicant ID
         $applicant_id = isset($_POST['applicant_id']) ? intval($_POST['applicant_id']) : 0;
         
@@ -392,7 +395,7 @@ class BPP_Admin {
      *
      * @since    1.0.0
      */
-    public function ajax_reject_applicant() {
+    public function reject_applicant() {
         // Check nonce
         check_ajax_referer('bpp_admin_nonce', 'nonce');
 

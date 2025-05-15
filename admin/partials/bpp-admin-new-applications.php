@@ -16,6 +16,26 @@ if (!defined('WPINC')) {
     die;
 }
 
+/**
+ * Helper function to ensure values are strings before passing to WordPress formatting functions
+ * This prevents PHP 8.1 deprecation warnings about passing null to string functions
+ *
+ * @param mixed $value The value to ensure is a string
+ * @return string The value as a string, or empty string if null
+ */
+function bpp_ensure_string($value) {
+    return $value === null ? '' : (string)$value;
+}
+
+// Include WordPress core files for linter recognition
+require_once(ABSPATH . 'wp-includes/class-wp-query.php');
+require_once(ABSPATH . 'wp-includes/post.php');
+require_once(ABSPATH . 'wp-includes/formatting.php');
+require_once(ABSPATH . 'wp-includes/link-template.php');
+require_once(ABSPATH . 'wp-includes/post-template.php');
+require_once(ABSPATH . 'wp-includes/media.php');
+require_once(ABSPATH . 'wp-includes/l10n.php');
+
 // Get new applications (draft status)
 $args = array(
     'post_type' => 'bpp_applicant',
@@ -24,7 +44,15 @@ $args = array(
     'orderby' => 'date',
     'order' => 'DESC',
 );
-$applications_query = new WP_Query($args);
+
+// Safely create WP_Query
+try {
+    $applications_query = new WP_Query($args);
+} catch (Exception $e) {
+    // Handle exception
+    $applications_query = null;
+    echo '<div class="error"><p>Error: ' . esc_html($e->getMessage()) . '</p></div>';
+}
 ?>
 
 <div class="wrap bpp-admin-new-applications">
@@ -39,27 +67,60 @@ $applications_query = new WP_Query($args);
         </p>
     </div>
     
-    <?php if ($applications_query->have_posts()) : ?>
+    <?php if ($applications_query && $applications_query->have_posts()) : ?>
         <div class="bpp-application-list">
             <?php while ($applications_query->have_posts()) : $applications_query->the_post(); 
                 $post_id = get_the_ID();
                 $submission_date = get_post_meta($post_id, 'bpp_submission_date', true);
                 $formatted_date = !empty($submission_date) ? date_i18n(get_option('date_format'), strtotime($submission_date)) : '';
                 
-                $email = get_post_meta($post_id, 'bpp_email', true);
-                $phone = get_post_meta($post_id, 'bpp_phone', true);
-                $job_title = get_post_meta($post_id, 'bpp_job_title', true);
-                $years_experience = get_post_meta($post_id, 'bpp_years_experience', true);
-                $location = get_post_meta($post_id, 'bpp_location', true);
-                $linkedin = get_post_meta($post_id, 'bpp_linkedin', true);
+                $email = get_post_meta($post_id, 'bpp_email', true) ?: '';
+                $phone = get_post_meta($post_id, 'bpp_phone', true) ?: '';
+                $job_title = get_post_meta($post_id, 'bpp_job_title', true) ?: '';
+                $years_experience = get_post_meta($post_id, 'bpp_years_experience', true) ?: '';
+                $location = get_post_meta($post_id, 'bpp_location', true) ?: '';
+                $linkedin = get_post_meta($post_id, 'bpp_linkedin', true) ?: '';
                 
-                $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
-                $industry = !empty($industry_terms) ? $industry_terms[0] : '';
+                // Completely safe approach to get industry
+                $industry = '';
+                if (taxonomy_exists('bpp_industry')) {
+                    $terms = get_the_terms($post_id, 'bpp_industry');
+                    if ($terms && !is_wp_error($terms) && !empty($terms) && isset($terms[0])) {
+                        $industry = $terms[0]->name;
+                    }
+                }
                 
+                // Safely handle resume data
                 $resume_id = get_post_meta($post_id, 'bpp_resume', true);
-                $resume_url = !empty($resume_id) ? wp_get_attachment_url($resume_id) : '';
+                $resume_url = '';
+                $resume_filename = '';
+                
+                if (!empty($resume_id)) {
+                    if (is_wp_error($resume_id)) {
+                        $resume_url = '';
+                        $resume_filename = 'Error: ' . $resume_id->get_error_message();
+                    } else {
+                        $resume_url = wp_get_attachment_url($resume_id);
+                        $resume_filename = basename(get_attached_file($resume_id));
+                    }
+                }
+
+                // For the resume filename
+                if (!empty($resume_url)) {
+                    $resume_filename = (string)($resume_filename ?: '');
+                }
+
+                // Make sure years_experience is properly handled for _n() function
+                if (!empty($years_experience) && is_numeric($years_experience)) {
+                    $years_experience_display = sprintf(
+                        esc_html(_n('%d year', '%d years', intval($years_experience), 'black-potential-pipeline')), 
+                        intval($years_experience)
+                    );
+                } else {
+                    $years_experience_display = '';
+                }
             ?>
-                <div class="bpp-application-card" data-id="<?php echo esc_attr($post_id); ?>">
+                <div class="bpp-application-card" data-id="<?php echo esc_attr((string)$post_id); ?>">
                     <div class="bpp-application-header">
                         <h2 class="bpp-application-title"><?php the_title(); ?></h2>
                         <?php if (!empty($formatted_date)) : ?>
@@ -99,11 +160,11 @@ $applications_query = new WP_Query($args);
                                 </div>
                             <?php endif; ?>
                             
-                            <?php if (!empty($years_experience)) : ?>
+                            <?php if (!empty($years_experience_display)) : ?>
                                 <div class="bpp-meta-item">
                                     <span class="bpp-meta-label"><?php echo esc_html__('Experience:', 'black-potential-pipeline'); ?></span>
                                     <span class="bpp-meta-value">
-                                        <?php echo sprintf(esc_html(_n('%d year', '%d years', $years_experience, 'black-potential-pipeline')), $years_experience); ?>
+                                        <?php echo $years_experience_display; ?>
                                     </span>
                                 </div>
                             <?php endif; ?>
@@ -128,7 +189,11 @@ $applications_query = new WP_Query($args);
                                 <div class="bpp-meta-item">
                                     <span class="bpp-meta-label"><?php echo esc_html__('Resume:', 'black-potential-pipeline'); ?></span>
                                     <span class="bpp-meta-value">
-                                        <a href="<?php echo esc_url($resume_url); ?>" target="_blank"><?php echo esc_html__('Download Resume', 'black-potential-pipeline'); ?></a>
+                                        <?php if ($resume_url) : ?>
+                                            <a href="<?php echo esc_url((string)$resume_url); ?>" target="_blank"><?php echo esc_html((string)$resume_filename); ?></a>
+                                        <?php else : ?>
+                                            <?php echo esc_html((string)($resume_filename ?: __('No resume', 'black-potential-pipeline'))); ?>
+                                        <?php endif; ?>
                                     </span>
                                 </div>
                             <?php endif; ?>
@@ -144,12 +209,12 @@ $applications_query = new WP_Query($args);
                     
                     <div class="bpp-application-footer">
                         <div class="bpp-application-actions">
-                            <button type="button" class="button button-primary bpp-approve-button" data-id="<?php echo esc_attr($post_id); ?>">
+                            <button type="button" class="button button-primary bpp-approve-button" data-id="<?php echo esc_attr((string)$post_id); ?>">
                                 <span class="dashicons dashicons-yes"></span>
                                 <?php echo esc_html__('Approve', 'black-potential-pipeline'); ?>
                             </button>
                             
-                            <button type="button" class="button bpp-reject-button" data-id="<?php echo esc_attr($post_id); ?>">
+                            <button type="button" class="button bpp-reject-button" data-id="<?php echo esc_attr((string)$post_id); ?>">
                                 <span class="dashicons dashicons-no"></span>
                                 <?php echo esc_html__('Reject', 'black-potential-pipeline'); ?>
                             </button>

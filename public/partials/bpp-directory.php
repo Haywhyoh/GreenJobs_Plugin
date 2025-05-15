@@ -206,7 +206,10 @@ $current_url = esc_url(add_query_arg(array(), get_permalink()));
                 
                 // Get industry from taxonomy
                 $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
-                $industry = !empty($industry_terms) ? $industry_terms[0] : '';
+                $industry = '';
+                if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
+                    $industry = $industry_terms[0];
+                }
             ?>
                 <div class="bpp-professional-card">
                     <div class="bpp-professional-header">

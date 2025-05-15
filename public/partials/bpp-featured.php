@@ -80,7 +80,10 @@ if ($featured_query->post_count < $count) {
                             $post_id = get_the_ID();
                             $job_title = get_post_meta($post_id, 'bpp_job_title', true);
                             $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
-                            $industry = !empty($industry_terms) ? $industry_terms[0] : '';
+                            $industry = '';
+                            if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
+                                $industry = $industry_terms[0];
+                            }
                         ?>
                             <div class="bpp-carousel-slide">
                                 <div class="bpp-professional-card">
@@ -126,7 +129,10 @@ if ($featured_query->post_count < $count) {
                                 $post_id = get_the_ID();
                                 $job_title = get_post_meta($post_id, 'bpp_job_title', true);
                                 $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
-                                $industry = !empty($industry_terms) ? $industry_terms[0] : '';
+                                $industry = '';
+                                if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
+                                    $industry = $industry_terms[0];
+                                }
                         ?>
                             <div class="bpp-carousel-slide">
                                 <div class="bpp-professional-card">
@@ -187,7 +193,10 @@ if ($featured_query->post_count < $count) {
                     $post_id = get_the_ID();
                     $job_title = get_post_meta($post_id, 'bpp_job_title', true);
                     $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
-                    $industry = !empty($industry_terms) ? $industry_terms[0] : '';
+                    $industry = '';
+                    if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
+                        $industry = $industry_terms[0];
+                    }
                 ?>
                     <div class="bpp-professional-card">
                         <div class="bpp-professional-header">
@@ -231,7 +240,10 @@ if ($featured_query->post_count < $count) {
                         $post_id = get_the_ID();
                         $job_title = get_post_meta($post_id, 'bpp_job_title', true);
                         $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
-                        $industry = !empty($industry_terms) ? $industry_terms[0] : '';
+                        $industry = '';
+                        if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
+                            $industry = $industry_terms[0];
+                        }
                 ?>
                     <div class="bpp-professional-card">
                         <div class="bpp-professional-header">

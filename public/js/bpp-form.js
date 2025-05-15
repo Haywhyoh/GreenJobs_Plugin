@@ -194,6 +194,23 @@
             formData.append('action', 'bpp_submit_application');
             formData.append('nonce', bpp_form_obj.nonce);
             
+            // Debug file inputs specifically
+            const resumeInput = document.getElementById('bpp_resume');
+            if (resumeInput && resumeInput.files.length > 0) {
+                console.log('Resume file being added to FormData:', resumeInput.files[0].name);
+                // Explicitly add the file to ensure it's included
+                formData.delete('resume'); // Remove any existing entry
+                formData.append('resume', resumeInput.files[0]);
+            }
+            
+            const photoInput = document.getElementById('bpp_photo');
+            if (photoInput && photoInput.files.length > 0) {
+                console.log('Photo file being added to FormData:', photoInput.files[0].name);
+                // Explicitly add the file to ensure it's included
+                formData.delete('photo'); // Remove any existing entry
+                formData.append('photo', photoInput.files[0]);
+            }
+            
             // Debug: Log form data being submitted
             console.log('Form submission started');
             console.log('AJAX URL:', bpp_form_obj.ajax_url);
@@ -201,9 +218,6 @@
             console.log('Nonce:', bpp_form_obj.nonce);
             
             // Debug file inputs
-            const resumeInput = document.getElementById('bpp_resume');
-            const photoInput = document.getElementById('bpp_photo');
-            
             console.log('File Input Debug:');
             if (resumeInput) {
                 console.log('Resume Input: Found');
@@ -251,9 +265,39 @@
                     
                     console.log('AJAX Response:', response);
                     
-                    if (response.success) {
+                    // Check if response is properly formatted
+                    if (typeof response !== 'object') {
+                        console.error('Invalid response format:', response);
+                        displayMessage(bpp_form_obj.i18n.submit_error, false);
+                        return;
+                    }
+                    
+                    // Extract message from response (handle both direct and nested structures)
+                    let message = '';
+                    let success = false;
+                    
+                    if (response.success !== undefined) {
+                        success = response.success;
+                        
+                        // Try to get message from different possible locations
+                        if (response.message) {
+                            message = response.message;
+                        } else if (response.data && response.data.message) {
+                            message = response.data.message;
+                        }
+                    } else if (response.data && response.data.success !== undefined) {
+                        success = response.data.success;
+                        message = response.data.message || '';
+                    }
+                    
+                    console.log('Processed response:', { success: success, message: message });
+                    
+                    // Handle success or error
+                    if (success) {
+                        console.log('Form submission successful!');
+                        
                         // Show success message
-                        displayMessage(response.message, true);
+                        displayMessage(message || bpp_form_obj.i18n.submit_success, true);
                         
                         // Reset form
                         $form[0].reset();
@@ -267,16 +311,20 @@
                             scrollTop: $successMessage.offset().top - 100
                         }, 500);
                     } else {
+                        console.log('Form submission failed with message:', message || 'Unknown error');
+                        
                         // Show error message
-                        if (response.message) {
-                            displayMessage(response.message, false);
+                        if (message) {
+                            displayMessage(message, false);
                         } else {
                             displayMessage(bpp_form_obj.i18n.submit_error, false);
                         }
                         
                         // Show field-specific errors if available
-                        if (response.errors) {
-                            $.each(response.errors, function(fieldId, errorMessage) {
+                        let errors = response.errors || (response.data ? response.data.errors : null);
+                        if (errors) {
+                            console.log('Specific errors:', errors);
+                            $.each(errors, function(fieldId, errorMessage) {
                                 showFieldError(fieldId, errorMessage);
                             });
                         }
@@ -288,13 +336,12 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    // Log error details to console
-                    console.error('AJAX Error:', status, error);
-                    console.log('Response Text:', xhr.responseText);
-                    
                     // Re-enable submit button and hide spinner
                     $submitButton.prop('disabled', false);
                     $spinner.hide();
+                    
+                    console.error('AJAX Error:', status, error);
+                    console.log('Response Text:', xhr.responseText);
                     
                     // Show error message
                     displayMessage(bpp_form_obj.i18n.submit_error, false);

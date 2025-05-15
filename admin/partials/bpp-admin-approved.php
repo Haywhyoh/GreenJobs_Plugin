@@ -98,7 +98,10 @@ if (!empty($selected_industry)) {
                 $skills = get_post_meta($post_id, 'bpp_skills', true);
                 
                 $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
-                $industry = !empty($industry_terms) ? $industry_terms[0] : '';
+                $industry = '';
+                if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
+                    $industry = $industry_terms[0];
+                }
                 
                 $resume_id = get_post_meta($post_id, 'bpp_resume', true);
                 $resume_url = !empty($resume_id) ? wp_get_attachment_url($resume_id) : '';

@@ -396,34 +396,125 @@ class BPP_Email_Manager {
     }
 
     /**
-     * Get applicant data for emails.
+     * Get applicant data for email templates
      *
      * @since    1.0.0
-     * @param    int      $applicant_id    The applicant ID.
-     * @return   array                     Applicant data.
+     * @param    int    $applicant_id    The applicant post ID
+     * @return   array                   Applicant data
      */
     private function get_applicant_data($applicant_id) {
+        // Get applicant post
         $applicant = get_post($applicant_id);
+        
         if (!$applicant) {
+            error_log('Email Manager: Applicant post not found for ID: ' . $applicant_id);
             return array();
         }
-
-        $name = $applicant->post_title;
-        $first_name = explode(' ', $name)[0];
-        $email = get_post_meta($applicant_id, 'bpp_email', true);
-        $industry_terms = wp_get_post_terms($applicant_id, 'bpp_industry', array('fields' => 'names'));
-        $industry = !empty($industry_terms) ? $industry_terms[0] : '';
-        $job_title = get_post_meta($applicant_id, 'bpp_job_title', true);
-        $years_experience = get_post_meta($applicant_id, 'bpp_years_experience', true);
         
-        return array(
-            'id' => $applicant_id,
-            'name' => $name,
-            'first_name' => $first_name,
-            'email' => $email,
-            'industry' => $industry,
-            'job_title' => $job_title,
-            'years_experience' => $years_experience,
+        // Get applicant meta
+        $first_name = get_post_meta($applicant_id, 'first_name', true);
+        $last_name = get_post_meta($applicant_id, 'last_name', true);
+        $email = get_post_meta($applicant_id, 'email', true);
+        $phone = get_post_meta($applicant_id, 'phone', true);
+        $job_title = get_post_meta($applicant_id, 'job_title', true);
+        $industry = get_post_meta($applicant_id, 'industry', true);
+        $years_experience = get_post_meta($applicant_id, 'years_experience', true);
+        $skills = get_post_meta($applicant_id, 'skills', true);
+        $website = get_post_meta($applicant_id, 'website', true);
+        $linkedin = get_post_meta($applicant_id, 'linkedin', true);
+        $cover_letter = get_post_meta($applicant_id, 'cover_letter', true);
+        
+        // Get resume attachment
+        $resume_id = get_post_meta($applicant_id, 'resume_id', true);
+        $resume_url = '';
+        $resume_filename = '';
+        
+        if ($resume_id) {
+            // Check if resume_id is a WP_Error object
+            if (is_wp_error($resume_id)) {
+                error_log('Email Manager: Resume ID is a WP_Error: ' . $resume_id->get_error_message());
+                $resume_url = '';
+                $resume_filename = '';
+            } else {
+                $resume_url = wp_get_attachment_url($resume_id);
+                $resume_filename = basename(get_attached_file($resume_id));
+                
+                // Check if we got valid results
+                if (!$resume_url) {
+                    error_log('Email Manager: Could not get resume URL for attachment ID: ' . $resume_id);
+                    $resume_url = '';
+                }
+                
+                if (!$resume_filename) {
+                    error_log('Email Manager: Could not get resume filename for attachment ID: ' . $resume_id);
+                    $resume_filename = '';
+                }
+            }
+        }
+        
+        // Get photo attachment
+        $photo_id = get_post_meta($applicant_id, 'photo_id', true);
+        $photo_url = '';
+        
+        if ($photo_id) {
+            // Check if photo_id is a WP_Error object
+            if (is_wp_error($photo_id)) {
+                error_log('Email Manager: Photo ID is a WP_Error: ' . $photo_id->get_error_message());
+                $photo_url = '';
+            } else {
+                $photo_url = wp_get_attachment_url($photo_id);
+                
+                // Check if we got a valid URL
+                if (!$photo_url) {
+                    error_log('Email Manager: Could not get photo URL for attachment ID: ' . $photo_id);
+                    $photo_url = '';
+                }
+            }
+        }
+        
+        // Get industry label
+        $industry_label = $industry;
+        $industries = array(
+            'climate-science' => __('Climate Science', 'black-potential-pipeline'),
+            'environmental-policy' => __('Environmental Policy', 'black-potential-pipeline'),
+            'renewable-energy' => __('Renewable Energy', 'black-potential-pipeline'),
+            'sustainable-agriculture' => __('Sustainable Agriculture', 'black-potential-pipeline'),
+            'conservation' => __('Conservation', 'black-potential-pipeline'),
+            'environmental-justice' => __('Environmental Justice', 'black-potential-pipeline'),
+            'green-building' => __('Green Building', 'black-potential-pipeline'),
+            'waste-management' => __('Waste Management', 'black-potential-pipeline'),
+            'water-resources' => __('Water Resources', 'black-potential-pipeline'),
+            'nature-based-work' => __('Nature-Based Work', 'black-potential-pipeline'),
+            'other' => __('Other', 'black-potential-pipeline')
         );
+        
+        if (isset($industries[$industry])) {
+            $industry_label = $industries[$industry];
+        }
+        
+        // Build applicant data array
+        $applicant_data = array(
+            'id' => $applicant_id,
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'full_name' => $first_name . ' ' . $last_name,
+            'email' => $email,
+            'phone' => $phone,
+            'job_title' => $job_title,
+            'industry' => $industry,
+            'industry_label' => $industry_label,
+            'years_experience' => $years_experience,
+            'skills' => $skills,
+            'website' => $website,
+            'linkedin' => $linkedin,
+            'cover_letter' => $cover_letter,
+            'resume_url' => $resume_url,
+            'resume_filename' => $resume_filename,
+            'photo_url' => $photo_url,
+            'submission_date' => get_the_date('F j, Y', $applicant_id),
+            'admin_url' => admin_url('post.php?post=' . $applicant_id . '&action=edit')
+        );
+        
+        return $applicant_data;
     }
 } 

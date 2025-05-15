@@ -341,7 +341,8 @@ Thank you,
 Black Potential Pipeline Plugin', 'black-potential-pipeline'),
             get_the_title($applicant),
             get_post_meta($applicant_id, 'bpp_email', true),
-            wp_get_post_terms($applicant_id, 'bpp_industry', array('fields' => 'names'))[0] ?? '',
+            function_exists('is_wp_error') && function_exists('wp_get_post_terms') ? 
+                (($terms = wp_get_post_terms($applicant_id, 'bpp_industry', array('fields' => 'names'))) && !is_wp_error($terms) && !empty($terms) ? $terms[0] : '') : '',
             get_post_meta($applicant_id, 'bpp_job_title', true),
             get_post_meta($applicant_id, 'bpp_years_experience', true),
             admin_url('admin.php?page=bpp-new-applications')

@@ -37,7 +37,10 @@ $featured = (bool) get_post_meta($post_id, 'bpp_featured', true);
 
 // Get industry from taxonomy
 $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
-$industry = !empty($industry_terms) ? $industry_terms[0] : '';
+$industry = '';
+if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
+    $industry = $industry_terms[0];
+}
 
 // Get related professionals in the same industry (limit to 3)
 $related_args = array(
@@ -215,7 +218,10 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                     
                     // Get industry from taxonomy for related professional
                     $related_industry_terms = wp_get_post_terms($related_id, 'bpp_industry', array('fields' => 'names'));
-                    $related_industry = !empty($related_industry_terms) ? $related_industry_terms[0] : '';
+                    $related_industry = '';
+                    if (!is_wp_error($related_industry_terms) && !empty($related_industry_terms)) {
+                        $related_industry = $related_industry_terms[0];
+                    }
                 ?>
                     <div class="bpp-related-profile-card">
                         <div class="bpp-related-profile-header">

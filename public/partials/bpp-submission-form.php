@@ -391,7 +391,7 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                             </label>
                             <input type="file" id="bpp_photo" name="photo" 
                                    class="<?php echo $use_bootstrap ? 'form-control' : ''; ?>"
-                                   accept="image/*" 
+                                   accept=".jpg,.jpeg,.png,.gif" 
                                    <?php echo in_array('photo', $required_fields) ? 'required' : ''; ?>>
                             <div id="bpp_photo_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
                             <small class="<?php echo esc_attr($help_text_class); ?>">
