@@ -394,6 +394,13 @@ try {
                                             </p>
                                         </div>
                                     <?php endif; ?>
+                                    
+                                    <div class="bpp-details-actions" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; text-align: right;">
+                                        <a href="<?php echo esc_url(admin_url('admin.php?page=bpp-applicant-profile&id=' . $post_id)); ?>" class="button button-primary" style="display: inline-flex; align-items: center; gap: 5px;">
+                                            <span class="dashicons dashicons-admin-users"></span>
+                                            <?php echo esc_html__('View Full Profile', 'black-potential-pipeline'); ?>
+                                        </a>
+                                    </div>
                                 </div>
                             </td>
                         </tr>

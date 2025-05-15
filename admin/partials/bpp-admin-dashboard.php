@@ -233,6 +233,10 @@ if (!defined('WPINC')) {
                                         </p>
                                     </div>
                                     <div class="bpp-featured-actions">
+                                        <a href="<?php echo esc_url(admin_url('admin.php?page=bpp-applicant-profile&id=' . $professional->ID)); ?>" class="button button-small">
+                                            <span class="dashicons dashicons-admin-users"></span>
+                                            <?php echo esc_html__('Profile', 'black-potential-pipeline'); ?>
+                                        </a>
                                         <a href="<?php echo esc_url(get_edit_post_link($professional->ID)); ?>" class="button button-small">
                                             <span class="dashicons dashicons-edit"></span>
                                             <?php echo esc_html__('Edit', 'black-potential-pipeline'); ?>
