@@ -372,11 +372,11 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                             </label>
                             <input type="file" id="bpp_resume" name="resume" 
                                    class="<?php echo $use_bootstrap ? 'form-control' : ''; ?>"
-                                   accept=".pdf" 
+                                   accept=".pdf,.doc,.docx" 
                                    <?php echo in_array('resume', $required_fields) ? 'required' : ''; ?>>
                             <div id="bpp_resume_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
                             <small class="<?php echo esc_attr($help_text_class); ?>">
-                                <?php _e('Maximum file size: 5MB', 'black-potential-pipeline'); ?>
+                                <?php _e('Maximum file size: 5MB. Accepted formats: PDF, DOC, DOCX', 'black-potential-pipeline'); ?>
                             </small>
                         </div>
                     <?php endif; ?>

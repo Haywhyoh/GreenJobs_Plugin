@@ -68,6 +68,10 @@ class BPP_Form_Handler {
      * @since    1.0.0
      */
     public function process_application_submission() {
+        // Debug information
+        error_log('BPP Form Handler: Processing application submission');
+        error_log('$_FILES contents: ' . print_r($_FILES, true));
+        
         // Check nonce for security
         if (!check_ajax_referer('bpp_form_nonce', 'nonce', false)) {
             $this->send_error_response(__('Security check failed. Please refresh the page and try again.', 'black-potential-pipeline'));

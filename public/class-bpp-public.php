@@ -203,113 +203,17 @@ class BPP_Public {
     /**
      * Process the application submission from the form.
      *
+     * This method is no longer used as form handling is now done by BPP_Form_Handler.
+     * 
      * @since    1.0.0
+     * @deprecated
      */
+    /*
     public function process_application_submission() {
-        // Check nonce
-        check_ajax_referer('bpp_form_nonce', 'nonce');
-
-        // Initialize response array
-        $response = array(
-            'success' => false,
-            'message' => __('Error processing submission.', 'black-potential-pipeline'),
-        );
-
-        // Validate required fields
-        $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume');
-        foreach ($required_fields as $field) {
-            if (empty($_POST[$field])) {
-                $response['message'] = sprintf(__('Missing required field: %s', 'black-potential-pipeline'), $field);
-                wp_send_json($response);
-                return;
-            }
-        }
-        
-        // Special check for resume file upload
-        if (in_array('resume', $required_fields)) {
-            if (empty($_FILES['resume']) || $_FILES['resume']['error'] !== UPLOAD_ERR_OK || empty($_FILES['resume']['tmp_name'])) {
-                $response['message'] = __('Missing required field: Resume/CV', 'black-potential-pipeline');
-                wp_send_json($response);
-                return;
-            }
-        }
-
-        // Sanitize input data
-        $first_name = sanitize_text_field($_POST['first_name']);
-        $last_name = sanitize_text_field($_POST['last_name']);
-        $email = sanitize_email($_POST['email']);
-        $phone = sanitize_text_field($_POST['phone'] ?? '');
-        $industry = sanitize_text_field($_POST['industry']);
-        $job_title = sanitize_text_field($_POST['job_title'] ?? '');
-        $years_experience = intval($_POST['years_experience'] ?? 0);
-        $linkedin = esc_url_raw($_POST['linkedin'] ?? '');
-        $skills = sanitize_textarea_field($_POST['skills'] ?? '');
-        $cover_letter = sanitize_textarea_field($_POST['cover_letter']);
-        $job_type = sanitize_text_field($_POST['job_type'] ?? '');
-        $location = sanitize_text_field($_POST['location'] ?? '');
-        $consent = isset($_POST['consent']) && $_POST['consent'] === 'yes';
-
-        // Validate email
-        if (!is_email($email)) {
-            $response['message'] = __('Please provide a valid email address.', 'black-potential-pipeline');
-            wp_send_json($response);
-            return;
-        }
-
-        // Create a new applicant post
-        $applicant_data = array(
-            'post_title'    => $first_name . ' ' . $last_name,
-            'post_content'  => $cover_letter,
-            'post_status'   => 'draft', // Start as draft for review
-            'post_type'     => 'bpp_applicant',
-            'post_author'   => 1, // Default admin user
-        );
-
-        // Insert the post into the database
-        $applicant_id = wp_insert_post($applicant_data);
-
-        if (!$applicant_id || is_wp_error($applicant_id)) {
-            $response['message'] = __('Failed to create application. Please try again.', 'black-potential-pipeline');
-            wp_send_json($response);
-            return;
-        }
-
-        // Save meta data
-        update_post_meta($applicant_id, 'bpp_email', $email);
-        update_post_meta($applicant_id, 'bpp_phone', $phone);
-        update_post_meta($applicant_id, 'bpp_job_title', $job_title);
-        update_post_meta($applicant_id, 'bpp_years_experience', $years_experience);
-        update_post_meta($applicant_id, 'bpp_linkedin', $linkedin);
-        update_post_meta($applicant_id, 'bpp_skills', $skills);
-        update_post_meta($applicant_id, 'bpp_job_type', $job_type);
-        update_post_meta($applicant_id, 'bpp_location', $location);
-        update_post_meta($applicant_id, 'bpp_consent', $consent ? 'yes' : 'no');
-        update_post_meta($applicant_id, 'bpp_submission_date', current_time('mysql'));
-
-        // Set the industry taxonomy
-        wp_set_object_terms($applicant_id, $industry, 'bpp_industry');
-
-        // Handle resume upload
-        if (!empty($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
-            $this->handle_resume_upload($applicant_id);
-        }
-
-        // Handle photo upload
-        if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-            $this->handle_photo_upload($applicant_id);
-        }
-
-        // Send notification email to admin
-        $this->send_admin_notification($applicant_id);
-
-        // Send confirmation email to applicant
-        $this->send_applicant_confirmation($applicant_id);
-
-        // Return success response
-        $response['success'] = true;
-        $response['message'] = __('Thank you for your submission! We will review your application shortly.', 'black-potential-pipeline');
-        wp_send_json($response);
+        // This method is no longer used
+        // Form submissions are now handled by BPP_Form_Handler
     }
+    */
 
     /**
      * Handle resume file upload.
