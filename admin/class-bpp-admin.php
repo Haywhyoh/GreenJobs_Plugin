@@ -54,6 +54,9 @@ class BPP_Admin {
         add_action('wp_ajax_bpp_approve_applicant', array($this, 'approve_applicant'));
         add_action('wp_ajax_bpp_reject_applicant', array($this, 'reject_applicant'));
         add_action('wp_ajax_bpp_toggle_featured', array($this, 'toggle_featured'));
+        
+        // Add action for profile update form submission
+        add_action('admin_post_bpp_update_profile', array($this, 'handle_profile_update'));
     }
 
     /**
@@ -167,6 +170,16 @@ class BPP_Admin {
             'manage_options',
             'bpp-settings',
             array($this, 'display_settings_page')
+        );
+        
+        // Add a hidden submenu for the applicant profile view
+        add_submenu_page(
+            null, // No parent, so it won't appear in the menu
+            __('Applicant Profile', 'black-potential-pipeline'),
+            __('Applicant Profile', 'black-potential-pipeline'),
+            'manage_options',
+            'bpp-applicant-profile',
+            array($this, 'display_applicant_profile_page')
         );
     }
 
@@ -333,6 +346,98 @@ class BPP_Admin {
      */
     public function display_settings_page() {
         include_once BPP_PLUGIN_DIR . 'admin/partials/bpp-admin-settings.php';
+    }
+
+    /**
+     * Display the applicant profile page.
+     * 
+     * @since    1.0.0
+     */
+    public function display_applicant_profile_page() {
+        include_once BPP_PLUGIN_DIR . 'admin/partials/bpp-admin-profile-view.php';
+    }
+    
+    /**
+     * Handle profile update form submission.
+     * 
+     * @since    1.0.0
+     */
+    public function handle_profile_update() {
+        // Check nonce
+        if (!isset($_POST['bpp_profile_nonce']) || !wp_verify_nonce($_POST['bpp_profile_nonce'], 'bpp_update_profile')) {
+            wp_die(__('Security check failed.', 'black-potential-pipeline'));
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have permission to perform this action.', 'black-potential-pipeline'));
+        }
+        
+        // Get applicant ID
+        $applicant_id = isset($_POST['applicant_id']) ? intval($_POST['applicant_id']) : 0;
+        
+        if (!$applicant_id) {
+            wp_die(__('Invalid applicant ID.', 'black-potential-pipeline'));
+        }
+        
+        // Get form data
+        $name = isset($_POST['bpp_name']) ? sanitize_text_field($_POST['bpp_name']) : '';
+        $job_title = isset($_POST['bpp_job_title']) ? sanitize_text_field($_POST['bpp_job_title']) : '';
+        $industry = isset($_POST['bpp_industry']) ? sanitize_text_field($_POST['bpp_industry']) : '';
+        $location = isset($_POST['bpp_location']) ? sanitize_text_field($_POST['bpp_location']) : '';
+        $years_experience = isset($_POST['bpp_years_experience']) ? intval($_POST['bpp_years_experience']) : 0;
+        $status = isset($_POST['bpp_status']) ? sanitize_text_field($_POST['bpp_status']) : 'publish';
+        $featured = isset($_POST['bpp_featured']) ? 1 : 0;
+        $email = isset($_POST['bpp_email']) ? sanitize_email($_POST['bpp_email']) : '';
+        $phone = isset($_POST['bpp_phone']) ? sanitize_text_field($_POST['bpp_phone']) : '';
+        $linkedin = isset($_POST['bpp_linkedin']) ? esc_url_raw($_POST['bpp_linkedin']) : '';
+        $website = isset($_POST['bpp_website']) ? esc_url_raw($_POST['bpp_website']) : '';
+        $skills = isset($_POST['bpp_skills']) ? sanitize_text_field($_POST['bpp_skills']) : '';
+        $bio = isset($_POST['bpp_bio']) ? sanitize_textarea_field($_POST['bpp_bio']) : '';
+        
+        // Update the applicant post
+        $post_data = array(
+            'ID' => $applicant_id,
+            'post_title' => $name,
+            'post_content' => $bio,
+            'post_status' => $status,
+        );
+        
+        $updated = wp_update_post($post_data);
+        
+        if (!$updated) {
+            wp_die(__('Failed to update profile.', 'black-potential-pipeline'));
+        }
+        
+        // Update post meta
+        update_post_meta($applicant_id, 'bpp_job_title', $job_title);
+        update_post_meta($applicant_id, 'bpp_location', $location);
+        update_post_meta($applicant_id, 'bpp_years_experience', $years_experience);
+        update_post_meta($applicant_id, 'bpp_featured', $featured);
+        update_post_meta($applicant_id, 'bpp_email', $email);
+        update_post_meta($applicant_id, 'bpp_phone', $phone);
+        update_post_meta($applicant_id, 'bpp_linkedin', $linkedin);
+        update_post_meta($applicant_id, 'bpp_website', $website);
+        update_post_meta($applicant_id, 'bpp_skills', $skills);
+        update_post_meta($applicant_id, 'bpp_bio', $bio);
+        
+        // If status changed to publish, update approval date
+        if ($status === 'publish') {
+            // Only update approval date if it doesn't exist or status was previously not published
+            $current_post = get_post($applicant_id);
+            if ($current_post->post_status !== 'publish' || !get_post_meta($applicant_id, 'bpp_approval_date', true)) {
+                update_post_meta($applicant_id, 'bpp_approval_date', current_time('mysql'));
+            }
+        }
+        
+        // Add/update industry if provided
+        if (!empty($industry)) {
+            wp_set_object_terms($applicant_id, $industry, 'bpp_industry', false);
+        }
+        
+        // Redirect back to the profile view with a success message
+        wp_redirect(admin_url('admin.php?page=bpp-applicant-profile&id=' . $applicant_id . '&updated=true'));
+        exit;
     }
 
     /**

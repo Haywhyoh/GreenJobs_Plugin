@@ -41,6 +41,7 @@ COMPLETED TASKS:
 ✅ Added expandable details for applicant information across all views
 ✅ Created dropdown action menus for all application management pages
 ✅ Fixed popup for admin to add rejection reasons
+✅ Created dedicated applicant profile view/edit page with comprehensive editing functionality
 
 
 Important Next Steps:

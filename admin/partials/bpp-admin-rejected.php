@@ -328,6 +328,10 @@ if (!empty($selected_industry)) {
                                             <span class="dashicons dashicons-yes"></span>
                                             <?php echo esc_html__('Reconsider & Approve', 'black-potential-pipeline'); ?>
                                         </button>
+                                        <a href="<?php echo esc_url(admin_url('admin.php?page=bpp-applicant-profile&id=' . $post_id)); ?>" class="bpp-dropdown-item">
+                                            <span class="dashicons dashicons-admin-users"></span>
+                                            <?php echo esc_html__('Detailed View/Edit', 'black-potential-pipeline'); ?>
+                                        </a>
                                         <a href="<?php echo esc_url(get_edit_post_link($post_id)); ?>" class="bpp-dropdown-item">
                                             <span class="dashicons dashicons-edit"></span>
                                             <?php echo esc_html__('Edit', 'black-potential-pipeline'); ?>
