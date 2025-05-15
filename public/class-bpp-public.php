@@ -457,13 +457,23 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
                 'title' => __('Black Potential Pipeline Directory', 'black-potential-pipeline'),
                 'per_page' => 12,
                 'layout' => 'grid', // grid or list
+                'use_bootstrap' => 'yes', // Enable Bootstrap styling by default
             ),
             $atts,
             'black_potential_pipeline_directory'
         );
 
-        // Enqueue directory-specific scripts and styles
-        wp_enqueue_style('bpp-directory-style');
+        // Check if Bootstrap styling is enabled
+        if (isset($atts['use_bootstrap']) && $atts['use_bootstrap'] === 'yes') {
+            wp_enqueue_style('bpp-bootstrap-style');
+            wp_enqueue_style('bpp-bootstrap-custom-style');
+            wp_enqueue_script('bpp-bootstrap-script');
+        } else {
+            // Enqueue regular directory-specific styles
+            wp_enqueue_style('bpp-directory-style');
+        }
+        
+        // Enqueue directory-specific scripts
         wp_enqueue_script('bpp-directory-script');
 
         // Start output buffering
@@ -493,6 +503,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
                 'title' => '',
                 'per_page' => 12,
                 'layout' => 'grid', // grid or list
+                'use_bootstrap' => 'yes', // Enable Bootstrap styling by default
             ),
             $atts,
             'black_potential_pipeline_category'
@@ -509,8 +520,17 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             $atts['title'] = sprintf(__('Black Professionals in %s', 'black-potential-pipeline'), $category_term ? $category_term->name : $atts['category']);
         }
 
-        // Enqueue directory-specific scripts and styles
-        wp_enqueue_style('bpp-directory-style');
+        // Check if Bootstrap styling is enabled
+        if (isset($atts['use_bootstrap']) && $atts['use_bootstrap'] === 'yes') {
+            wp_enqueue_style('bpp-bootstrap-style');
+            wp_enqueue_style('bpp-bootstrap-custom-style');
+            wp_enqueue_script('bpp-bootstrap-script');
+        } else {
+            // Enqueue regular directory-specific styles
+            wp_enqueue_style('bpp-directory-style');
+        }
+        
+        // Enqueue directory-specific scripts
         wp_enqueue_script('bpp-directory-script');
 
         // Start output buffering

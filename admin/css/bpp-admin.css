@@ -185,6 +185,58 @@
     font-size: 13px;
 }
 
+/* Featured Professionals */
+.bpp-featured-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.bpp-featured-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.bpp-featured-item:last-child {
+    border-bottom: none;
+}
+
+.bpp-featured-pro-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+}
+
+.bpp-featured-pro-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.bpp-job-title {
+    font-weight: 600;
+}
+
+.bpp-industry {
+    margin-left: 5px;
+    padding-left: 5px;
+    border-left: 1px solid #ddd;
+}
+
+.bpp-featured-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.bpp-featured-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
 /* Application Review */
 .bpp-application-list {
     margin-top: 20px;

@@ -51,7 +51,37 @@ if (!defined('WPINC')) {
                 $post_counts = wp_count_posts('bpp_applicant');
                 $new_count = isset($post_counts->draft) ? $post_counts->draft : 0;
                 $approved_count = isset($post_counts->publish) ? $post_counts->publish : 0;
-                $rejected_count = isset($post_counts->private) ? $post_counts->private : 0;
+                
+                // Count rejected applications properly (checking meta fields)
+                $rejected_private = new WP_Query(array(
+                    'post_type' => 'bpp_applicant',
+                    'post_status' => 'private',
+                    'posts_per_page' => -1,
+                    'fields' => 'ids',
+                    'meta_query' => array(
+                        array(
+                            'key' => 'bpp_rejected',
+                            'value' => '1',
+                            'compare' => '=',
+                        ),
+                    ),
+                ));
+                
+                $rejected_trash = new WP_Query(array(
+                    'post_type' => 'bpp_applicant',
+                    'post_status' => 'trash',
+                    'posts_per_page' => -1,
+                    'fields' => 'ids',
+                    'meta_query' => array(
+                        array(
+                            'key' => 'bpp_application_status',
+                            'value' => 'rejected',
+                            'compare' => '=',
+                        ),
+                    ),
+                ));
+                
+                $rejected_count = $rejected_private->found_posts + $rejected_trash->found_posts;
                 $total_count = $new_count + $approved_count + $rejected_count;
                 
                 // Get industry counts
@@ -59,6 +89,21 @@ if (!defined('WPINC')) {
                     'taxonomy' => 'bpp_industry',
                     'hide_empty' => false,
                 ));
+                
+                // Get featured count
+                $featured_count = get_posts(array(
+                    'post_type' => 'bpp_applicant',
+                    'post_status' => 'publish',
+                    'numberposts' => -1,
+                    'meta_query' => array(
+                        array(
+                            'key' => 'bpp_featured',
+                            'value' => '1',
+                            'compare' => '=',
+                        ),
+                    ),
+                ));
+                $featured_count = count($featured_count);
                 ?>
                 <div class="bpp-stats-grid">
                     <div class="bpp-stat-item">
@@ -76,6 +121,10 @@ if (!defined('WPINC')) {
                     <div class="bpp-stat-item">
                         <span class="bpp-stat-number"><?php echo esc_html($rejected_count); ?></span>
                         <span class="bpp-stat-label"><?php echo esc_html__('Rejected Applications', 'black-potential-pipeline'); ?></span>
+                    </div>
+                    <div class="bpp-stat-item">
+                        <span class="bpp-stat-number"><?php echo esc_html($featured_count); ?></span>
+                        <span class="bpp-stat-label"><?php echo esc_html__('Featured Professionals', 'black-potential-pipeline'); ?></span>
                     </div>
                 </div>
             </div>
@@ -135,6 +184,79 @@ if (!defined('WPINC')) {
                         <?php echo esc_html__('Configure Settings', 'black-potential-pipeline'); ?>
                     </a>
                 </div>
+            </div>
+        </div>
+        
+        <div class="bpp-card">
+            <div class="bpp-card-header">
+                <span class="dashicons dashicons-star-filled"></span>
+                <h3><?php echo esc_html__('Featured Professionals', 'black-potential-pipeline'); ?></h3>
+            </div>
+            <div class="bpp-card-body">
+                <?php
+                // Get featured professionals
+                $featured_professionals = get_posts(array(
+                    'post_type' => 'bpp_applicant',
+                    'post_status' => 'publish',
+                    'posts_per_page' => 5, // Show only 5 featured pros
+                    'meta_query' => array(
+                        array(
+                            'key' => 'bpp_featured',
+                            'value' => '1',
+                            'compare' => '=',
+                        ),
+                    ),
+                ));
+                
+                if (!empty($featured_professionals)) :
+                ?>
+                    <div class="bpp-featured-professionals">
+                        <ul class="bpp-featured-list">
+                            <?php foreach ($featured_professionals as $professional) : 
+                                $job_title = get_post_meta($professional->ID, 'bpp_job_title', true);
+                                $industry_terms = wp_get_post_terms($professional->ID, 'bpp_industry', array('fields' => 'names'));
+                                $industry = '';
+                                if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
+                                    $industry = $industry_terms[0];
+                                }
+                            ?>
+                                <li class="bpp-featured-item">
+                                    <div class="bpp-featured-pro-info">
+                                        <h4><?php echo esc_html($professional->post_title); ?></h4>
+                                        <p>
+                                            <?php if (!empty($job_title)) : ?>
+                                                <span class="bpp-job-title"><?php echo esc_html($job_title); ?></span>
+                                            <?php endif; ?>
+                                            <?php if (!empty($industry)) : ?>
+                                                <span class="bpp-industry"><?php echo esc_html($industry); ?></span>
+                                            <?php endif; ?>
+                                        </p>
+                                    </div>
+                                    <div class="bpp-featured-actions">
+                                        <a href="<?php echo esc_url(get_edit_post_link($professional->ID)); ?>" class="button button-small">
+                                            <span class="dashicons dashicons-edit"></span>
+                                            <?php echo esc_html__('Edit', 'black-potential-pipeline'); ?>
+                                        </a>
+                                        <a href="<?php echo esc_url(get_permalink($professional->ID)); ?>" class="button button-small" target="_blank">
+                                            <span class="dashicons dashicons-visibility"></span>
+                                            <?php echo esc_html__('View', 'black-potential-pipeline'); ?>
+                                        </a>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <div class="bpp-featured-footer">
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=bpp-approved')); ?>" class="button">
+                                <?php echo esc_html__('Manage Featured Professionals', 'black-potential-pipeline'); ?>
+                            </a>
+                        </div>
+                    </div>
+                <?php else : ?>
+                    <p><?php echo esc_html__('No featured professionals yet. Use the "Feature" button on approved professionals to highlight them.', 'black-potential-pipeline'); ?></p>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=bpp-approved')); ?>" class="button">
+                        <?php echo esc_html__('Go to Approved Professionals', 'black-potential-pipeline'); ?>
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
         

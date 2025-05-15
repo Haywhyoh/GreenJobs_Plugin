@@ -4,7 +4,7 @@
  * Plugin URI: https://beinitiative/black-potential-pipeline
  * Description: A curated database of Black professionals seeking green jobs, featuring a submission form, admin screening interface, and public directory.
  * Version: 1.0.0
- * Author: Your Name
+ * Author: Adedayo Samuel
  * Author URI: https://codemygig.com/cruisedev
  * Text Domain: black-potential-pipeline
  * Domain Path: /languages

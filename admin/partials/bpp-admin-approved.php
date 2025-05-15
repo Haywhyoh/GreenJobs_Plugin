@@ -108,6 +108,9 @@ if (!empty($selected_industry)) {
 
                 // Get profile views if available
                 $profile_views = get_post_meta($post_id, 'bpp_profile_views', true);
+
+                // Get featured status
+                $featured = get_post_meta($post_id, 'bpp_featured', true);
             ?>
                 <div class="bpp-professional-card" data-id="<?php echo esc_attr($post_id); ?>">
                     <div class="bpp-professional-header">
@@ -219,6 +222,11 @@ if (!empty($selected_industry)) {
                                 <?php echo esc_html__('Remove', 'black-potential-pipeline'); ?>
                             </button>
                             
+                            <button type="button" class="button <?php echo (!empty($featured)) ? 'button-primary bpp-unfeature-button' : 'bpp-feature-button'; ?>" data-id="<?php echo esc_attr($post_id); ?>">
+                                <span class="dashicons <?php echo (!empty($featured)) ? 'dashicons-star-filled' : 'dashicons-star-empty'; ?>"></span>
+                                <?php echo (!empty($featured)) ? esc_html__('Unfeature', 'black-potential-pipeline') : esc_html__('Feature', 'black-potential-pipeline'); ?>
+                            </button>
+                            
                             <?php if (!empty($resume_url)) : ?>
                                 <a href="<?php echo esc_url($resume_url); ?>" class="button" target="_blank">
                                     <span class="dashicons dashicons-media-document"></span>
@@ -270,6 +278,76 @@ jQuery(document).ready(function($) {
         var professionalId = $(this).data('id');
         $('#bpp-remove-professional-id').val(professionalId);
         $('#bpp-remove-modal').show();
+    });
+    
+    // Feature button click handler
+    $('.bpp-feature-button').on('click', function() {
+        var professionalId = $(this).data('id');
+        var $button = $(this);
+        
+        $.ajax({
+            url: bpp_admin_obj.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'bpp_toggle_featured',
+                applicant_id: professionalId,
+                featured: 1,
+                nonce: bpp_admin_obj.nonce
+            },
+            beforeSend: function() {
+                $button.prop('disabled', true);
+            },
+            success: function(response) {
+                if (response.success) {
+                    $button.removeClass('bpp-feature-button').addClass('button-primary bpp-unfeature-button');
+                    $button.find('.dashicons').removeClass('dashicons-star-empty').addClass('dashicons-star-filled');
+                    $button.html('<span class="dashicons dashicons-star-filled"></span> ' + bpp_admin_obj.i18n.unfeature_text);
+                } else {
+                    alert(response.data || bpp_admin_obj.i18n.error);
+                }
+            },
+            error: function() {
+                alert(bpp_admin_obj.i18n.error);
+            },
+            complete: function() {
+                $button.prop('disabled', false);
+            }
+        });
+    });
+    
+    // Unfeature button click handler
+    $('.bpp-unfeature-button').on('click', function() {
+        var professionalId = $(this).data('id');
+        var $button = $(this);
+        
+        $.ajax({
+            url: bpp_admin_obj.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'bpp_toggle_featured',
+                applicant_id: professionalId,
+                featured: 0,
+                nonce: bpp_admin_obj.nonce
+            },
+            beforeSend: function() {
+                $button.prop('disabled', true);
+            },
+            success: function(response) {
+                if (response.success) {
+                    $button.removeClass('button-primary bpp-unfeature-button').addClass('bpp-feature-button');
+                    $button.find('.dashicons').removeClass('dashicons-star-filled').addClass('dashicons-star-empty');
+                    $button.html('<span class="dashicons dashicons-star-empty"></span> ' + bpp_admin_obj.i18n.feature_text);
+                } else {
+                    alert(response.data || bpp_admin_obj.i18n.error);
+                }
+            },
+            error: function() {
+                alert(bpp_admin_obj.i18n.error);
+            },
+            complete: function() {
+                $button.prop('disabled', false);
+            }
+        });
     });
     
     // Modal close button

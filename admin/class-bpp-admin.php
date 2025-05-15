@@ -53,6 +53,7 @@ class BPP_Admin {
         // Add these in your admin class constructor or init method
         add_action('wp_ajax_bpp_approve_applicant', array($this, 'approve_applicant'));
         add_action('wp_ajax_bpp_reject_applicant', array($this, 'reject_applicant'));
+        add_action('wp_ajax_bpp_toggle_featured', array($this, 'toggle_featured'));
     }
 
     /**
@@ -95,6 +96,8 @@ class BPP_Admin {
                     'approve_confirm' => __('Are you sure you want to approve this application?', 'black-potential-pipeline'),
                     'error' => __('An error occurred. Please try again.', 'black-potential-pipeline'),
                     'no_applications' => __('No new applications at this time.', 'black-potential-pipeline'),
+                    'feature_text' => __('Feature', 'black-potential-pipeline'),
+                    'unfeature_text' => __('Unfeature', 'black-potential-pipeline'),
                 ),
             )
         );
@@ -429,6 +432,52 @@ class BPP_Admin {
         } else {
             wp_send_json_error('Failed to reject applicant');
         }
+    }
+
+    /**
+     * Toggle featured status for an applicant.
+     *
+     * @since    1.0.0
+     */
+    public function toggle_featured() {
+        // Check nonce
+        check_ajax_referer('bpp_admin_nonce', 'nonce');
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(__('You do not have permission to perform this action.', 'black-potential-pipeline'));
+            return;
+        }
+        
+        // Get applicant ID
+        $applicant_id = isset($_POST['applicant_id']) ? intval($_POST['applicant_id']) : 0;
+        
+        // Check if we have a valid applicant ID
+        if (!$applicant_id || get_post_type($applicant_id) !== 'bpp_applicant') {
+            wp_send_json_error(__('Invalid applicant ID.', 'black-potential-pipeline'));
+            return;
+        }
+        
+        // Get featured status (1 to feature, 0 to unfeature)
+        $featured = isset($_POST['featured']) ? intval($_POST['featured']) : 0;
+        
+        // Update the meta field
+        $result = update_post_meta($applicant_id, 'bpp_featured', $featured);
+        
+        if ($result) {
+            // Send success response
+            wp_send_json_success(array(
+                'message' => $featured 
+                    ? __('Professional marked as featured.', 'black-potential-pipeline') 
+                    : __('Professional removed from featured.', 'black-potential-pipeline'),
+                'featured' => $featured
+            ));
+        } else {
+            // Send error response
+            wp_send_json_error(__('Failed to update featured status.', 'black-potential-pipeline'));
+        }
+        
+        wp_die();
     }
 
     /**

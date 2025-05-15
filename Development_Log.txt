@@ -31,6 +31,13 @@ COMPLETED TASKS:
 ✅ Fix shortcode implementation and naming consistency
 ✅ Fix form submission issues (IDs, validation, and file handling)
 ✅ Implement Bootstrap styling for submission form with option to toggle
+✅ Add functionality for featuring applicants
+✅ Implement Bootstrap styling for the directory with option to toggle
+✅ Fix the dashboard statistics not updating properly
+
+
+Important Next Steps: Attend to this first:
+- Create a popup for admin to add the reason why an applicant is rejected (FIXED - Already implemented in bpp-admin-new-applications.php)
 
 NEXT STEPS:
 🔲 Create unit tests
