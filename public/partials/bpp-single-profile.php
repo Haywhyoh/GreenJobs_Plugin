@@ -42,6 +42,26 @@ if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
     $industry = $industry_terms[0];
 }
 
+// Get profile visibility settings
+$directory_settings = get_option('bpp_directory_settings', array());
+$visibility_settings = isset($directory_settings['profile_visibility']) ? $directory_settings['profile_visibility'] : array();
+$default_visibility = array(
+    'photo' => true,
+    'job_title' => true,
+    'industry' => true,
+    'location' => true,
+    'years_experience' => true,
+    'skills' => true,
+    'bio' => true,
+    'website' => true,
+    'linkedin' => true,
+    'email' => true,
+    'phone' => false,
+    'resume' => true
+);
+// Merge with defaults
+$visibility = array_merge($default_visibility, $visibility_settings);
+
 // Get related professionals in the same industry (limit to 3)
 $related_args = array(
     'post_type' => 'bpp_applicant',
@@ -80,6 +100,7 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
         <?php endif; ?>
         
         <div class="bpp-profile-main-info">
+            <?php if (!empty($visibility['photo'])) : ?>
             <div class="bpp-profile-photo-container">
                 <?php if (has_post_thumbnail()) : ?>
                     <div class="bpp-profile-photo">
@@ -91,30 +112,31 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                     </div>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
             
             <div class="bpp-profile-identity">
                 <h1 class="bpp-profile-name"><?php the_title(); ?></h1>
                 
-                <?php if (!empty($job_title)) : ?>
+                <?php if (!empty($job_title) && !empty($visibility['job_title'])) : ?>
                     <h2 class="bpp-profile-job-title"><?php echo esc_html($job_title); ?></h2>
                 <?php endif; ?>
                 
                 <div class="bpp-profile-meta">
-                    <?php if (!empty($industry)) : ?>
+                    <?php if (!empty($industry) && !empty($visibility['industry'])) : ?>
                         <div class="bpp-profile-industry">
                             <span class="dashicons dashicons-category"></span>
                             <?php echo esc_html($industry); ?>
                         </div>
                     <?php endif; ?>
                     
-                    <?php if (!empty($location)) : ?>
+                    <?php if (!empty($location) && !empty($visibility['location'])) : ?>
                         <div class="bpp-profile-location">
                             <span class="dashicons dashicons-location"></span>
                             <?php echo esc_html($location); ?>
                         </div>
                     <?php endif; ?>
                     
-                    <?php if (!empty($years_experience)) : ?>
+                    <?php if (!empty($years_experience) && !empty($visibility['years_experience'])) : ?>
                         <div class="bpp-profile-experience">
                             <span class="dashicons dashicons-businessman"></span>
                             <?php printf(_n('%s year experience', '%s years experience', (int)$years_experience, 'black-potential-pipeline'), esc_html($years_experience)); ?>
@@ -122,16 +144,16 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                     <?php endif; ?>
                 </div>
                 
-                <?php if (!empty($website) || !empty($linkedin)) : ?>
+                <?php if ((!empty($website) && !empty($visibility['website'])) || (!empty($linkedin) && !empty($visibility['linkedin']))) : ?>
                     <div class="bpp-profile-social">
-                        <?php if (!empty($website)) : ?>
+                        <?php if (!empty($website) && !empty($visibility['website'])) : ?>
                             <a href="<?php echo esc_url($website); ?>" class="bpp-social-link bpp-website-link" target="_blank">
                                 <span class="dashicons dashicons-admin-site-alt3"></span>
                                 <?php _e('Website', 'black-potential-pipeline'); ?>
                             </a>
                         <?php endif; ?>
                         
-                        <?php if (!empty($linkedin)) : ?>
+                        <?php if (!empty($linkedin) && !empty($visibility['linkedin'])) : ?>
                             <a href="<?php echo esc_url($linkedin); ?>" class="bpp-social-link bpp-linkedin-link" target="_blank">
                                 <span class="dashicons dashicons-linkedin"></span>
                                 <?php _e('LinkedIn', 'black-potential-pipeline'); ?>
@@ -145,7 +167,7 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
     
     <div class="bpp-profile-content">
         <div class="bpp-profile-main">
-            <?php if (!empty($bio)) : ?>
+            <?php if (!empty($bio) && !empty($visibility['bio'])) : ?>
                 <div class="bpp-profile-section bpp-profile-bio">
                     <h3><?php _e('Professional Bio', 'black-potential-pipeline'); ?></h3>
                     <div class="bpp-profile-bio-content">
@@ -154,7 +176,7 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                 </div>
             <?php endif; ?>
             
-            <?php if (!empty($skills_array)) : ?>
+            <?php if (!empty($skills_array) && !empty($visibility['skills'])) : ?>
                 <div class="bpp-profile-section bpp-profile-skills">
                     <h3><?php _e('Skills & Expertise', 'black-potential-pipeline'); ?></h3>
                     <div class="bpp-skills-tags">
@@ -165,7 +187,7 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                 </div>
             <?php endif; ?>
             
-            <?php if (!empty($resume_url)) : ?>
+            <?php if (!empty($resume_url) && !empty($visibility['resume'])) : ?>
                 <div class="bpp-profile-section bpp-profile-resume">
                     <h3><?php _e('Resume/CV', 'black-potential-pipeline'); ?></h3>
                     <a href="<?php echo esc_url($resume_url); ?>" class="bpp-resume-download bpp-button" target="_blank">
@@ -177,18 +199,19 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
         </div>
         
         <div class="bpp-profile-sidebar">
+            <?php if ((!empty($email) && !empty($visibility['email'])) || (!empty($phone) && !empty($visibility['phone']))) : ?>
             <div class="bpp-profile-section bpp-profile-contact">
                 <h3><?php _e('Contact Information', 'black-potential-pipeline'); ?></h3>
                 
                 <div class="bpp-contact-info">
-                    <?php if (!empty($email)) : ?>
+                    <?php if (!empty($email) && !empty($visibility['email'])) : ?>
                         <div class="bpp-contact-item">
                             <span class="dashicons dashicons-email"></span>
                             <a href="mailto:<?php echo esc_attr($email); ?>"><?php echo esc_html($email); ?></a>
                         </div>
                     <?php endif; ?>
                     
-                    <?php if (!empty($phone)) : ?>
+                    <?php if (!empty($phone) && !empty($visibility['phone'])) : ?>
                         <div class="bpp-contact-item">
                             <span class="dashicons dashicons-phone"></span>
                             <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9]/', '', $phone)); ?>"><?php echo esc_html($phone); ?></a>
@@ -196,6 +219,7 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                     <?php endif; ?>
                 </div>
             </div>
+            <?php endif; ?>
             
             <?php if (!empty($contact_form_shortcode)) : ?>
                 <div class="bpp-profile-section bpp-profile-contact-form">
@@ -225,7 +249,7 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                 ?>
                     <div class="bpp-related-profile-card">
                         <div class="bpp-related-profile-header">
-                            <?php if (has_post_thumbnail()) : ?>
+                            <?php if (has_post_thumbnail() && !empty($visibility['photo'])) : ?>
                                 <div class="bpp-related-profile-photo">
                                     <?php the_post_thumbnail('thumbnail'); ?>
                                 </div>
@@ -240,11 +264,11 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
                                     <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                                 </h4>
                                 
-                                <?php if (!empty($related_job_title)) : ?>
+                                <?php if (!empty($related_job_title) && !empty($visibility['job_title'])) : ?>
                                     <p class="bpp-related-profile-title"><?php echo esc_html($related_job_title); ?></p>
                                 <?php endif; ?>
                                 
-                                <?php if (!empty($related_industry)) : ?>
+                                <?php if (!empty($related_industry) && !empty($visibility['industry'])) : ?>
                                     <p class="bpp-related-profile-industry"><?php echo esc_html($related_industry); ?></p>
                                 <?php endif; ?>
                             </div>

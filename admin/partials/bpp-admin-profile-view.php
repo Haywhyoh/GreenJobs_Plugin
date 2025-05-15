@@ -106,6 +106,66 @@ $updated = isset($_GET['updated']) && $_GET['updated'] == 'true';
         </div>
     <?php endif; ?>
     
+    <?php
+    // Check if there are any fields hidden from public view
+    $directory_settings = get_option('bpp_directory_settings', array());
+    $visibility_settings = isset($directory_settings['profile_visibility']) ? $directory_settings['profile_visibility'] : array();
+    $default_visibility = array(
+        'photo' => true,
+        'job_title' => true,
+        'industry' => true,
+        'location' => true,
+        'years_experience' => true,
+        'skills' => true,
+        'bio' => true,
+        'website' => true,
+        'linkedin' => true,
+        'email' => true,
+        'phone' => false,
+        'resume' => true
+    );
+    // Merge with defaults
+    $visibility = array_merge($default_visibility, $visibility_settings);
+    
+    // Get names of hidden fields
+    $hidden_fields = array();
+    $field_labels = array(
+        'photo' => __('Profile Photo', 'black-potential-pipeline'),
+        'job_title' => __('Job Title', 'black-potential-pipeline'),
+        'industry' => __('Industry', 'black-potential-pipeline'),
+        'location' => __('Location', 'black-potential-pipeline'),
+        'years_experience' => __('Years of Experience', 'black-potential-pipeline'),
+        'skills' => __('Skills', 'black-potential-pipeline'),
+        'bio' => __('Professional Bio', 'black-potential-pipeline'),
+        'website' => __('Website', 'black-potential-pipeline'),
+        'linkedin' => __('LinkedIn Profile', 'black-potential-pipeline'),
+        'email' => __('Email Address', 'black-potential-pipeline'),
+        'phone' => __('Phone Number', 'black-potential-pipeline'),
+        'resume' => __('Resume', 'black-potential-pipeline')
+    );
+    
+    foreach ($visibility as $field => $is_visible) {
+        if (!$is_visible && isset($field_labels[$field])) {
+            $hidden_fields[] = $field_labels[$field];
+        }
+    }
+    ?>
+    
+    <?php if (!empty($hidden_fields) && $status === 'publish') : ?>
+        <div class="notice notice-info">
+            <p>
+                <span class="dashicons dashicons-privacy" style="color:#72aee6;vertical-align:text-bottom;"></span>
+                <?php 
+                echo esc_html__('Privacy notice: The following information is hidden from the public profile: ', 'black-potential-pipeline'); 
+                echo '<strong>' . esc_html(implode(', ', $hidden_fields)) . '</strong>';
+                ?>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=bpp-settings#directory-settings')); ?>">
+                    <?php echo esc_html__('Change settings', 'black-potential-pipeline'); ?>
+                </a>
+            </p>
+        </div>
+    <?php endif; ?>
+    
     <div class="bpp-profile-actions">
         <?php
         // Generate links to appropriate listing pages based on status

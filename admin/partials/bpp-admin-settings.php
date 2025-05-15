@@ -211,6 +211,115 @@ if (!defined('WPINC')) {
                         </td>
                     </tr>
                 </table>
+                
+                <h3><?php echo esc_html__('Profile Visibility Settings', 'black-potential-pipeline'); ?></h3>
+                <p class="bpp-settings-description">
+                    <?php echo esc_html__('Control which information is visible on public profile pages.', 'black-potential-pipeline'); ?>
+                </p>
+                
+                <?php
+                // Get profile visibility settings with defaults
+                $visibility_settings = isset($directory_settings['profile_visibility']) ? $directory_settings['profile_visibility'] : array();
+                $default_visibility = array(
+                    'photo' => true,
+                    'job_title' => true,
+                    'industry' => true,
+                    'location' => true,
+                    'years_experience' => true,
+                    'skills' => true,
+                    'bio' => true,
+                    'website' => true,
+                    'linkedin' => true,
+                    'email' => true,
+                    'phone' => false,
+                    'resume' => true
+                );
+                // Merge with defaults
+                $visibility = array_merge($default_visibility, $visibility_settings);
+                ?>
+                
+                <table class="widefat striped">
+                    <thead>
+                        <tr>
+                            <th><?php echo esc_html__('Field', 'black-potential-pipeline'); ?></th>
+                            <th width="100"><?php echo esc_html__('Publicly Visible', 'black-potential-pipeline'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Profile Photo', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_photo" name="bpp_directory_settings[profile_visibility][photo]" value="1" <?php checked(true, $visibility['photo']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Job Title', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_job_title" name="bpp_directory_settings[profile_visibility][job_title]" value="1" <?php checked(true, $visibility['job_title']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Industry', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_industry" name="bpp_directory_settings[profile_visibility][industry]" value="1" <?php checked(true, $visibility['industry']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Location', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_location" name="bpp_directory_settings[profile_visibility][location]" value="1" <?php checked(true, $visibility['location']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Years of Experience', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_years_experience" name="bpp_directory_settings[profile_visibility][years_experience]" value="1" <?php checked(true, $visibility['years_experience']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Skills & Expertise', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_skills" name="bpp_directory_settings[profile_visibility][skills]" value="1" <?php checked(true, $visibility['skills']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Professional Bio', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_bio" name="bpp_directory_settings[profile_visibility][bio]" value="1" <?php checked(true, $visibility['bio']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Website', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_website" name="bpp_directory_settings[profile_visibility][website]" value="1" <?php checked(true, $visibility['website']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('LinkedIn Profile', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_linkedin" name="bpp_directory_settings[profile_visibility][linkedin]" value="1" <?php checked(true, $visibility['linkedin']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Email Address', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_email" name="bpp_directory_settings[profile_visibility][email]" value="1" <?php checked(true, $visibility['email']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Phone Number', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_phone" name="bpp_directory_settings[profile_visibility][phone]" value="1" <?php checked(true, $visibility['phone']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Resume/CV Download', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_resume" name="bpp_directory_settings[profile_visibility][resume]" value="1" <?php checked(true, $visibility['resume']); ?>>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             
             <!-- Approval Workflow Settings -->

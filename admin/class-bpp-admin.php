@@ -224,6 +224,13 @@ class BPP_Admin {
             'bpp-settings'
         );
 
+        add_settings_section(
+            'bpp_profile_privacy_section',
+            __('Profile Privacy Settings', 'black-potential-pipeline'),
+            array($this, 'profile_privacy_section_callback'),
+            'bpp-settings'
+        );
+
         // Add settings fields
         add_settings_field(
             'bpp_admin_email',
@@ -278,6 +285,15 @@ class BPP_Admin {
      */
     public function workflow_section_callback() {
         echo '<p>' . __('Configure the approval workflow and notifications.', 'black-potential-pipeline') . '</p>';
+    }
+
+    /**
+     * Callback for profile privacy settings section.
+     *
+     * @since    1.0.0
+     */
+    public function profile_privacy_section_callback() {
+        echo '<p>' . __('Control which information is visible on public professional profiles.', 'black-potential-pipeline') . '</p>';
     }
 
     /**
