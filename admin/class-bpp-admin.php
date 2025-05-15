@@ -96,8 +96,11 @@ class BPP_Admin {
                     'approve_confirm' => __('Are you sure you want to approve this application?', 'black-potential-pipeline'),
                     'error' => __('An error occurred. Please try again.', 'black-potential-pipeline'),
                     'no_applications' => __('No new applications at this time.', 'black-potential-pipeline'),
+                    'no_professionals' => __('No approved professionals found.', 'black-potential-pipeline'),
                     'feature_text' => __('Feature', 'black-potential-pipeline'),
                     'unfeature_text' => __('Unfeature', 'black-potential-pipeline'),
+                    'featured_text' => __('Featured', 'black-potential-pipeline'),
+                    'approved_text' => __('Approved', 'black-potential-pipeline'),
                 ),
             )
         );

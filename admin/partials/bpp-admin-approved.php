@@ -83,160 +83,153 @@ if (!empty($selected_industry)) {
     <?php endif; ?>
     
     <?php if ($professionals_query->have_posts()) : ?>
-        <div class="bpp-professionals-list">
-            <?php while ($professionals_query->have_posts()) : $professionals_query->the_post(); 
-                $post_id = get_the_ID();
-                $approval_date = get_post_meta($post_id, 'bpp_approval_date', true);
-                $formatted_date = !empty($approval_date) ? date_i18n(get_option('date_format'), strtotime($approval_date)) : '';
-                
-                $email = get_post_meta($post_id, 'bpp_email', true);
-                $phone = get_post_meta($post_id, 'bpp_phone', true);
-                $job_title = get_post_meta($post_id, 'bpp_job_title', true);
-                $years_experience = get_post_meta($post_id, 'bpp_years_experience', true);
-                $location = get_post_meta($post_id, 'bpp_location', true);
-                $linkedin = get_post_meta($post_id, 'bpp_linkedin', true);
-                $skills = get_post_meta($post_id, 'bpp_skills', true);
-                
-                $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
-                $industry = '';
-                if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
-                    $industry = $industry_terms[0];
-                }
-                
-                $resume_id = get_post_meta($post_id, 'bpp_resume', true);
-                $resume_url = !empty($resume_id) ? wp_get_attachment_url($resume_id) : '';
+        <div class="bpp-table-container">
+            <table class="bpp-professionals-table widefat striped responsive">
+                <thead>
+                    <tr>
+                        <th><?php echo esc_html__('Name', 'black-potential-pipeline'); ?></th>
+                        <th><?php echo esc_html__('Job Title', 'black-potential-pipeline'); ?></th>
+                        <th><?php echo esc_html__('Industry', 'black-potential-pipeline'); ?></th>
+                        <th><?php echo esc_html__('Location', 'black-potential-pipeline'); ?></th>
+                        <th><?php echo esc_html__('Experience', 'black-potential-pipeline'); ?></th>
+                        <th><?php echo esc_html__('Status', 'black-potential-pipeline'); ?></th>
+                        <th><?php echo esc_html__('Actions', 'black-potential-pipeline'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($professionals_query->have_posts()) : $professionals_query->the_post(); 
+                        $post_id = get_the_ID();
+                        $approval_date = get_post_meta($post_id, 'bpp_approval_date', true);
+                        $formatted_date = !empty($approval_date) ? date_i18n(get_option('date_format'), strtotime($approval_date)) : '';
+                        
+                        $email = get_post_meta($post_id, 'bpp_email', true);
+                        $phone = get_post_meta($post_id, 'bpp_phone', true);
+                        $job_title = get_post_meta($post_id, 'bpp_job_title', true);
+                        $years_experience = get_post_meta($post_id, 'bpp_years_experience', true);
+                        $location = get_post_meta($post_id, 'bpp_location', true);
+                        $linkedin = get_post_meta($post_id, 'bpp_linkedin', true);
+                        $skills = get_post_meta($post_id, 'bpp_skills', true);
+                        
+                        $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
+                        $industry = '';
+                        if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
+                            $industry = $industry_terms[0];
+                        }
+                        
+                        $resume_id = get_post_meta($post_id, 'bpp_resume', true);
+                        $resume_url = !empty($resume_id) ? wp_get_attachment_url($resume_id) : '';
 
-                // Get profile views if available
-                $profile_views = get_post_meta($post_id, 'bpp_profile_views', true);
+                        // Get profile views if available
+                        $profile_views = get_post_meta($post_id, 'bpp_profile_views', true);
 
-                // Get featured status
-                $featured = get_post_meta($post_id, 'bpp_featured', true);
-            ?>
-                <div class="bpp-professional-card" data-id="<?php echo esc_attr($post_id); ?>">
-                    <div class="bpp-professional-header">
-                        <div class="bpp-professional-title-area">
-                            <h2 class="bpp-professional-title"><?php the_title(); ?></h2>
-                            <?php if (!empty($formatted_date)) : ?>
-                                <span class="bpp-professional-date">
-                                    <?php echo esc_html__('Approved:', 'black-potential-pipeline') . ' ' . esc_html($formatted_date); ?>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-                        <?php if (has_post_thumbnail()) : ?>
-                            <div class="bpp-professional-thumbnail">
-                                <?php the_post_thumbnail('thumbnail'); ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="bpp-professional-body">
-                        <div class="bpp-professional-meta">
-                            <?php if (!empty($job_title)) : ?>
-                                <div class="bpp-meta-item">
-                                    <span class="bpp-meta-label"><?php echo esc_html__('Job Title:', 'black-potential-pipeline'); ?></span>
-                                    <span class="bpp-meta-value"><?php echo esc_html($job_title); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($industry)) : ?>
-                                <div class="bpp-meta-item">
-                                    <span class="bpp-meta-label"><?php echo esc_html__('Industry:', 'black-potential-pipeline'); ?></span>
-                                    <span class="bpp-meta-value"><?php echo esc_html($industry); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($email)) : ?>
-                                <div class="bpp-meta-item">
-                                    <span class="bpp-meta-label"><?php echo esc_html__('Email:', 'black-potential-pipeline'); ?></span>
-                                    <span class="bpp-meta-value"><?php echo esc_html($email); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($phone)) : ?>
-                                <div class="bpp-meta-item">
-                                    <span class="bpp-meta-label"><?php echo esc_html__('Phone:', 'black-potential-pipeline'); ?></span>
-                                    <span class="bpp-meta-value"><?php echo esc_html($phone); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($years_experience)) : ?>
-                                <div class="bpp-meta-item">
-                                    <span class="bpp-meta-label"><?php echo esc_html__('Experience:', 'black-potential-pipeline'); ?></span>
-                                    <span class="bpp-meta-value">
-                                        <?php echo sprintf(esc_html(_n('%d year', '%d years', $years_experience, 'black-potential-pipeline')), $years_experience); ?>
+                        // Get featured status
+                        $featured = get_post_meta($post_id, 'bpp_featured', true);
+                        
+                        // Format experience
+                        $experience_text = !empty($years_experience) ? 
+                            sprintf(_n('%d year', '%d years', $years_experience, 'black-potential-pipeline'), $years_experience) : 
+                            '';
+                    ?>
+                        <tr class="bpp-professional-row" data-id="<?php echo esc_attr($post_id); ?>">
+                            <td class="bpp-name-column" data-label="<?php echo esc_attr__('Name', 'black-potential-pipeline'); ?>">
+                                <strong><?php the_title(); ?></strong>
+                                <?php if (has_post_thumbnail()) : ?>
+                                    <div class="bpp-thumbnail-small">
+                                        <?php the_post_thumbnail('thumbnail'); ?>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="bpp-job-column" data-label="<?php echo esc_attr__('Job Title', 'black-potential-pipeline'); ?>"><?php echo esc_html($job_title); ?></td>
+                            <td class="bpp-industry-column" data-label="<?php echo esc_attr__('Industry', 'black-potential-pipeline'); ?>"><?php echo esc_html($industry); ?></td>
+                            <td class="bpp-location-column" data-label="<?php echo esc_attr__('Location', 'black-potential-pipeline'); ?>"><?php echo esc_html($location); ?></td>
+                            <td class="bpp-experience-column" data-label="<?php echo esc_attr__('Experience', 'black-potential-pipeline'); ?>"><?php echo esc_html($experience_text); ?></td>
+                            <td class="bpp-status-column" data-label="<?php echo esc_attr__('Status', 'black-potential-pipeline'); ?>">
+                                <?php if (!empty($featured)) : ?>
+                                    <span class="bpp-featured-badge">
+                                        <span class="dashicons dashicons-star-filled"></span>
+                                        <?php echo esc_html__('Featured', 'black-potential-pipeline'); ?>
                                     </span>
+                                <?php else : ?>
+                                    <span class="bpp-approved-badge">
+                                        <span class="dashicons dashicons-yes"></span>
+                                        <?php echo esc_html__('Approved', 'black-potential-pipeline'); ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="bpp-actions-column" data-label="<?php echo esc_attr__('Actions', 'black-potential-pipeline'); ?>">
+                                <div class="bpp-action-dropdown">
+                                    <button class="button bpp-action-toggle">
+                                        <span class="dashicons dashicons-admin-generic"></span>
+                                        <?php echo esc_html__('Options', 'black-potential-pipeline'); ?>
+                                        <span class="dashicons dashicons-arrow-down-alt2"></span>
+                                    </button>
+                                    <div class="bpp-dropdown-menu">
+                                        <a href="<?php echo esc_url(get_permalink($post_id)); ?>" target="_blank" class="bpp-dropdown-item">
+                                            <span class="dashicons dashicons-visibility"></span>
+                                            <?php echo esc_html__('View Profile', 'black-potential-pipeline'); ?>
+                                        </a>
+                                        <a href="<?php echo esc_url(get_edit_post_link($post_id)); ?>" class="bpp-dropdown-item">
+                                            <span class="dashicons dashicons-edit"></span>
+                                            <?php echo esc_html__('Edit', 'black-potential-pipeline'); ?>
+                                        </a>
+                                        <button type="button" class="bpp-dropdown-item bpp-remove-button" data-id="<?php echo esc_attr($post_id); ?>">
+                                            <span class="dashicons dashicons-no"></span>
+                                            <?php echo esc_html__('Remove', 'black-potential-pipeline'); ?>
+                                        </button>
+                                        <button type="button" class="bpp-dropdown-item bpp-<?php echo !empty($featured) ? 'unfeature' : 'feature'; ?>-button" data-id="<?php echo esc_attr($post_id); ?>">
+                                            <span class="dashicons dashicons-<?php echo !empty($featured) ? 'star-filled' : 'star-empty'; ?>"></span>
+                                            <?php echo !empty($featured) ? esc_html__('Unfeature', 'black-potential-pipeline') : esc_html__('Feature', 'black-potential-pipeline'); ?>
+                                        </button>
+                                        <?php if (!empty($resume_url)) : ?>
+                                            <a href="<?php echo esc_url($resume_url); ?>" class="bpp-dropdown-item" target="_blank">
+                                                <span class="dashicons dashicons-media-document"></span>
+                                                <?php echo esc_html__('View Resume', 'black-potential-pipeline'); ?>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($location)) : ?>
-                                <div class="bpp-meta-item">
-                                    <span class="bpp-meta-label"><?php echo esc_html__('Location:', 'black-potential-pipeline'); ?></span>
-                                    <span class="bpp-meta-value"><?php echo esc_html($location); ?></span>
+                            </td>
+                        </tr>
+                        <tr class="bpp-details-row" style="display: none;">
+                            <td colspan="7">
+                                <div class="bpp-professional-details">
+                                    <div class="bpp-details-section">
+                                        <h4><?php echo esc_html__('Contact Information', 'black-potential-pipeline'); ?></h4>
+                                        <p><strong><?php echo esc_html__('Email:', 'black-potential-pipeline'); ?></strong> <?php echo esc_html($email); ?></p>
+                                        <?php if (!empty($phone)) : ?>
+                                            <p><strong><?php echo esc_html__('Phone:', 'black-potential-pipeline'); ?></strong> <?php echo esc_html($phone); ?></p>
+                                        <?php endif; ?>
+                                        <?php if (!empty($linkedin)) : ?>
+                                            <p><strong><?php echo esc_html__('LinkedIn:', 'black-potential-pipeline'); ?></strong> <a href="<?php echo esc_url($linkedin); ?>" target="_blank"><?php echo esc_html__('View Profile', 'black-potential-pipeline'); ?></a></p>
+                                        <?php endif; ?>
+                                    </div>
+                                    
+                                    <?php if (!empty($skills)) : ?>
+                                        <div class="bpp-details-section">
+                                            <h4><?php echo esc_html__('Skills', 'black-potential-pipeline'); ?></h4>
+                                            <div class="bpp-skills-list">
+                                                <?php 
+                                                $skills_array = explode(',', $skills);
+                                                foreach ($skills_array as $skill) {
+                                                    echo '<span class="bpp-skill-tag">' . esc_html(trim($skill)) . '</span>';
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <div class="bpp-details-section">
+                                        <h4><?php echo esc_html__('Bio / Personal Statement', 'black-potential-pipeline'); ?></h4>
+                                        <div class="bpp-professional-excerpt">
+                                            <?php the_excerpt(); ?>
+                                        </div>
+                                    </div>
                                 </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($profile_views)) : ?>
-                                <div class="bpp-meta-item">
-                                    <span class="bpp-meta-label"><?php echo esc_html__('Profile Views:', 'black-potential-pipeline'); ?></span>
-                                    <span class="bpp-meta-value"><?php echo esc_html($profile_views); ?></span>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <?php if (!empty($skills)) : ?>
-                            <div class="bpp-professional-skills">
-                                <h3><?php echo esc_html__('Skills', 'black-potential-pipeline'); ?></h3>
-                                <div class="bpp-skills-list">
-                                    <?php 
-                                    $skills_array = explode(',', $skills);
-                                    foreach ($skills_array as $skill) {
-                                        echo '<span class="bpp-skill-tag">' . esc_html(trim($skill)) . '</span>';
-                                    }
-                                    ?>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <div class="bpp-professional-content">
-                            <h3><?php echo esc_html__('Bio / Personal Statement', 'black-potential-pipeline'); ?></h3>
-                            <div class="bpp-professional-excerpt">
-                                <?php the_excerpt(); ?>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bpp-professional-footer">
-                        <div class="bpp-professional-actions">
-                            <a href="<?php echo esc_url(get_permalink($post_id)); ?>" class="button button-primary" target="_blank">
-                                <span class="dashicons dashicons-visibility"></span>
-                                <?php echo esc_html__('View Profile', 'black-potential-pipeline'); ?>
-                            </a>
-                            
-                            <a href="<?php echo esc_url(get_edit_post_link($post_id)); ?>" class="button">
-                                <span class="dashicons dashicons-edit"></span>
-                                <?php echo esc_html__('Edit', 'black-potential-pipeline'); ?>
-                            </a>
-                            
-                            <button type="button" class="button bpp-remove-button" data-id="<?php echo esc_attr($post_id); ?>">
-                                <span class="dashicons dashicons-no"></span>
-                                <?php echo esc_html__('Remove', 'black-potential-pipeline'); ?>
-                            </button>
-                            
-                            <button type="button" class="button <?php echo (!empty($featured)) ? 'button-primary bpp-unfeature-button' : 'bpp-feature-button'; ?>" data-id="<?php echo esc_attr($post_id); ?>">
-                                <span class="dashicons <?php echo (!empty($featured)) ? 'dashicons-star-filled' : 'dashicons-star-empty'; ?>"></span>
-                                <?php echo (!empty($featured)) ? esc_html__('Unfeature', 'black-potential-pipeline') : esc_html__('Feature', 'black-potential-pipeline'); ?>
-                            </button>
-                            
-                            <?php if (!empty($resume_url)) : ?>
-                                <a href="<?php echo esc_url($resume_url); ?>" class="button" target="_blank">
-                                    <span class="dashicons dashicons-media-document"></span>
-                                    <?php echo esc_html__('View Resume', 'black-potential-pipeline'); ?>
-                                </a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            <?php endwhile; ?>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
         </div>
         
         <?php wp_reset_postdata(); ?>
@@ -284,6 +277,7 @@ jQuery(document).ready(function($) {
     $('.bpp-feature-button').on('click', function() {
         var professionalId = $(this).data('id');
         var $button = $(this);
+        var $row = $button.closest('tr.bpp-professional-row');
         
         $.ajax({
             url: bpp_admin_obj.ajax_url,
@@ -299,9 +293,11 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    $button.removeClass('bpp-feature-button').addClass('button-primary bpp-unfeature-button');
-                    $button.find('.dashicons').removeClass('dashicons-star-empty').addClass('dashicons-star-filled');
-                    $button.html('<span class="dashicons dashicons-star-filled"></span> ' + bpp_admin_obj.i18n.unfeature_text);
+                    // Update the UI to reflect the new featured status
+                    $row.find('.bpp-status-column').html('<span class="bpp-featured-badge"><span class="dashicons dashicons-star-filled"></span>' + bpp_admin_obj.i18n.featured_text + '</span>');
+                    
+                    // Reload the page to refresh all elements
+                    location.reload();
                 } else {
                     alert(response.data || bpp_admin_obj.i18n.error);
                 }
@@ -319,6 +315,7 @@ jQuery(document).ready(function($) {
     $('.bpp-unfeature-button').on('click', function() {
         var professionalId = $(this).data('id');
         var $button = $(this);
+        var $row = $button.closest('tr.bpp-professional-row');
         
         $.ajax({
             url: bpp_admin_obj.ajax_url,
@@ -334,9 +331,11 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    $button.removeClass('button-primary bpp-unfeature-button').addClass('bpp-feature-button');
-                    $button.find('.dashicons').removeClass('dashicons-star-filled').addClass('dashicons-star-empty');
-                    $button.html('<span class="dashicons dashicons-star-empty"></span> ' + bpp_admin_obj.i18n.feature_text);
+                    // Update the UI to reflect the new unfeatured status
+                    $row.find('.bpp-status-column').html('<span class="bpp-approved-badge"><span class="dashicons dashicons-yes"></span>' + bpp_admin_obj.i18n.approved_text + '</span>');
+                    
+                    // Reload the page to refresh all elements
+                    location.reload();
                 } else {
                     alert(response.data || bpp_admin_obj.i18n.error);
                 }
@@ -358,7 +357,7 @@ jQuery(document).ready(function($) {
     // Confirm removal
     $('#bpp-confirm-remove').on('click', function() {
         var professionalId = $('#bpp-remove-professional-id').val();
-        var $card = $('.bpp-professional-card[data-id="' + professionalId + '"]');
+        var $row = $('.bpp-professional-row[data-id="' + professionalId + '"]');
         
         $.ajax({
             url: bpp_admin_obj.ajax_url,
@@ -370,17 +369,19 @@ jQuery(document).ready(function($) {
                 nonce: bpp_admin_obj.nonce
             },
             beforeSend: function() {
-                $card.addClass('bpp-loading');
+                $row.addClass('bpp-loading');
             },
             success: function(response) {
                 if (response.success) {
                     $('#bpp-remove-modal').hide();
-                    $card.fadeOut(400, function() {
-                        $card.remove();
+                    $row.fadeOut(400, function() {
+                        // Also remove the details row
+                        $row.next('.bpp-details-row').remove();
+                        $row.remove();
                         
                         // Show message if no more professionals
-                        if ($('.bpp-professional-card').length === 0) {
-                            $('.bpp-professionals-list').html('<div class="bpp-no-professionals"><p>' + 
+                        if ($('.bpp-professional-row').length === 0) {
+                            $('.bpp-professionals-table').replaceWith('<div class="bpp-no-professionals"><p>' + 
                                 bpp_admin_obj.i18n.no_professionals + '</p></div>');
                         }
                     });
@@ -392,7 +393,7 @@ jQuery(document).ready(function($) {
                 alert(bpp_admin_obj.i18n.error);
             },
             complete: function() {
-                $card.removeClass('bpp-loading');
+                $row.removeClass('bpp-loading');
             }
         });
     });
@@ -403,195 +404,199 @@ jQuery(document).ready(function($) {
             $('#bpp-remove-modal').hide();
         }
     });
+    
+    // Toggle action dropdown
+    $('.bpp-action-toggle').on('click', function(e) {
+        e.stopPropagation();
+        var $dropdown = $(this).next('.bpp-dropdown-menu');
+        $('.bpp-dropdown-menu').not($dropdown).removeClass('active');
+        $dropdown.toggleClass('active');
+    });
+    
+    // Close dropdown when clicking outside
+    $(document).on('click', function() {
+        $('.bpp-dropdown-menu').removeClass('active');
+    });
+    
+    // Toggle details row
+    $('.bpp-professional-row').on('click', function(e) {
+        if (!$(e.target).closest('.bpp-actions-column').length) {
+            var $detailsRow = $(this).next('.bpp-details-row');
+            $detailsRow.toggle();
+            $(this).toggleClass('expanded');
+        }
+    });
 });
 </script>
 
 <style>
-/* Filter Bar */
-.bpp-filter-bar {
-    margin: 20px 0;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-}
-
-.bpp-filter-bar form {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Professional Cards */
-.bpp-professionals-list {
+/* Table styles */
+.bpp-table-container {
     margin-top: 20px;
+    overflow-x: auto;
 }
 
-.bpp-professional-card {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+.bpp-professionals-table {
+    width: 100%;
+    border-collapse: collapse;
     margin-bottom: 20px;
-    overflow: hidden;
 }
 
-.bpp-professional-header {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.bpp-professionals-table th,
+.bpp-professionals-table td {
+    padding: 12px;
+    text-align: left;
+    vertical-align: middle;
 }
 
-.bpp-professional-title-area {
-    flex: 1;
+.bpp-name-column {
+    font-weight: bold;
+    min-width: 150px;
 }
 
-.bpp-professional-title {
-    margin: 0;
-    font-size: 18px;
-    color: #23282d;
-}
-
-.bpp-professional-date {
-    color: #888;
-    font-size: 12px;
-}
-
-.bpp-professional-thumbnail {
-    width: 60px;
-    height: 60px;
+.bpp-thumbnail-small {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     overflow: hidden;
-    margin-left: 15px;
+    margin-top: 5px;
 }
 
-.bpp-professional-thumbnail img {
+.bpp-thumbnail-small img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.bpp-professional-body {
-    padding: 15px;
+.bpp-professional-row {
+    cursor: pointer;
 }
 
-.bpp-professional-meta {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 15px;
+.bpp-professional-row.expanded {
+    background-color: #f5f5f5;
 }
 
-.bpp-meta-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.bpp-meta-label {
-    font-weight: bold;
+.bpp-featured-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #ffc107;
+    color: #212529;
+    padding: 3px 8px;
+    border-radius: 4px;
     font-size: 12px;
-    color: #555;
 }
 
-.bpp-meta-value {
+.bpp-approved-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #28a745;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.bpp-featured-badge .dashicons,
+.bpp-approved-badge .dashicons {
     font-size: 14px;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
 }
 
-.bpp-professional-skills {
+/* Action dropdown styles */
+.bpp-action-dropdown {
+    position: relative;
+}
+
+.bpp-action-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bpp-action-toggle .dashicons {
+    margin: 0 2px;
+}
+
+.bpp-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    min-width: 180px;
+    z-index: 100;
+}
+
+.bpp-dropdown-menu.active {
+    display: block;
+}
+
+.bpp-dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    color: #333;
+    text-decoration: none;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.bpp-dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.bpp-dropdown-item .dashicons {
+    margin-right: 8px;
+    color: #666;
+}
+
+/* Details row styles */
+.bpp-details-row td {
+    padding: 0;
+}
+
+.bpp-professional-details {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+}
+
+.bpp-details-section {
     margin-bottom: 15px;
 }
 
-.bpp-professional-skills h3 {
+.bpp-details-section:last-child {
+    margin-bottom: 0;
+}
+
+.bpp-details-section h4 {
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-size: 14px;
+    color: #23282d;
 }
 
 .bpp-skills-list {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
+    margin-top: 8px;
 }
 
 .bpp-skill-tag {
-    background-color: #f0f0f0;
+    background-color: #e9e9e9;
     padding: 3px 8px;
     border-radius: 3px;
     font-size: 12px;
     display: inline-block;
-}
-
-.bpp-professional-content h3 {
-    margin-top: 0;
-    font-size: 14px;
-}
-
-.bpp-professional-excerpt {
-    font-size: 14px;
-    color: #555;
-    line-height: 1.5;
-}
-
-.bpp-professional-footer {
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-top: 1px solid #eee;
-}
-
-.bpp-professional-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-/* Modal Styles */
-.bpp-modal {
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-}
-
-.bpp-modal-content {
-    position: relative;
-    background-color: #fefefe;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 50%;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    border-radius: 4px;
-}
-
-.bpp-modal-close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.bpp-modal-close:hover,
-.bpp-modal-close:focus {
-    color: black;
-    text-decoration: none;
-}
-
-.bpp-modal h2 {
-    margin-top: 0;
-}
-
-.bpp-modal-actions {
-    text-align: right;
-    margin-top: 15px;
-}
-
-.bpp-modal-actions button {
-    margin-left: 10px;
 }
 
 /* Loading state */
@@ -600,25 +605,71 @@ jQuery(document).ready(function($) {
     pointer-events: none;
 }
 
-/* Responsive */
+/* Responsive adjustments */
 @media screen and (max-width: 782px) {
-    .bpp-professional-meta {
-        grid-template-columns: 1fr;
+    .bpp-professionals-table th,
+    .bpp-professionals-table td {
+        padding: 8px;
     }
     
-    .bpp-professional-actions {
-        flex-direction: column;
+    .bpp-action-toggle span:not(.dashicons) {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .bpp-professionals-table {
+        display: block;
     }
     
-    .bpp-professional-actions a,
-    .bpp-professional-actions button {
-        width: 100%;
-        margin-bottom: 5px;
-        text-align: center;
+    .bpp-professionals-table thead {
+        display: none;
     }
     
-    .bpp-modal-content {
-        width: 90%;
+    .bpp-professionals-table tbody,
+    .bpp-professionals-table tr {
+        display: block;
+    }
+    
+    .bpp-professionals-table tr.bpp-professional-row {
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+    }
+    
+    .bpp-professionals-table td {
+        display: block;
+        text-align: right;
+        padding-left: 40%;
+        position: relative;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .bpp-professionals-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 12px;
+        width: 35%;
+        padding-right: 10px;
+        text-align: left;
+        font-weight: bold;
+    }
+    
+    .bpp-professionals-table td:last-child {
+        border-bottom: 0;
+    }
+    
+    .bpp-actions-column {
+        text-align: center !important;
+        padding-left: 12px !important;
+    }
+    
+    .bpp-actions-column:before {
+        display: none;
+    }
+    
+    .bpp-dropdown-menu {
+        left: 0;
+        right: auto;
     }
 }
 </style> 
