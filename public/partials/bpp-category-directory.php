@@ -4,7 +4,7 @@
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline

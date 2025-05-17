@@ -2,7 +2,7 @@
 /**
  * Admin view for viewing and editing a single applicant profile
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -182,7 +182,17 @@ $updated = isset($_GET['updated']) && $_GET['updated'] == 'true';
         </a>
         
         <?php if ($status === 'publish') : ?>
-            <a href="<?php echo esc_url(get_permalink($applicant_id)); ?>" class="button" target="_blank">
+            <?php 
+            // Get the permalink and ensure it's properly structured
+            $permalink = get_permalink($applicant_id);
+            // If the permalink is using query parameters instead of pretty permalinks
+            if (strpos($permalink, '?p=') !== false) {
+                echo '<div class="notice notice-warning is-dismissible"><p>' . 
+                    esc_html__('Notice: Your profile URLs appear to be using default query parameters. To fix this, please go to WordPress Settings > Permalinks and choose a permalink structure (like "Post name"), then save changes.', 'black-potential-pipeline') . 
+                    '</p></div>';
+            }
+            ?>
+            <a href="<?php echo esc_url($permalink); ?>" class="button" target="_blank">
                 <span class="dashicons dashicons-visibility"></span>
                 <?php echo esc_html__('View Public Profile', 'black-potential-pipeline'); ?>
             </a>
@@ -355,7 +365,7 @@ $updated = isset($_GET['updated']) && $_GET['updated'] == 'true';
                         
                         <div class="bpp-form-field">
                             <label for="bpp_website"><?php echo esc_html__('Personal Website', 'black-potential-pipeline'); ?></label>
-                            <input type="url" id="bpp_website" name="bpp_website" value="<?php echo esc_attr($website); ?>" placeholder="https://example.com">
+                            <input type="url" id="bpp_website" name="bpp_website" value="<?php echo esc_attr($website); ?>" placeholder="https://codemygig.com,">
                         </div>
                     </div>
                 </div>

@@ -2,7 +2,7 @@
 /**
  * Provide a admin area view for managing plugin settings
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline

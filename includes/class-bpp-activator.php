@@ -2,7 +2,7 @@
 /**
  * Fired during plugin activation.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -17,7 +17,7 @@
  * @since      1.0.0
  * @package    Black_Potential_Pipeline
  * @subpackage Black_Potential_Pipeline/includes
- * @author     Your Name <email@example.com>
+ * @author     Adedayo Ayomide Samue ayomide@codemygig.com
  */
 class BPP_Activator {
 
@@ -27,14 +27,18 @@ class BPP_Activator {
      * @since    1.0.0
      */
     public static function activate() {
-        // Create custom post type for applicants
-        self::create_custom_post_types();
+        // Require the post types file to ensure proper registration
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bpp-post-types.php';
         
-        // Create industry taxonomy
-        self::create_taxonomies();
+        // Initialize post types
+        $post_types = new BPP_Post_Types('black-potential-pipeline', '1.0.0');
         
-        // Flush rewrite rules
-        flush_rewrite_rules();
+        // Register post types and taxonomies
+        $post_types->register_post_types();
+        $post_types->register_taxonomies();
+        
+        // Flush rewrite rules to ensure permalinks work properly
+        $post_types->flush_rewrite_rules();
     }
 
     /**

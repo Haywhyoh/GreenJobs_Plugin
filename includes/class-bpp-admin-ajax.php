@@ -4,7 +4,7 @@
  *
  * This class processes admin AJAX requests such as application approval and rejection.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -24,7 +24,7 @@ if (!defined('WPINC')) {
  *
  * @package    Black_Potential_Pipeline
  * @subpackage Black_Potential_Pipeline/includes
- * @author     Your Name <email@example.com>
+ * @author     Adedayo Ayomide Samue ayomide@codemygig.com
  */
 class BPP_Admin_Ajax {
 

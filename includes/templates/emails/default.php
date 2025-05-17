@@ -4,7 +4,7 @@
  *
  * This template is used when a specific email template is not found.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline

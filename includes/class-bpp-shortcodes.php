@@ -2,7 +2,7 @@
 /**
  * Register all shortcodes for the plugin.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -15,7 +15,7 @@
  * @since      1.0.0
  * @package    Black_Potential_Pipeline
  * @subpackage Black_Potential_Pipeline/includes
- * @author     Your Name <email@example.com>
+ * @author     Adedayo Ayomide Samue ayomide@codemygig.com
  */
 class BPP_Shortcodes {
 

@@ -4,7 +4,7 @@
  *
  * This template is used when an application is approved.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline

@@ -4,7 +4,7 @@
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -301,23 +301,7 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                                 <p class="<?php echo $use_bootstrap ? 'badge bg-primary' : 'bpp-professional-industry'; ?>"><?php echo esc_html($industry); ?></p>
                             <?php endif; ?>
                             
-                            <?php if ($use_bootstrap) : ?>
-                                <div class="mt-2">
-                                    <?php if (!empty($location)) : ?>
-                                        <small class="text-muted me-3">
-                                            <i class="dashicons dashicons-location"></i>
-                                            <?php echo esc_html($location); ?>
-                                        </small>
-                                    <?php endif; ?>
-                                    
-                                    <?php if (!empty($years_experience)) : ?>
-                                        <small class="text-muted">
-                                            <i class="dashicons dashicons-businessman"></i>
-                                            <?php printf(_n('%s year experience', '%s years experience', (int)$years_experience, 'black-potential-pipeline'), $years_experience); ?>
-                                        </small>
-                                    <?php endif; ?>
-                                </div>
-                            <?php else: ?>
+                            
                                 <?php if (!empty($location)) : ?>
                                     <p class="bpp-professional-location">
                                         <span class="dashicons dashicons-location"></span>
@@ -350,6 +334,8 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                                 </div>
                             </div>
                         <?php endif; ?>
+
+                        
                     </div>
                     
                     <div class="<?php echo esc_attr($card_footer_class); ?>">

@@ -2,7 +2,7 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -17,7 +17,7 @@
  *
  * @package    Black_Potential_Pipeline
  * @subpackage Black_Potential_Pipeline/public
- * @author     Your Name <email@example.com>
+ * @author     Adedayo Ayomide Samue ayomide@codemygig.com
  */
 class BPP_Public {
 

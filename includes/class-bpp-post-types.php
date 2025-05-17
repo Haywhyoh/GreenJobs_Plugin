@@ -2,7 +2,7 @@
 /**
  * Register custom post types and taxonomies.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -15,7 +15,7 @@
  * @since      1.0.0
  * @package    Black_Potential_Pipeline
  * @subpackage Black_Potential_Pipeline/includes
- * @author     Your Name <email@example.com>
+ * @author     Adedayo Ayomide Samue ayomide@codemygig.com
  */
 class BPP_Post_Types {
 
@@ -94,7 +94,12 @@ class BPP_Post_Types {
             'show_ui'            => true,
             'show_in_menu'       => 'bpp-dashboard', // Custom parent menu slug
             'query_var'          => true,
-            'rewrite'            => array('slug' => 'applicant'),
+            'rewrite'            => array(
+                'slug' => 'applicant',
+                'with_front' => true,
+                'pages' => true,
+                'feeds' => true,
+            ),
             'capability_type'    => 'post',
             'has_archive'        => true,
             'hierarchical'       => false,
@@ -142,6 +147,18 @@ class BPP_Post_Types {
 
         // Add default industry terms
         $this->add_default_terms();
+    }
+
+    /**
+     * Flush rewrite rules to make permalinks work properly.
+     * Call this when activating the plugin or when making changes to rewrite rules.
+     *
+     * @since    1.0.0
+     * @access   public
+     */
+    public function flush_rewrite_rules() {
+        // This should only be called on plugin activation or settings change
+        flush_rewrite_rules();
     }
 
     /**

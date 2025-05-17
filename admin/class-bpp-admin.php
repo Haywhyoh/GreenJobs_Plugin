@@ -2,7 +2,7 @@
 /**
  * The admin-specific functionality of the plugin.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -17,7 +17,7 @@
  *
  * @package    Black_Potential_Pipeline
  * @subpackage Black_Potential_Pipeline/admin
- * @author     Your Name <email@example.com>
+ * @author     Adedayo Ayomide Samue ayomide@codemygig.com
  */
 class BPP_Admin {
 
@@ -462,7 +462,9 @@ class BPP_Admin {
      * @since    1.0.0
      */
     public function admin_notices() {
+        // Check if we're on a plugin admin page
         if (isset($_GET['page']) && strpos($_GET['page'], 'bpp-') === 0) {
+            // Show success messages for various actions
             if (isset($_GET['updated']) && $_GET['updated'] === 'true') {
                 echo '<div class="notice notice-success is-dismissible"><p>' . __('Settings saved successfully!', 'black-potential-pipeline') . '</p></div>';
             }
@@ -473,6 +475,23 @@ class BPP_Admin {
             
             if (isset($_GET['rejected']) && $_GET['rejected'] === 'true') {
                 echo '<div class="notice notice-success is-dismissible"><p>' . __('Applicant rejected successfully!', 'black-potential-pipeline') . '</p></div>';
+            }
+            
+            // Check if permalinks are properly set up
+            $permalink_structure = get_option('permalink_structure');
+            if (empty($permalink_structure)) {
+                // If permalinks are using default structure, show notice
+                ?>
+                <div class="notice notice-warning is-dismissible">
+                    <p>
+                        <strong><?php _e('Green Jobs Plugin: Permalink Structure Issue', 'black-potential-pipeline'); ?></strong>
+                        <br>
+                        <?php _e('You are currently using default permalinks, which will display profile URLs as "?p=123". For better SEO and user experience, please go to', 'black-potential-pipeline'); ?>
+                        <a href="<?php echo admin_url('options-permalink.php'); ?>"><?php _e('Settings > Permalinks', 'black-potential-pipeline'); ?></a>
+                        <?php _e('and choose a permalink structure (recommended: Post name).', 'black-potential-pipeline'); ?>
+                    </p>
+                </div>
+                <?php
             }
         }
     }

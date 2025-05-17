@@ -5,7 +5,7 @@
  * This template displays various statistics and metrics about the professionals
  * in the Black Potential Pipeline database.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline

@@ -218,7 +218,7 @@ if (!function_exists('get_permalink')) {
      */
     function get_permalink($post = 0, $leavename = false) {
         // This is a placeholder for linting purposes
-        return 'https://example.com/sample-post/';
+        return 'https://codemygig.com,/sample-post/';
     }
 }
 
@@ -232,7 +232,7 @@ if (!function_exists('admin_url')) {
      */
     function admin_url($path = '', $scheme = 'admin') {
         // This is a placeholder for linting purposes
-        return 'https://example.com/wp-admin/' . ltrim($path, '/');
+        return 'https://codemygig.com,/wp-admin/' . ltrim($path, '/');
     }
 }
 

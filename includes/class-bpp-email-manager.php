@@ -5,7 +5,7 @@
  * This class manages all email templates and sends notifications to both
  * administrators and applicants at various stages of the application process.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline

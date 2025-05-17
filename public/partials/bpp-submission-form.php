@@ -4,7 +4,7 @@
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -30,10 +30,10 @@ $industries = get_terms(array(
 // If industries are not properly formatted, provide default industries
 if (empty($industries) || is_wp_error($industries)) {
     $industries = array(
-        array('term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
-        array('term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
-        array('term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
-        array('term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
+        array('slug' => 'nature-based-work', 'term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
+        array('slug' => 'environmental-policy', 'term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
+        array('slug' => 'climate-science', 'term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
+        array('slug' => 'green-construction', 'term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
     );
 }
 
@@ -222,10 +222,10 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                                     foreach ($industries as $industry) : 
                                         // Determine if we're dealing with a term object or a simple array
                                         if (is_object($industry) && isset($industry->term_id) && isset($industry->name)) {
-                                            $term_id = $industry->term_id;
+                                            $term_id = $industry->slug;
                                             $name = $industry->name;
                                         } elseif (is_array($industry) && isset($industry['term_id']) && isset($industry['name'])) {
-                                            $term_id = $industry['term_id'];
+                                            $term_id = $industry['slug'];
                                             $name = $industry['name'];
                                         } else {
                                             continue; // Skip if neither format is valid

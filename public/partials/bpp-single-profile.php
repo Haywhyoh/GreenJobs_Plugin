@@ -5,7 +5,7 @@
  * This template displays detailed information about an individual professional
  * in the Black Potential Pipeline database.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline

@@ -4,7 +4,7 @@
  *
  * This class processes form submissions, validates data, and creates applicant entries.
  *
- * @link       https://example.com
+ * @link       https://codemygig.com,
  * @since      1.0.0
  *
  * @package    Black_Potential_Pipeline
@@ -24,7 +24,7 @@ if (!defined('WPINC')) {
  *
  * @package    Black_Potential_Pipeline
  * @subpackage Black_Potential_Pipeline/includes
- * @author     Your Name <email@example.com>
+ * @author     Adedayo Ayomide Samue ayomide@codemygig.com
  */
 class BPP_Form_Handler {
 
@@ -754,6 +754,14 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         
         // Set the industry taxonomy
         if (!empty($industry)) {
+            error_log('BPP Debug - Setting industry: ' . print_r($industry, true));
+            // Try to resolve the term if it's a term_id
+            if (is_numeric($industry)) {
+                $term = get_term($industry, 'bpp_industry');
+                if (!is_wp_error($term) && !empty($term)) {
+                    $industry = $term->slug;
+                }
+            }
             wp_set_object_terms($applicant_id, $industry, 'bpp_industry', false);
         }
         
