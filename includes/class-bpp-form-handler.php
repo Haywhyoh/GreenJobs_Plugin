@@ -713,6 +713,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
     private function create_applicant_post($data, $uploaded_files = array()) {
         // Debug incoming data
         error_log('BPP Debug - Creating applicant post with data: ' . print_r($data, true));
+        error_log('BPP Debug - Uploaded files: ' . print_r($uploaded_files, true));
         
         // Sanitize input data
         $first_name = sanitize_text_field($data['first_name']);
@@ -772,11 +773,15 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         update_post_meta($applicant_id, 'bpp_consent', $consent ? 'yes' : 'no');
         update_post_meta($applicant_id, 'bpp_submission_date', current_time('mysql'));
         
-        // Set the industry taxonomy
+        // Handle industry with extra validation and debugging
         if (!empty($industry)) {
             error_log('BPP Debug - Setting industry: ' . print_r($industry, true));
             // The industry value from the form is already a slug, so use it directly
             wp_set_object_terms($applicant_id, $industry, 'bpp_industry', false);
+            
+            // Add extra log to check what's actually stored
+            $terms = wp_get_object_terms($applicant_id, 'bpp_industry');
+            error_log('BPP Debug - Industry terms after saving: ' . print_r($terms, true));
         }
         
         // Handle resume attachment if uploaded
@@ -786,10 +791,21 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         
         // Handle professional photo attachment if uploaded
         if (isset($uploaded_files['photo'])) {
+            error_log('BPP Debug - Saving photo attachment with ID: ' . $uploaded_files['photo']);
             update_post_meta($applicant_id, 'bpp_photo', $uploaded_files['photo']);
             
             // Set as featured image if available
             set_post_thumbnail($applicant_id, $uploaded_files['photo']);
+            
+            // Verify the attachment was saved
+            $saved_photo = get_post_meta($applicant_id, 'bpp_photo', true);
+            error_log('BPP Debug - Saved photo meta value: ' . $saved_photo);
+            
+            // Check if featured image was set
+            $thumbnail_id = get_post_thumbnail_id($applicant_id);
+            error_log('BPP Debug - Featured image ID: ' . $thumbnail_id);
+        } else {
+            error_log('BPP Debug - No photo file to process');
         }
         
         return $applicant_id;
@@ -858,6 +874,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         // Process professional photo upload
         if (!empty($files['professional_photo']) && $files['professional_photo']['error'] === UPLOAD_ERR_OK) {
             error_log('Processing professional photo file: ' . $files['professional_photo']['name']);
+            error_log('Professional photo details: ' . print_r($files['professional_photo'], true));
             
             $photo_result = $this->process_single_file_upload('professional_photo', $files['professional_photo'], array(
                 'allowed_types' => array('image/jpeg', 'image/png', 'image/gif'),
@@ -876,6 +893,9 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             $error_message = $this->get_file_upload_error_message($files['professional_photo']['error']);
             error_log('Professional photo upload error: ' . $error_message);
             $errors['photo'] = $error_message;
+        } else {
+            error_log('No professional photo uploaded or there was an error: ' . 
+                      (isset($files['professional_photo']) ? $files['professional_photo']['error'] : 'Not present in $_FILES'));
         }
         
         // Add errors if found
@@ -966,6 +986,8 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         // Generate metadata
         $attachment_data = wp_generate_attachment_metadata($attachment_id, $uploaded_file['file']);
         wp_update_attachment_metadata($attachment_id, $attachment_data);
+        
+        error_log("Attachment metadata: " . print_r($attachment_data, true));
         
         return $attachment_id;
     }

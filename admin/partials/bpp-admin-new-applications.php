@@ -53,6 +53,22 @@ try {
     $applications_query = null;
     echo '<div class="error"><p>Error: ' . esc_html($e->getMessage()) . '</p></div>';
 }
+
+// Get all industry terms for the dropdown
+$industries = get_terms(array(
+    'taxonomy' => 'bpp_industry',
+    'hide_empty' => false,
+));
+
+// Fallback to default industries if none are found
+if (empty($industries) || is_wp_error($industries)) {
+    $industries = array(
+        array('slug' => 'nature-based-work', 'term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
+        array('slug' => 'environmental-policy', 'term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
+        array('slug' => 'climate-science', 'term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
+        array('slug' => 'green-construction', 'term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
+    );
+}
 ?>
 
 <div class="wrap bpp-admin-new-applications">
@@ -263,6 +279,22 @@ try {
                         $industry = '';
                         if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
                             $industry = $industry_terms[0];
+                        }
+                        
+                        // If no industry is set, check if we can find a match in the default industries
+                        if (empty($industry)) {
+                            $industry_meta = get_post_meta($post_id, 'bpp_industry', true);
+                            if (!empty($industry_meta)) {
+                                foreach ($industries as $ind) {
+                                    if (is_array($ind) && isset($ind['slug']) && $ind['slug'] === $industry_meta) {
+                                        $industry = $ind['name'];
+                                        break;
+                                    } elseif (is_object($ind) && isset($ind->slug) && $ind->slug === $industry_meta) {
+                                        $industry = $ind->name;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         
                         // Get skills

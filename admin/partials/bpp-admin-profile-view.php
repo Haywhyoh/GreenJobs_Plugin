@@ -304,9 +304,13 @@ $updated = isset($_GET['updated']) && $_GET['updated'] == 'true';
                             <label for="bpp_industry"><?php echo esc_html__('Industry', 'black-potential-pipeline'); ?> <span class="required">*</span></label>
                             <select id="bpp_industry" name="bpp_industry" required>
                                 <option value=""><?php echo esc_html__('Select Industry', 'black-potential-pipeline'); ?></option>
-                                <?php foreach ($all_industries as $ind) : ?>
-                                    <option value="<?php echo esc_attr($ind->slug); ?>" <?php selected($industry, $ind->name); ?>>
-                                        <?php echo esc_html($ind->name); ?>
+                                <?php foreach ($all_industries as $ind) : 
+                                    // Check if $ind is an array or object
+                                    $slug = is_object($ind) ? $ind->slug : (isset($ind['slug']) ? $ind['slug'] : '');
+                                    $name = is_object($ind) ? $ind->name : (isset($ind['name']) ? $ind['name'] : '');
+                                ?>
+                                    <option value="<?php echo esc_attr($slug); ?>" <?php selected($industry, $name); ?>>
+                                        <?php echo esc_html($name); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>

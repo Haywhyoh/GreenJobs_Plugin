@@ -167,9 +167,14 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                             <label for="bpp_industry" class="<?php echo $use_bootstrap ? 'form-label' : ''; ?>"><?php _e('Industry', 'black-potential-pipeline'); ?></label>
                             <select id="bpp_industry" name="bpp_industry" class="<?php echo esc_attr($select_class); ?>">
                                 <option value=""><?php _e('All Industries', 'black-potential-pipeline'); ?></option>
-                                <?php foreach ($industries as $industry) : ?>
-                                    <option value="<?php echo esc_attr($industry->slug); ?>" <?php selected($industry_filter, $industry->slug); ?>>
-                                        <?php echo esc_html($industry->name); ?>
+                                <?php foreach ($industries as $industry) : 
+                                    // Check if $industry is an array or object
+                                    $slug = is_object($industry) ? $industry->slug : (isset($industry['slug']) ? $industry['slug'] : '');
+                                    $name = is_object($industry) ? $industry->name : (isset($industry['name']) ? $industry['name'] : '');
+                                    if (empty($slug) || empty($name)) continue;
+                                ?>
+                                    <option value="<?php echo esc_attr($slug); ?>" <?php selected($industry_filter, $slug); ?>>
+                                        <?php echo esc_html($name); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>

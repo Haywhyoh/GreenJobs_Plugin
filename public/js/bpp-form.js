@@ -177,6 +177,18 @@
             if (industryElement && industryElement.value) {
                 formData.set('industry', industryElement.value);
                 console.log('Prepared industry:', industryElement.value);
+                // Add extra debugging information about the industry
+                console.log('Industry element details:', {
+                    id: industryElement.id,
+                    name: industryElement.name,
+                    value: industryElement.value,
+                    selectedIndex: industryElement.selectedIndex,
+                    selectedOption: industryElement.options[industryElement.selectedIndex] ? 
+                        industryElement.options[industryElement.selectedIndex].text : 'None selected'
+                });
+            } else {
+                console.log('Industry field not found or has no value:', 
+                    industryElement ? 'Element exists but no value' : 'Element not found');
             }
             
             // Handle professional photo
@@ -185,6 +197,16 @@
                 // Make sure to explicitly add the file to FormData with correct name
                 formData.set('professional_photo', professionalPhotoInput.files[0]);
                 console.log('Prepared professional photo:', professionalPhotoInput.files[0].name);
+                // Add extra debugging information about the photo file
+                console.log('Professional photo details:', {
+                    name: professionalPhotoInput.files[0].name,
+                    size: professionalPhotoInput.files[0].size,
+                    type: professionalPhotoInput.files[0].type,
+                    lastModified: new Date(professionalPhotoInput.files[0].lastModified).toISOString()
+                });
+            } else {
+                console.log('Professional photo field not found or has no files:', 
+                    professionalPhotoInput ? 'Element exists but no files selected' : 'Element not found');
             }
             
             return formData;
