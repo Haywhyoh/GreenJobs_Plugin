@@ -135,7 +135,7 @@ $card_class = $use_bootstrap ? 'card h-100 shadow-sm' : 'bpp-professional-card';
 $card_header_class = $use_bootstrap ? 'card-header d-flex' : 'bpp-professional-header';
 $photo_class = $use_bootstrap ? 'me-3' : 'bpp-professional-photo';
 $info_class = $use_bootstrap ? 'flex-grow-1' : 'bpp-professional-info';
-$card_name_class = $use_bootstrap ? 'h5 mb-1' : 'bpp-professional-name';
+$card_name_class = $use_bootstrap ? 'h4 mb-1' : 'bpp-professional-name';
 $card_title_class = $use_bootstrap ? 'text-muted mb-1' : 'bpp-professional-title';
 $card_content_class = $use_bootstrap ? 'card-body' : 'bpp-professional-content';
 $card_excerpt_class = $use_bootstrap ? 'mb-3' : 'bpp-professional-excerpt';
@@ -294,9 +294,7 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                     </div>
                     
                     <div class="<?php echo esc_attr($card_content_class); ?>">
-                        <div class="<?php echo esc_attr($card_excerpt_class); ?>">
-                            <?php the_excerpt(); ?>
-                        </div>
+                        
                         
                         <div class="<?php echo esc_attr($info_class); ?>">
                             <h3 class="<?php echo esc_attr($card_name_class); ?>"><?php the_title(); ?></h3>
@@ -351,6 +349,9 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                                 </div>
                             </div>
                         <?php endif; ?>
+                        <div class="<?php echo esc_attr($card_excerpt_class); ?>">
+                            <?php the_excerpt(); ?>
+                        </div>
                     </div>
                     
                     <div class="<?php echo esc_attr($card_footer_class); ?>">

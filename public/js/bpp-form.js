@@ -159,6 +159,37 @@
             return re.test(String(email).toLowerCase());
         }
         
+        // Function to prepare form data before submission
+        function prepareFormData(formData) {
+            // Handle years_experience field
+            const yearsExpElement = document.getElementById('years_experience');
+            if (yearsExpElement) {
+                const yearsExpValue = yearsExpElement.value.trim();
+                if (yearsExpValue !== '') {
+                    // Make sure it's stored as a number
+                    formData.set('years_experience', parseInt(yearsExpValue, 10));
+                    console.log('Prepared years_experience:', parseInt(yearsExpValue, 10));
+                }
+            }
+            
+            // Handle industry field
+            const industryElement = document.getElementById('bpp_industry');
+            if (industryElement && industryElement.value) {
+                formData.set('industry', industryElement.value);
+                console.log('Prepared industry:', industryElement.value);
+            }
+            
+            // Handle professional photo
+            const professionalPhotoInput = document.getElementById('professional_photo');
+            if (professionalPhotoInput && professionalPhotoInput.files.length > 0) {
+                // Make sure to explicitly add the file to FormData with correct name
+                formData.set('professional_photo', professionalPhotoInput.files[0]);
+                console.log('Prepared professional photo:', professionalPhotoInput.files[0].name);
+            }
+            
+            return formData;
+        }
+        
         // Display message
         function displayMessage(message, isSuccess) {
             if (isBootstrapForm) {
@@ -187,29 +218,15 @@
             $submitButton.prop('disabled', true);
             $spinner.show();
             
-            // Create FormData object
+            // Make FormData object
             const formData = new FormData(this);
             
             // Add action and nonce
             formData.append('action', 'bpp_submit_application');
             formData.append('nonce', bpp_form_obj.nonce);
             
-            // Debug file inputs specifically
-            const resumeInput = document.getElementById('bpp_resume');
-            if (resumeInput && resumeInput.files.length > 0) {
-                console.log('Resume file being added to FormData:', resumeInput.files[0].name);
-                // Explicitly add the file to ensure it's included
-                formData.delete('resume'); // Remove any existing entry
-                formData.append('resume', resumeInput.files[0]);
-            }
-            
-            const photoInput = document.getElementById('bpp_photo');
-            if (photoInput && photoInput.files.length > 0) {
-                console.log('Photo file being added to FormData:', photoInput.files[0].name);
-                // Explicitly add the file to ensure it's included
-                formData.delete('photo'); // Remove any existing entry
-                formData.append('photo', photoInput.files[0]);
-            }
+            // Prepare form data before submission
+            const preparedFormData = prepareFormData(formData);
             
             // Debug: Log form data being submitted
             console.log('Form submission started');
@@ -219,35 +236,32 @@
             
             // Debug file inputs
             console.log('File Input Debug:');
-            if (resumeInput) {
-                console.log('Resume Input: Found');
-                console.log('Resume Required:', resumeInput.hasAttribute('required'));
-                console.log('Resume Files Selected:', resumeInput.files.length > 0);
-                if (resumeInput.files.length > 0) {
-                    console.log('Resume File Name:', resumeInput.files[0].name);
-                    console.log('Resume File Size:', resumeInput.files[0].size, 'bytes');
-                    console.log('Resume File Type:', resumeInput.files[0].type);
+            
+            // Debug professional photo input
+            const professionalPhotoInput = document.getElementById('professional_photo');
+            if (professionalPhotoInput) {
+                console.log('Professional Photo Input: Found');
+                console.log('Professional Photo Required:', professionalPhotoInput.hasAttribute('required'));
+                console.log('Professional Photo Files Selected:', professionalPhotoInput.files.length > 0);
+                if (professionalPhotoInput.files.length > 0) {
+                    console.log('Professional Photo File Name:', professionalPhotoInput.files[0].name);
+                    console.log('Professional Photo File Size:', professionalPhotoInput.files[0].size, 'bytes');
+                    console.log('Professional Photo File Type:', professionalPhotoInput.files[0].type);
                 }
             } else {
-                console.log('Resume Input: Not found in DOM');
+                console.log('Professional Photo Input: Not found in DOM');
             }
             
-            if (photoInput) {
-                console.log('Photo Input: Found');
-                console.log('Photo Required:', photoInput.hasAttribute('required'));
-                console.log('Photo Files Selected:', photoInput.files.length > 0);
-                if (photoInput.files.length > 0) {
-                    console.log('Photo File Name:', photoInput.files[0].name);
-                    console.log('Photo File Size:', photoInput.files[0].size, 'bytes');
-                    console.log('Photo File Type:', photoInput.files[0].type);
-                }
-            } else {
-                console.log('Photo Input: Not found in DOM');
-            }
+            // Ensure industry and years_experience are properly included in form data
+            const industryValue = $('#bpp_industry').val();
+            const yearsExpValue = $('#years_experience').val();
+            
+            console.log('Industry value:', industryValue);
+            console.log('Years of experience value:', yearsExpValue);
             
             // Log all form fields for debugging
             console.log('Form data being submitted:');
-            for (let pair of formData.entries()) {
+            for (let pair of preparedFormData.entries()) {
                 console.log(pair[0] + ': ' + (pair[0] === 'nonce' ? '[HIDDEN]' : pair[1]));
             }
             
@@ -255,7 +269,7 @@
             $.ajax({
                 type: 'POST',
                 url: bpp_form_obj.ajax_url,
-                data: formData,
+                data: preparedFormData,
                 processData: false,
                 contentType: false,
                 success: function(response) {

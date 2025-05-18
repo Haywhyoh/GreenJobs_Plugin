@@ -283,6 +283,10 @@ class BPP_Form_Handler {
                 update_post_meta($applicant_id, 'bpp_photo', $photo_id);
             }
             
+            // Save submission date
+            $submission_date = current_time('mysql');
+            update_post_meta($applicant_id, 'bpp_submission_date', $submission_date);
+            
             error_log('Applicant meta data saved');
             
             // Send notification emails
@@ -707,6 +711,9 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
      * @return   int|bool                 The post ID on success, false on failure
      */
     private function create_applicant_post($data, $uploaded_files = array()) {
+        // Debug incoming data
+        error_log('BPP Debug - Creating applicant post with data: ' . print_r($data, true));
+        
         // Sanitize input data
         $first_name = sanitize_text_field($data['first_name']);
         $last_name = sanitize_text_field($data['last_name']);
@@ -714,14 +721,27 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         $phone = isset($data['phone']) ? sanitize_text_field($data['phone']) : '';
         $industry = isset($data['industry']) ? sanitize_text_field($data['industry']) : '';
         $job_title = isset($data['job_title']) ? sanitize_text_field($data['job_title']) : '';
-        $years_experience = isset($data['years_experience']) ? sanitize_text_field($data['years_experience']) : '';
+        
+        // Handle years experience with extra validation and debugging
+        $years_experience = 0;
+        if (isset($data['years_experience'])) {
+            if (is_numeric($data['years_experience'])) {
+                $years_experience = intval($data['years_experience']);
+                error_log('BPP Debug - Years experience value: ' . $years_experience);
+            } else {
+                error_log('BPP Debug - Invalid years_experience value: ' . print_r($data['years_experience'], true));
+            }
+        } else {
+            error_log('BPP Debug - years_experience not set in data');
+        }
+        
         $linkedin = isset($data['linkedin']) ? esc_url_raw($data['linkedin']) : '';
         $website = isset($data['website']) ? esc_url_raw($data['website']) : '';
         $skills = isset($data['skills']) ? sanitize_textarea_field($data['skills']) : '';
         $cover_letter = isset($data['cover_letter']) ? sanitize_textarea_field($data['cover_letter']) : '';
         $job_type = isset($data['job_type']) ? sanitize_text_field($data['job_type']) : '';
         $location = isset($data['location']) ? sanitize_text_field($data['location']) : '';
-        $consent = isset($data['consent']) && $data['consent'] === 'yes';
+        $consent = isset($data['consent']) && ($data['consent'] === 'yes' || $data['consent'] === 'on');
         
         // Prepare post data
         $applicant_data = array(
@@ -755,13 +775,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         // Set the industry taxonomy
         if (!empty($industry)) {
             error_log('BPP Debug - Setting industry: ' . print_r($industry, true));
-            // Try to resolve the term if it's a term_id
-            if (is_numeric($industry)) {
-                $term = get_term($industry, 'bpp_industry');
-                if (!is_wp_error($term) && !empty($term)) {
-                    $industry = $term->slug;
-                }
-            }
+            // The industry value from the form is already a slug, so use it directly
             wp_set_object_terms($applicant_id, $industry, 'bpp_industry', false);
         }
         
@@ -770,7 +784,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             update_post_meta($applicant_id, 'bpp_resume', $uploaded_files['resume']);
         }
         
-        // Handle photo attachment if uploaded
+        // Handle professional photo attachment if uploaded
         if (isset($uploaded_files['photo'])) {
             update_post_meta($applicant_id, 'bpp_photo', $uploaded_files['photo']);
             
@@ -818,7 +832,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             $errors['resume'] = $error_message;
         }
         
-        // Process photo upload
+        // Process photo upload (legacy field)
         if (!empty($files['photo']) && $files['photo']['error'] === UPLOAD_ERR_OK) {
             error_log('Processing photo file: ' . $files['photo']['name']);
             
@@ -838,6 +852,29 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             // Handle other upload errors
             $error_message = $this->get_file_upload_error_message($files['photo']['error']);
             error_log('Photo upload error: ' . $error_message);
+            $errors['photo'] = $error_message;
+        }
+        
+        // Process professional photo upload
+        if (!empty($files['professional_photo']) && $files['professional_photo']['error'] === UPLOAD_ERR_OK) {
+            error_log('Processing professional photo file: ' . $files['professional_photo']['name']);
+            
+            $photo_result = $this->process_single_file_upload('professional_photo', $files['professional_photo'], array(
+                'allowed_types' => array('image/jpeg', 'image/png', 'image/gif'),
+                'max_size' => 2 * 1024 * 1024 // 2MB
+            ));
+            
+            if (is_wp_error($photo_result)) {
+                error_log('Professional photo upload error: ' . $photo_result->get_error_message());
+                $errors['photo'] = $photo_result->get_error_message();
+            } else {
+                error_log('Professional photo uploaded successfully. Attachment ID: ' . $photo_result);
+                $uploaded_files['photo'] = $photo_result; // Use 'photo' to be consistent with existing code
+            }
+        } elseif (!empty($files['professional_photo']) && $files['professional_photo']['error'] !== UPLOAD_ERR_NO_FILE) {
+            // Handle other upload errors
+            $error_message = $this->get_file_upload_error_message($files['professional_photo']['error']);
+            error_log('Professional photo upload error: ' . $error_message);
             $errors['photo'] = $error_message;
         }
         
@@ -958,6 +995,70 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
                 return __('A PHP extension stopped the file upload.', 'black-potential-pipeline');
             default:
                 return __('Unknown upload error.', 'black-potential-pipeline');
+        }
+    }
+
+    /**
+     * Process form submission
+     *
+     * @since    1.0.0
+     * @return   array    Result with success status and message
+     */
+    public function process_form_submission() {
+        try {
+            // Debug information
+            error_log('BPP Form Handler: Processing form submission');
+            error_log('$_FILES contents: ' . print_r($_FILES, true));
+            error_log('$_POST contents: ' . print_r($_POST, true));
+            
+            // Validate fields
+            $errors = $this->validate_submission_fields($_POST);
+            
+            if (!empty($errors)) {
+                return array(
+                    'success' => false,
+                    'message' => __('Please correct the errors below.', 'black-potential-pipeline'),
+                    'errors' => $errors
+                );
+            }
+            
+            // Process file uploads
+            $uploaded_files = $this->process_file_uploads($_FILES);
+            
+            if (isset($uploaded_files['errors']) && !empty($uploaded_files['errors'])) {
+                return array(
+                    'success' => false,
+                    'message' => __('There were issues with your file uploads.', 'black-potential-pipeline'),
+                    'errors' => $uploaded_files['errors']
+                );
+            }
+            
+            // Create applicant post
+            $applicant_id = $this->create_applicant_post($_POST, $uploaded_files);
+            
+            if (!$applicant_id) {
+                return array(
+                    'success' => false,
+                    'message' => __('Failed to submit your application. Please try again.', 'black-potential-pipeline')
+                );
+            }
+            
+            // Send notification emails
+            $this->send_notification_emails($applicant_id);
+            
+            // Success response
+            return array(
+                'success' => true,
+                'message' => __('Thank you! Your application has been submitted successfully and is pending review.', 'black-potential-pipeline')
+            );
+            
+        } catch (Exception $e) {
+            error_log('Exception in process_form_submission: ' . $e->getMessage());
+            error_log('Exception trace: ' . $e->getTraceAsString());
+            return array(
+                'success' => false,
+                'message' => __('An unexpected error occurred: ' . $e->getMessage(), 'black-potential-pipeline')
+            );
         }
     }
 } 

@@ -60,6 +60,7 @@ class BPP_Admin_Ajax {
         // Register AJAX handlers
         add_action('wp_ajax_bpp_approve_applicant', array($this, 'approve_applicant'));
         add_action('wp_ajax_bpp_reject_applicant', array($this, 'reject_applicant'));
+        add_action('wp_ajax_bpp_handle_profile_submission', array($this, 'handle_profile_submission'));
     }
 
     /**
@@ -201,5 +202,24 @@ class BPP_Admin_Ajax {
      */
     private function send_success_response($data) {
         wp_send_json_success($data);
+    }
+
+    public function handle_profile_submission() {
+        // Check nonce for security
+        check_ajax_referer('bpp_form_nonce', 'security');
+        
+        // Initialize the form handler if not already done
+        $form_handler = new BPP_Form_Handler();
+        
+        // Process the submission
+        $result = $form_handler->process_form_submission();
+        
+        if ($result['success']) {
+            wp_send_json_success(array('message' => $result['message']));
+        } else {
+            wp_send_json_error(array('message' => $result['message']));
+        }
+        
+        wp_die();
     }
 } 

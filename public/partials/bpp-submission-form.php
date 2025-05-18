@@ -241,26 +241,10 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                         </div>
                     </div>
                     
-                    <?php if (in_array('years_experience', array_merge($required_fields, $optional_fields))) : ?>
-                        <div class="<?php echo esc_attr($form_group_class); ?>">
-                            <label for="bpp_years_experience" class="<?php echo esc_attr($label_class); ?>">
-                                <?php _e('Years of Experience', 'black-potential-pipeline'); ?>
-                                <?php if (in_array('years_experience', $required_fields)) : ?>
-                                    <span class="<?php echo esc_attr($required_class); ?>">*</span>
-                                <?php endif; ?>
-                            </label>
-                            <select id="bpp_years_experience" name="years_experience" 
-                                    class="<?php echo esc_attr($select_class); ?>"
-                                    <?php echo in_array('years_experience', $required_fields) ? 'required' : ''; ?>>
-                                <option value=""><?php _e('Select years of experience', 'black-potential-pipeline'); ?></option>
-                                <option value="0-2"><?php _e('0-2 years', 'black-potential-pipeline'); ?></option>
-                                <option value="3-5"><?php _e('3-5 years', 'black-potential-pipeline'); ?></option>
-                                <option value="6-10"><?php _e('6-10 years', 'black-potential-pipeline'); ?></option>
-                                <option value="10+"><?php _e('10+ years', 'black-potential-pipeline'); ?></option>
-                            </select>
-                            <div id="bpp_years_experience_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
-                        </div>
-                    <?php endif; ?>
+                    <div class="<?php echo esc_attr($form_group_class); ?>">
+                        <label for="years_experience"><?php _e('Years of Experience', 'business-professional-profiles'); ?> <span class="required">*</span></label>
+                        <input type="number" name="years_experience" id="years_experience" class="form-control" min="0" required>
+                    </div>
                     
                     <?php if (in_array('skills', array_merge($required_fields, $optional_fields))) : ?>
                         <div class="<?php echo esc_attr($form_group_class); ?>">
@@ -381,24 +365,11 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                         </div>
                     <?php endif; ?>
                     
-                    <?php if (in_array('photo', array_merge($required_fields, $optional_fields))) : ?>
-                        <div class="<?php echo esc_attr($form_group_class); ?>">
-                            <label for="bpp_photo" class="<?php echo esc_attr($label_class); ?>">
-                                <?php _e('Professional Photo', 'black-potential-pipeline'); ?>
-                                <?php if (in_array('photo', $required_fields)) : ?>
-                                    <span class="<?php echo esc_attr($required_class); ?>">*</span>
-                                <?php endif; ?>
-                            </label>
-                            <input type="file" id="bpp_photo" name="photo" 
-                                   class="<?php echo $use_bootstrap ? 'form-control' : ''; ?>"
-                                   accept=".jpg,.jpeg,.png,.gif" 
-                                   <?php echo in_array('photo', $required_fields) ? 'required' : ''; ?>>
-                            <div id="bpp_photo_error" class="<?php echo esc_attr($error_feedback_class); ?>"></div>
-                            <small class="<?php echo esc_attr($help_text_class); ?>">
-                                <?php _e('Maximum file size: 2MB. Recommended dimensions: 400x400px', 'black-potential-pipeline'); ?>
-                            </small>
-                        </div>
-                    <?php endif; ?>
+                    <div class="form-group">
+                        <label for="professional_photo"><?php _e('Professional Photo', 'business-professional-profiles'); ?></label>
+                        <input type="file" name="professional_photo" id="professional_photo" class="form-control" accept="image/*">
+                        <small class="form-text text-muted"><?php _e('Upload a professional headshot or profile picture.', 'business-professional-profiles'); ?></small>
+                    </div>
                 <?php if ($use_bootstrap): ?>
                     </div>
                 </div>
