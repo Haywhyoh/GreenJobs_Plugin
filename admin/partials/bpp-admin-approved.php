@@ -116,6 +116,38 @@ if (!empty($selected_industry)) {
                             $industry = $industry_terms[0];
                         }
                         
+                        // If no industry is set from terms, check if we can find a match in the default industries
+                        if (empty($industry)) {
+                            $industry_meta = get_post_meta($post_id, 'bpp_industry', true);
+                            if (!empty($industry_meta)) {
+                                // Get all available industries for comparison
+                                $all_industries = get_terms(array(
+                                    'taxonomy' => 'bpp_industry',
+                                    'hide_empty' => false,
+                                ));
+                                
+                                // If terms couldn't be retrieved, use default industry list
+                                if (empty($all_industries) || is_wp_error($all_industries)) {
+                                    $all_industries = array(
+                                        array('slug' => 'nature-based-work', 'term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
+                                        array('slug' => 'environmental-policy', 'term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
+                                        array('slug' => 'climate-science', 'term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
+                                        array('slug' => 'green-construction', 'term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
+                                    );
+                                }
+                                
+                                foreach ($all_industries as $ind) {
+                                    if (is_array($ind) && isset($ind['slug']) && $ind['slug'] === $industry_meta) {
+                                        $industry = $ind['name'];
+                                        break;
+                                    } elseif (is_object($ind) && isset($ind->slug) && $ind->slug === $industry_meta) {
+                                        $industry = $ind->name;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
                         $resume_id = get_post_meta($post_id, 'bpp_resume', true);
                         $resume_url = !empty($resume_id) ? wp_get_attachment_url($resume_id) : '';
 
