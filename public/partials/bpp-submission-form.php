@@ -366,9 +366,9 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
                     <?php endif; ?>
                     
                     <div class="form-group">
-                        <label for="professional_photo"><?php _e('Professional Photo', 'business-professional-profiles'); ?></label>
-                        <input type="file" name="professional_photo" id="professional_photo" class="form-control" accept="image/*">
-                        <small class="form-text text-muted"><?php _e('Upload a professional headshot or profile picture.', 'business-professional-profiles'); ?></small>
+                        <label for="professional_photo"><?php _e('Professional Photo', 'business-professional-profiles'); ?> <span class="required">*</span></label>
+                        <input type="file" name="professional_photo" id="professional_photo" class="form-control" accept="image/*" required>
+                        <small class="form-text text-muted"><?php _e('Upload a professional headshot or profile picture. Required for your profile.', 'business-professional-profiles'); ?></small>
                     </div>
                 <?php if ($use_bootstrap): ?>
                     </div>

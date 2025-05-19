@@ -93,13 +93,13 @@ class BPP_Form_Handler {
             
             // If no configuration is found, use default required fields
             if (empty($required_fields)) {
-                $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume');
+                $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume', 'professional_photo');
             }
 
             // Validate required fields (except file uploads)
             foreach ($required_fields as $field) {
                 // Skip file fields - we'll check them separately
-                if ($field === 'resume' || $field === 'photo') {
+                if ($field === 'resume' || $field === 'photo' || $field === 'professional_photo') {
                     continue;
                 }
                 
@@ -137,6 +137,34 @@ class BPP_Form_Handler {
                 }
                 
                 error_log('Resume file upload validation passed');
+            }
+
+            // Special validation for professional photo file upload
+            if (in_array('professional_photo', $required_fields)) {
+                error_log('Checking professional photo file upload...');
+                
+                if (!isset($_FILES['professional_photo'])) {
+                    error_log('$_FILES["professional_photo"] is not set at all');
+                    $this->send_error_response(__('Professional photo is missing. Please select an image file.', 'black-potential-pipeline'));
+                    return;
+                }
+                
+                error_log('Professional photo upload error code: ' . $_FILES['professional_photo']['error']);
+                
+                if ($_FILES['professional_photo']['error'] !== UPLOAD_ERR_OK) {
+                    $error_message = $this->get_file_upload_error_message($_FILES['professional_photo']['error']);
+                    error_log('Professional photo upload error: ' . $error_message);
+                    $this->send_error_response(sprintf(__('Professional photo upload error: %s', 'black-potential-pipeline'), $error_message));
+                    return;
+                }
+                
+                if (empty($_FILES['professional_photo']['tmp_name']) || !is_uploaded_file($_FILES['professional_photo']['tmp_name'])) {
+                    error_log('Professional photo tmp_name is empty or not an uploaded file');
+                    $this->send_error_response(__('Professional photo upload failed. Please try again.', 'black-potential-pipeline'));
+                    return;
+                }
+                
+                error_log('Professional photo file upload validation passed');
             }
 
             // Process file uploads
@@ -637,12 +665,12 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         
         // If no configuration is found, use default required fields
         if (empty($required_fields)) {
-            $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume');
+            $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume', 'professional_photo');
         }
         
         // Validate required fields
         foreach ($required_fields as $field) {
-            if ($field !== 'resume' && $field !== 'photo' && empty($data[$field])) {
+            if ($field !== 'resume' && $field !== 'photo' && $field !== 'professional_photo' && empty($data[$field])) {
                 $field_label = isset($form_fields[$field]['label']) ? $form_fields[$field]['label'] : $field;
                 $errors[$field] = sprintf(__('The %s field is required.', 'black-potential-pipeline'), $field_label);
             }
@@ -672,6 +700,19 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             // If there was an error other than no file uploaded
             elseif ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
                 $errors['photo'] = $this->get_file_upload_error_message($_FILES['photo']['error']);
+            }
+        }
+        
+        if (in_array('professional_photo', $required_fields)) {
+            // Error only if no file was uploaded at all
+            if (empty($_FILES['professional_photo']) || 
+                !isset($_FILES['professional_photo']['tmp_name']) || 
+                empty($_FILES['professional_photo']['tmp_name'])) {
+                $errors['professional_photo'] = __('Professional photo is required.', 'black-potential-pipeline');
+            }
+            // If there was an error other than no file uploaded
+            elseif ($_FILES['professional_photo']['error'] !== UPLOAD_ERR_OK) {
+                $errors['professional_photo'] = $this->get_file_upload_error_message($_FILES['professional_photo']['error']);
             }
         }
         
@@ -790,22 +831,22 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         }
         
         // Handle professional photo attachment if uploaded
-        if (isset($uploaded_files['photo'])) {
-            error_log('BPP Debug - Saving photo attachment with ID: ' . $uploaded_files['photo']);
-            update_post_meta($applicant_id, 'bpp_photo', $uploaded_files['photo']);
+        if (isset($uploaded_files['professional_photo'])) {
+            error_log('BPP Debug - Saving professional photo attachment with ID: ' . $uploaded_files['professional_photo']);
+            update_post_meta($applicant_id, 'bpp_professional_photo', $uploaded_files['professional_photo']);
             
             // Set as featured image if available
-            set_post_thumbnail($applicant_id, $uploaded_files['photo']);
+            set_post_thumbnail($applicant_id, $uploaded_files['professional_photo']);
             
             // Verify the attachment was saved
-            $saved_photo = get_post_meta($applicant_id, 'bpp_photo', true);
-            error_log('BPP Debug - Saved photo meta value: ' . $saved_photo);
+            $saved_photo = get_post_meta($applicant_id, 'bpp_professional_photo', true);
+            error_log('BPP Debug - Saved professional photo meta value: ' . $saved_photo);
             
             // Check if featured image was set
             $thumbnail_id = get_post_thumbnail_id($applicant_id);
             error_log('BPP Debug - Featured image ID: ' . $thumbnail_id);
         } else {
-            error_log('BPP Debug - No photo file to process');
+            error_log('BPP Debug - No professional photo file to process');
         }
         
         return $applicant_id;
@@ -883,16 +924,16 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             
             if (is_wp_error($photo_result)) {
                 error_log('Professional photo upload error: ' . $photo_result->get_error_message());
-                $errors['photo'] = $photo_result->get_error_message();
+                $errors['professional_photo'] = $photo_result->get_error_message();
             } else {
                 error_log('Professional photo uploaded successfully. Attachment ID: ' . $photo_result);
-                $uploaded_files['photo'] = $photo_result; // Use 'photo' to be consistent with existing code
+                $uploaded_files['professional_photo'] = $photo_result; // Use 'professional_photo' to be consistent with existing code
             }
         } elseif (!empty($files['professional_photo']) && $files['professional_photo']['error'] !== UPLOAD_ERR_NO_FILE) {
             // Handle other upload errors
             $error_message = $this->get_file_upload_error_message($files['professional_photo']['error']);
             error_log('Professional photo upload error: ' . $error_message);
-            $errors['photo'] = $error_message;
+            $errors['professional_photo'] = $error_message;
         } else {
             error_log('No professional photo uploaded or there was an error: ' . 
                       (isset($files['professional_photo']) ? $files['professional_photo']['error'] : 'Not present in $_FILES'));

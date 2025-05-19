@@ -127,24 +127,24 @@
             }
             
             // Validate photo file
-            const photoInput = document.getElementById('bpp_photo');
+            const photoInput = document.getElementById('professional_photo');
             if (photoInput && photoInput.hasAttribute('required')) {
                 if (!photoInput.files.length) {
                     // No file selected, but it's required
-                    showFieldError('bpp_photo', bpp_form_obj.i18n.required_field || 'Photo is required.');
+                    showFieldError('professional_photo', bpp_form_obj.i18n.required_field || 'Professional photo is required.');
                     isValid = false;
                 } else {
                     const photoFile = photoInput.files[0];
                     
                     // Max size: 2MB
                     if (!validateFileSize(photoFile, 2 * 1024 * 1024)) {
-                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_size_error);
+                        showFieldError('professional_photo', bpp_form_obj.i18n.file_size_error || 'Photo file is too large. Maximum size is 2MB.');
                         isValid = false;
                     }
                     
                     // Allowed file types: jpg, jpeg, png, gif
                     if (!validateFileType(photoFile, ['jpg', 'jpeg', 'png', 'gif'])) {
-                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_type_error);
+                        showFieldError('professional_photo', bpp_form_obj.i18n.file_type_error || 'Invalid photo format. Please use JPG, PNG or GIF.');
                         isValid = false;
                     }
                 }
@@ -269,6 +269,10 @@
                     console.log('Professional Photo File Name:', professionalPhotoInput.files[0].name);
                     console.log('Professional Photo File Size:', professionalPhotoInput.files[0].size, 'bytes');
                     console.log('Professional Photo File Type:', professionalPhotoInput.files[0].type);
+                } else if (professionalPhotoInput.hasAttribute('required')) {
+                    console.log('Professional Photo is required but no file selected');
+                    showFieldError('professional_photo', bpp_form_obj.i18n.required_field || 'Professional photo is required.');
+                    return false; // Prevent form submission
                 }
             } else {
                 console.log('Professional Photo Input: Not found in DOM');
