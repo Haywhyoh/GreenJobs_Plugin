@@ -46,20 +46,13 @@ COMPLETED TASKS:
 ✅ Added admin UI to configure which fields are visible on public profiles
 ✅ Updated public profile template to respect visibility settings
 ✅ Added visual indication in admin view of which fields are hidden from public view
+✅ Fixed industry access in directory listings by implementing dual mode handling (works with both object and array formats)
+✅ Improved layout of filter options to display inline
+✅ Fixed list view to take full width of container
 
 
 Important Next Steps:
--The direcory rendered with the shortcode needs to be properly styled. The cards have to be arrange in this manner: {
-    the  profile photo
-    the applicant name
-    the applicant job title
-    the applicant industry
-the remove the view profile link. an ovverall ink should be used on the card when they click on it it takes then to the profile page
-}
-
-
-- Fix the styling on the listing page. the cards neeeds  to tbe styled. and the list and grid view to be functional.
-. the featured listing are on top of each other, they should be like grid when grid is selected and another design when list is selected.
+- Fix the years of experience error for the filter. before, years of experience were in ranges, but now there are are single digit. the filter seems to still work with ranges. fix that error.
 
 NEXT STEPS:
 🔲 Create unit tests
@@ -128,6 +121,20 @@ NOTES FOR FUTURE DEVELOPMENT:
 - Consider adding custom fields configuration for the application form
 - Add granular privacy controls for applicants to choose which information they want to share
 - Create additional contact methods that don't expose personal information directly
+
+IMPLEMENTATION NOTES:
+1. Industry Access Method:
+   - Industry data can be accessed in two formats: as an object or as an array
+   - Object format: Use $industry->slug and $industry->name
+   - Array format: Use $industry['slug'] and $industry['name']
+   - All code now checks for both formats to ensure consistent access
+   - Industries are primarily stored as taxonomy terms (bpp_industry)
+   - Fallback exists to read industry from post meta (bpp_industry) if taxonomy relation is missing
+   - Default industry list is provided if terms can't be retrieved:
+     - Nature-based work
+     - Environmental policy
+     - Climate science
+     - Green construction & infrastructure
 
 
 
