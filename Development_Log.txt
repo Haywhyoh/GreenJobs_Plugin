@@ -49,11 +49,17 @@ COMPLETED TASKS:
 
 
 Important Next Steps:
-- Let the list of approged be in a table. reponsive table. then the other suffs like edit, feature, view can be like an option
-- There should be a page that handle the profile view that once they click on it, they can see the all the applicant details.
-- The rejection to also be in a table like structure and responsive. then shpuld have like an options.
-- The new applications to also be in a table like structure. responive with the options icon or button to click
-- Create a popup for admin to add the reason why an applicant is rejected (FIXED - Already implemented in bpp-admin-new-applications.php)
+-The direcory rendered with the shortcode needs to be properly styled. The cards have to be arrange in this manner: {
+    the  profile photo
+    the applicant name
+    the applicant job title
+    the applicant industry
+the remove the view profile link. an ovverall ink should be used on the card when they click on it it takes then to the profile page
+}
+
+
+- Fix the styling on the listing page. the cards neeeds  to tbe styled. and the list and grid view to be functional.
+. the featured listing are on top of each other, they should be like grid when grid is selected and another design when list is selected.
 
 NEXT STEPS:
 🔲 Create unit tests

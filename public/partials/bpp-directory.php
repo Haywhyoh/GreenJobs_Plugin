@@ -71,12 +71,26 @@ if (!empty($experience_filter)) {
         case '0-2':
             $meta_query[] = array(
                 'key' => 'bpp_years_experience',
+                'value' => array(0, 1, 2),
+                'compare' => 'IN',
+                'type' => 'NUMERIC'
+            );
+            // Also check for legacy range format
+            $meta_query[] = array(
+                'key' => 'bpp_years_experience',
                 'value' => '0-2',
                 'compare' => '=',
             );
             break;
             
         case '3-5':
+            $meta_query[] = array(
+                'key' => 'bpp_years_experience',
+                'value' => array(3, 4, 5),
+                'compare' => 'IN',
+                'type' => 'NUMERIC'
+            );
+            // Also check for legacy range format
             $meta_query[] = array(
                 'key' => 'bpp_years_experience',
                 'value' => '3-5',
@@ -87,12 +101,26 @@ if (!empty($experience_filter)) {
         case '6-10':
             $meta_query[] = array(
                 'key' => 'bpp_years_experience',
+                'value' => array(6, 7, 8, 9, 10),
+                'compare' => 'IN',
+                'type' => 'NUMERIC'
+            );
+            // Also check for legacy range format
+            $meta_query[] = array(
+                'key' => 'bpp_years_experience',
                 'value' => '6-10',
                 'compare' => '=',
             );
             break;
             
         case '10+':
+            $meta_query[] = array(
+                'key' => 'bpp_years_experience',
+                'value' => 10,
+                'compare' => '>=',
+                'type' => 'NUMERIC'
+            );
+            // Also check for legacy range format
             $meta_query[] = array(
                 'key' => 'bpp_years_experience',
                 'value' => '10+',
@@ -279,92 +307,40 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                 if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
                     $industry = $industry_terms[0];
                 }
+                
+                // Get permalink for the profile
+                $profile_url = get_permalink();
             ?>
                 <?php if ($use_bootstrap) : ?>
                 <div class="col">
                 <?php endif; ?>
-                <div class="<?php echo esc_attr($card_class); ?>">
-                    <div class="<?php echo esc_attr($card_header_class); ?>">
-                        <?php if (has_post_thumbnail()) : ?>
-                            <div class="<?php echo esc_attr($photo_class); ?>">
-                                <?php the_post_thumbnail($use_bootstrap ? 'thumbnail' : 'thumbnail', array('class' => $use_bootstrap ? 'rounded-circle' : '')); ?>
-                            </div>
-                        <?php else : ?>
-                            <div class="<?php echo esc_attr($photo_class); ?> <?php echo !$use_bootstrap ? 'bpp-no-photo' : ''; ?>">
-                                <span class="dashicons dashicons-businessperson"></span>
-                            </div>
-                        <?php endif; ?>
-                        
-                     
-                    </div>
-                    
-                    <div class="<?php echo esc_attr($card_content_class); ?>">
-                        
-                        
-                        <div class="<?php echo esc_attr($info_class); ?>">
-                            <h3 class="<?php echo esc_attr($card_name_class); ?>"><?php the_title(); ?></h3>
-                            
-                            <?php if (!empty($job_title)) : ?>
-                                <p class="<?php echo esc_attr($card_title_class); ?>"><?php echo esc_html($job_title); ?></p>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($industry)) : ?>
-                                <p class="<?php echo $use_bootstrap ? 'badge bg-primary' : 'bpp-professional-industry'; ?>"><?php echo esc_html($industry); ?></p>
-                            <?php endif; ?>
-                            
-                            <?php if ($use_bootstrap) : ?>
-                                <div class="mt-2">
-                                    <?php if (!empty($location)) : ?>
-                                        <small class="text-muted me-3">
-                                            <i class="dashicons dashicons-location"></i>
-                                            <?php echo esc_html($location); ?>
-                                        </small>
-                                    <?php endif; ?>
-                                    
-                                    <?php if (!empty($years_experience)) : ?>
-                                        <small class="text-muted">
-                                            <i class="dashicons dashicons-businessman"></i>
-                                            <?php printf(_n('%s year experience', '%s years experience', (int)$years_experience, 'black-potential-pipeline'), $years_experience); ?>
-                                        </small>
-                                    <?php endif; ?>
+                <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
+                    <div class="<?php echo esc_attr($card_class); ?>" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
+                        <div class="<?php echo esc_attr($card_content_class); ?> text-center">
+                            <?php if (has_post_thumbnail()) : ?>
+                                <div class="<?php echo esc_attr($photo_class); ?> mb-3 text-center">
+                                    <?php the_post_thumbnail($use_bootstrap ? 'thumbnail' : 'thumbnail', array('class' => $use_bootstrap ? 'rounded-circle mx-auto d-block' : 'mx-auto d-block', 'style' => 'width: 120px; height: 120px; object-fit: cover;')); ?>
                                 </div>
-                            <?php else: ?>
-                                <?php if (!empty($location)) : ?>
-                                    <p class="bpp-professional-location">
-                                        <span class="dashicons dashicons-location"></span>
-                                        <?php echo esc_html($location); ?>
-                                    </p>
+                            <?php else : ?>
+                                <div class="<?php echo esc_attr($photo_class); ?> <?php echo !$use_bootstrap ? 'bpp-no-photo' : ''; ?> mb-3 text-center">
+                                    <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px;"></span>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <div class="<?php echo esc_attr($info_class); ?>">
+                                <h3 class="<?php echo esc_attr($card_name_class); ?>"><?php the_title(); ?></h3>
+                                
+                                <?php if (!empty($job_title)) : ?>
+                                    <p class="<?php echo esc_attr($card_title_class); ?>"><?php echo esc_html($job_title); ?></p>
                                 <?php endif; ?>
                                 
-                                <?php if (!empty($years_experience)) : ?>
-                                    <p class="bpp-professional-experience">
-                                        <span class="dashicons dashicons-businessman"></span>
-                                        <?php printf(_n('%s year experience', '%s years experience', (int)$years_experience, 'black-potential-pipeline'), $years_experience); ?>
-                                    </p>
+                                <?php if (!empty($industry)) : ?>
+                                    <p class="<?php echo $use_bootstrap ? 'badge bg-primary' : 'bpp-professional-industry'; ?>"><?php echo esc_html($industry); ?></p>
                                 <?php endif; ?>
-                            <?php endif; ?>
-                        </div>
-                        <?php if (!empty($skills_array)) : ?>
-                            <div class="<?php echo esc_attr($skills_container_class); ?>">
-                                <h4 class="<?php echo esc_attr($skills_title_class); ?>"><?php _e('Skills', 'black-potential-pipeline'); ?></h4>
-                                <div class="<?php echo esc_attr($skills_tags_class); ?>">
-                                    <?php foreach ($skills_array as $skill) : ?>
-                                        <span class="<?php echo esc_attr($skill_tag_class); ?>"><?php echo esc_html(trim($skill)); ?></span>
-                                    <?php endforeach; ?>
-                                </div>
                             </div>
-                        <?php endif; ?>
-                        <div class="<?php echo esc_attr($card_excerpt_class); ?>">
-                            <?php the_excerpt(); ?>
                         </div>
                     </div>
-                    
-                    <div class="<?php echo esc_attr($card_footer_class); ?>">
-                        <a href="<?php the_permalink(); ?>" class="<?php echo esc_attr($button_primary_class); ?>">
-                            <?php _e('View Full Profile', 'black-potential-pipeline'); ?>
-                        </a>
-                    </div>
-                </div>
+                </a>
                 <?php if ($use_bootstrap) : ?>
                 </div>
                 <?php endif; ?>
@@ -470,5 +446,21 @@ jQuery(document).ready(function($) {
         // Trigger click on the appropriate button
         $('.bpp-toggle-' + savedLayout + ', .btn-group button[data-layout="' + savedLayout + '"]').trigger('click');
     }
+    
+    // Add hover effect to card
+    $('.bpp-card-link .card, .bpp-card-link .bpp-professional-card').hover(
+        function() {
+            $(this).css({
+                'transform': 'translateY(-5px)',
+                'box-shadow': '0 10px 20px rgba(0,0,0,0.1)'
+            });
+        },
+        function() {
+            $(this).css({
+                'transform': 'translateY(0)',
+                'box-shadow': ''
+            });
+        }
+    );
 });
 </script> 

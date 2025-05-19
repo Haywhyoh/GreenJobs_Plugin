@@ -84,41 +84,34 @@ if ($featured_query->post_count < $count) {
                             if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
                                 $industry = $industry_terms[0];
                             }
+                            $profile_url = get_permalink();
                         ?>
                             <div class="bpp-carousel-slide">
-                                <div class="bpp-professional-card">
-                                    <div class="bpp-professional-header">
-                                        <?php if (has_post_thumbnail()) : ?>
-                                            <div class="bpp-professional-photo">
-                                                <?php the_post_thumbnail('thumbnail'); ?>
-                                            </div>
-                                        <?php else : ?>
-                                            <div class="bpp-professional-photo bpp-no-photo">
-                                                <span class="dashicons dashicons-businessperson"></span>
-                                            </div>
-                                        <?php endif; ?>
-                                        
-                                        <div class="bpp-professional-info">
-                                            <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
-                                            <?php if (!empty($job_title)) : ?>
-                                                <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
+                                <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
+                                    <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
+                                        <div class="bpp-professional-content text-center">
+                                            <?php if (has_post_thumbnail()) : ?>
+                                                <div class="bpp-professional-photo mb-3 text-center">
+                                                    <?php the_post_thumbnail('thumbnail', array('class' => 'mx-auto d-block', 'style' => 'width: 120px; height: 120px; object-fit: cover;')); ?>
+                                                </div>
+                                            <?php else : ?>
+                                                <div class="bpp-professional-photo bpp-no-photo mb-3 text-center">
+                                                    <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px;"></span>
+                                                </div>
                                             <?php endif; ?>
-                                            <?php if (!empty($industry)) : ?>
-                                                <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
-                                            <?php endif; ?>
+                                            
+                                            <div class="bpp-professional-info">
+                                                <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
+                                                <?php if (!empty($job_title)) : ?>
+                                                    <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
+                                                <?php endif; ?>
+                                                <?php if (!empty($industry)) : ?>
+                                                    <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="bpp-professional-excerpt">
-                                        <?php the_excerpt(); ?>
-                                    </div>
-                                    
-                                    <div class="bpp-professional-footer">
-                                        <a href="<?php the_permalink(); ?>" class="bpp-view-profile">
-                                            <?php echo esc_html__('View Full Profile', 'black-potential-pipeline'); ?>
-                                        </a>
-                                    </div>
-                                </div>
+                                </a>
                             </div>
                         <?php endwhile; ?>
                         
@@ -133,41 +126,34 @@ if ($featured_query->post_count < $count) {
                                 if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
                                     $industry = $industry_terms[0];
                                 }
+                                $profile_url = get_permalink();
                         ?>
                             <div class="bpp-carousel-slide">
-                                <div class="bpp-professional-card">
-                                    <div class="bpp-professional-header">
-                                        <?php if (has_post_thumbnail()) : ?>
-                                            <div class="bpp-professional-photo">
-                                                <?php the_post_thumbnail('thumbnail'); ?>
-                                            </div>
-                                        <?php else : ?>
-                                            <div class="bpp-professional-photo bpp-no-photo">
-                                                <span class="dashicons dashicons-businessperson"></span>
-                                            </div>
-                                        <?php endif; ?>
-                                        
-                                        <div class="bpp-professional-info">
-                                            <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
-                                            <?php if (!empty($job_title)) : ?>
-                                                <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
+                                <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
+                                    <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
+                                        <div class="bpp-professional-content text-center">
+                                            <?php if (has_post_thumbnail()) : ?>
+                                                <div class="bpp-professional-photo mb-3 text-center">
+                                                    <?php the_post_thumbnail('thumbnail', array('class' => 'mx-auto d-block', 'style' => 'width: 120px; height: 120px; object-fit: cover;')); ?>
+                                                </div>
+                                            <?php else : ?>
+                                                <div class="bpp-professional-photo bpp-no-photo mb-3 text-center">
+                                                    <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px;"></span>
+                                                </div>
                                             <?php endif; ?>
-                                            <?php if (!empty($industry)) : ?>
-                                                <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
-                                            <?php endif; ?>
+                                            
+                                            <div class="bpp-professional-info">
+                                                <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
+                                                <?php if (!empty($job_title)) : ?>
+                                                    <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
+                                                <?php endif; ?>
+                                                <?php if (!empty($industry)) : ?>
+                                                    <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="bpp-professional-excerpt">
-                                        <?php the_excerpt(); ?>
-                                    </div>
-                                    
-                                    <div class="bpp-professional-footer">
-                                        <a href="<?php the_permalink(); ?>" class="bpp-view-profile">
-                                            <?php echo esc_html__('View Full Profile', 'black-potential-pipeline'); ?>
-                                        </a>
-                                    </div>
-                                </div>
+                                </a>
                             </div>
                         <?php 
                             endwhile; 
@@ -186,7 +172,7 @@ if ($featured_query->post_count < $count) {
                 </div>
             </div>
         <?php else : ?>
-            <div class="bpp-featured-grid">
+            <div class="bpp-featured-grid bpp-layout-<?php echo esc_attr($layout); ?>">
                 <?php 
                 // Output featured candidates first
                 while ($featured_query->have_posts()) : $featured_query->the_post();
@@ -197,40 +183,33 @@ if ($featured_query->post_count < $count) {
                     if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
                         $industry = $industry_terms[0];
                     }
+                    $profile_url = get_permalink();
                 ?>
-                    <div class="bpp-professional-card">
-                        <div class="bpp-professional-header">
-                            <?php if (has_post_thumbnail()) : ?>
-                                <div class="bpp-professional-photo">
-                                    <?php the_post_thumbnail('thumbnail'); ?>
-                                </div>
-                            <?php else : ?>
-                                <div class="bpp-professional-photo bpp-no-photo">
-                                    <span class="dashicons dashicons-businessperson"></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <div class="bpp-professional-info">
-                                <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
-                                <?php if (!empty($job_title)) : ?>
-                                    <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
+                    <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
+                        <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
+                            <div class="bpp-professional-content text-center">
+                                <?php if (has_post_thumbnail()) : ?>
+                                    <div class="bpp-professional-photo mb-3 text-center">
+                                        <?php the_post_thumbnail('thumbnail', array('class' => 'mx-auto d-block', 'style' => 'width: 120px; height: 120px; object-fit: cover;')); ?>
+                                    </div>
+                                <?php else : ?>
+                                    <div class="bpp-professional-photo bpp-no-photo mb-3 text-center">
+                                        <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px;"></span>
+                                    </div>
                                 <?php endif; ?>
-                                <?php if (!empty($industry)) : ?>
-                                    <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
-                                <?php endif; ?>
+                                
+                                <div class="bpp-professional-info">
+                                    <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
+                                    <?php if (!empty($job_title)) : ?>
+                                        <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
+                                    <?php endif; ?>
+                                    <?php if (!empty($industry)) : ?>
+                                        <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="bpp-professional-excerpt">
-                            <?php the_excerpt(); ?>
-                        </div>
-                        
-                        <div class="bpp-professional-footer">
-                            <a href="<?php the_permalink(); ?>" class="bpp-view-profile">
-                                <?php echo esc_html__('View Full Profile', 'black-potential-pipeline'); ?>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
                 <?php endwhile; ?>
                 
                 <?php 
@@ -244,40 +223,33 @@ if ($featured_query->post_count < $count) {
                         if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
                             $industry = $industry_terms[0];
                         }
+                        $profile_url = get_permalink();
                 ?>
-                    <div class="bpp-professional-card">
-                        <div class="bpp-professional-header">
-                            <?php if (has_post_thumbnail()) : ?>
-                                <div class="bpp-professional-photo">
-                                    <?php the_post_thumbnail('thumbnail'); ?>
-                                </div>
-                            <?php else : ?>
-                                <div class="bpp-professional-photo bpp-no-photo">
-                                    <span class="dashicons dashicons-businessperson"></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <div class="bpp-professional-info">
-                                <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
-                                <?php if (!empty($job_title)) : ?>
-                                    <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
+                    <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
+                        <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
+                            <div class="bpp-professional-content text-center">
+                                <?php if (has_post_thumbnail()) : ?>
+                                    <div class="bpp-professional-photo mb-3 text-center">
+                                        <?php the_post_thumbnail('thumbnail', array('class' => 'mx-auto d-block', 'style' => 'width: 120px; height: 120px; object-fit: cover;')); ?>
+                                    </div>
+                                <?php else : ?>
+                                    <div class="bpp-professional-photo bpp-no-photo mb-3 text-center">
+                                        <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px;"></span>
+                                    </div>
                                 <?php endif; ?>
-                                <?php if (!empty($industry)) : ?>
-                                    <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
-                                <?php endif; ?>
+                                
+                                <div class="bpp-professional-info">
+                                    <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
+                                    <?php if (!empty($job_title)) : ?>
+                                        <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
+                                    <?php endif; ?>
+                                    <?php if (!empty($industry)) : ?>
+                                        <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="bpp-professional-excerpt">
-                            <?php the_excerpt(); ?>
-                        </div>
-                        
-                        <div class="bpp-professional-footer">
-                            <a href="<?php the_permalink(); ?>" class="bpp-view-profile">
-                                <?php echo esc_html__('View Full Profile', 'black-potential-pipeline'); ?>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
                 <?php 
                     endwhile; 
                 endif;

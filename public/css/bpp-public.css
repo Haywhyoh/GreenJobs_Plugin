@@ -190,7 +190,11 @@
     margin: 0 auto;
 }
 
-.bpp-directory-filters {
+.bpp-directory-controls {
+    margin-bottom: 30px;
+}
+
+.bpp-search-filter-container {
     background-color: #f9f9f9;
     padding: 15px;
     border-radius: 4px;
@@ -250,41 +254,60 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 8px 15px;
-    text-decoration: none;
+    cursor: pointer;
     font-size: 14px;
-    display: inline-block;
+    text-decoration: none;
 }
 
-.bpp-directory-layout-toggle {
+.bpp-reset-button:hover {
+    background-color: #eee;
+}
+
+.bpp-display-options {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+}
+
+.bpp-layout-toggle {
+    display: flex;
+    gap: 5px;
 }
 
 .bpp-layout-button {
+    background-color: #f7f7f7;
+    color: #555;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    padding: 5px 10px;
-    background-color: #f7f7f7;
-    border: 1px solid #ddd;
-    color: #555;
+    gap: 5px;
     text-decoration: none;
-    font-size: 14px;
-    margin-left: 10px;
 }
 
-.bpp-layout-button.active {
+.bpp-layout-button:hover,
+.bpp-toggle-grid:hover,
+.bpp-toggle-list:hover {
+    background-color: #eee;
+}
+
+.bpp-layout-button.active,
+.bpp-toggle-grid.active,
+.bpp-toggle-list.active {
     background-color: #0073aa;
-    border-color: #0073aa;
     color: #fff;
+    border-color: #0073aa;
 }
 
-.bpp-layout-button .dashicons {
-    margin-right: 5px;
-}
-
-.bpp-directory-results {
-    margin-bottom: 20px;
+.bpp-layout-button .dashicons,
+.bpp-toggle-grid .dashicons,
+.bpp-toggle-list .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
 }
 
 .bpp-results-count {
@@ -292,172 +315,164 @@
     color: #555;
 }
 
-/* Grid Layout */
-.bpp-directory-content.bpp-layout-grid {
+/* Grid and List Layouts */
+.bpp-directory-content,
+.bpp-featured-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
 }
 
-/* List Layout */
-.bpp-directory-content.bpp-layout-list .bpp-professional-card {
-    margin-bottom: 20px;
+.bpp-directory-content.bpp-layout-grid,
+.bpp-featured-grid.bpp-layout-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
 
-/* Professional Card */
-.bpp-professional-card {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
+.bpp-directory-content.bpp-layout-list,
+.bpp-featured-grid.bpp-layout-list {
+    grid-template-columns: 1fr;
 }
 
-.bpp-professional-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.bpp-professional-header {
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-}
-
-.bpp-professional-photo {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 15px;
-    flex-shrink: 0;
-}
-
-.bpp-professional-photo img {
+.bpp-directory-content.bpp-layout-list .bpp-card-link,
+.bpp-featured-grid.bpp-layout-list .bpp-card-link {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
 }
 
-.bpp-professional-photo.bpp-no-photo {
-    background-color: #f7f7f7;
+.bpp-directory-content.bpp-layout-list .bpp-professional-card,
+.bpp-featured-grid.bpp-layout-list .bpp-professional-card {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
 }
 
-.bpp-professional-photo.bpp-no-photo .dashicons {
-    font-size: 30px;
-    color: #ddd;
+.bpp-directory-content.bpp-layout-list .bpp-professional-content,
+.bpp-featured-grid.bpp-layout-list .bpp-professional-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    text-align: left !important;
 }
 
-.bpp-professional-info {
+.bpp-directory-content.bpp-layout-list .bpp-professional-photo,
+.bpp-featured-grid.bpp-layout-list .bpp-professional-photo {
+    flex: 0 0 100px;
+    margin-right: 20px;
+    margin-bottom: 0 !important;
+}
+
+.bpp-directory-content.bpp-layout-list .bpp-professional-info,
+.bpp-featured-grid.bpp-layout-list .bpp-professional-info {
     flex: 1;
 }
 
+/* Card Styles */
+.bpp-card-link {
+    text-decoration: none !important;
+    color: inherit !important;
+    display: block;
+}
+
+.bpp-professional-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+    cursor: pointer;
+}
+
+.bpp-professional-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.bpp-professional-content {
+    padding: 20px;
+}
+
+.bpp-professional-photo {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.bpp-professional-photo img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #f0f0f0;
+}
+
+.bpp-professional-photo.bpp-no-photo {
+    width: 120px;
+    height: 120px;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.bpp-professional-photo.bpp-no-photo .dashicons {
+    font-size: 50px;
+    width: 50px;
+    height: 50px;
+    color: #999;
+}
+
+.bpp-professional-info {
+    text-align: center;
+}
+
 .bpp-professional-name {
-    margin: 0 0 5px;
     font-size: 18px;
+    margin: 0 0 5px;
     color: #333;
 }
 
 .bpp-professional-title {
-    margin: 0 0 10px;
     font-size: 14px;
     color: #555;
-}
-
-.bpp-professional-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    font-size: 12px;
-    color: #777;
-}
-
-.bpp-professional-meta span {
-    display: flex;
-    align-items: center;
-}
-
-.bpp-professional-meta .dashicons {
-    font-size: 16px;
-    margin-right: 5px;
-}
-
-.bpp-professional-content {
-    padding: 15px;
-}
-
-.bpp-professional-excerpt {
-    margin-bottom: 15px;
-    font-size: 14px;
-    color: #555;
-    line-height: 1.5;
-}
-
-.bpp-professional-skills h4 {
     margin: 0 0 5px;
-    font-size: 14px;
-    color: #333;
 }
 
-.bpp-professional-skills p {
-    margin: 0;
-    font-size: 13px;
-    color: #555;
-}
-
-.bpp-professional-footer {
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-top: 1px solid #eee;
-    text-align: center;
-}
-
-.bpp-view-profile {
+.bpp-professional-industry {
     display: inline-block;
     background-color: #0073aa;
     color: #fff;
-    padding: 8px 15px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 14px;
-    transition: background-color 0.3s;
-}
-
-.bpp-view-profile:hover {
-    background-color: #005f8b;
-}
-
-.bpp-directory-pagination {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.bpp-directory-pagination .page-numbers {
-    display: inline-block;
-    padding: 5px 10px;
-    margin: 0 2px;
-    border: 1px solid #ddd;
-    color: #0073aa;
-    text-decoration: none;
+    padding: 3px 8px;
     border-radius: 3px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 
-.bpp-directory-pagination .page-numbers.current {
-    background-color: #0073aa;
-    color: #fff;
-    border-color: #0073aa;
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .bpp-directory-content.bpp-layout-grid,
+    .bpp-featured-grid.bpp-layout-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    .bpp-directory-content.bpp-layout-list .bpp-professional-content,
+    .bpp-featured-grid.bpp-layout-list .bpp-professional-content {
+        flex-direction: column;
+        text-align: center !important;
+    }
+    
+    .bpp-directory-content.bpp-layout-list .bpp-professional-photo,
+    .bpp-featured-grid.bpp-layout-list .bpp-professional-photo {
+        margin-right: 0;
+        margin-bottom: 15px !important;
+    }
 }
 
-.bpp-no-results {
-    text-align: center;
-    padding: 30px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-    color: #555;
+@media screen and (max-width: 480px) {
+    .bpp-directory-content.bpp-layout-grid,
+    .bpp-featured-grid.bpp-layout-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Featured Candidates */
