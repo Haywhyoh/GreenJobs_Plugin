@@ -65,6 +65,7 @@ class BPP {
 
         $this->load_dependencies();
         $this->set_locale();
+        $this->define_post_type_hooks();
         $this->define_admin_hooks();
         $this->define_public_hooks();
         $this->register_shortcodes();
@@ -164,6 +165,24 @@ class BPP {
     }
 
     /**
+     * Register all of the hooks related to post types and taxonomies
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function define_post_type_hooks() {
+        // Initialize the post types class with high priority (5) to ensure it runs early
+        $post_types = new BPP_Post_Types($this->get_plugin_name(), $this->get_version());
+        
+        // Register post types early to ensure they're available throughout the site
+        $this->loader->add_action('init', $post_types, 'register_post_types', 5);
+        $this->loader->add_action('init', $post_types, 'register_taxonomies', 5);
+        
+        // Log that we've set up the post type hooks
+        error_log('BPP: Post type hooks have been registered with priority 5');
+    }
+
+    /**
      * Register all of the hooks related to the admin area functionality
      * of the plugin.
      *
@@ -228,6 +247,16 @@ class BPP {
         add_shortcode( 'black_potential_pipeline_featured', array( $plugin_public, 'display_featured_applicants' ) );
         add_shortcode( 'black_potential_pipeline_stats', array( $plugin_public, 'display_statistics' ) );
         add_shortcode( 'black_potential_pipeline_category_featured', array( $plugin_public, 'display_category_featured' ) );
+    }
+
+    /**
+     * Function to run on plugin activation.
+     * 
+     * @since    1.0.0
+     */
+    public static function activate() {
+        // Set a flag to flush rewrite rules
+        update_option('bpp_flush_rewrite_rules', true);
     }
 
     /**

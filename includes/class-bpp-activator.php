@@ -37,8 +37,12 @@ class BPP_Activator {
         $post_types->register_post_types();
         $post_types->register_taxonomies();
         
+        // Set the flag to flush rewrite rules
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bpp.php';
+        BPP::activate();
+        
         // Flush rewrite rules to ensure permalinks work properly
-        $post_types->flush_rewrite_rules();
+        flush_rewrite_rules();
     }
 
     /**

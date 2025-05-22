@@ -454,14 +454,14 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                 <?php endif; ?>
                 <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
                     <div class="<?php echo esc_attr($card_class); ?>" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                        <?php if (has_post_thumbnail()) : ?>
+                            <?php if (has_post_thumbnail()) : ?>
                             <div class="card-img-top">
                                 <?php the_post_thumbnail('medium', array('class' => 'w-100 img-fluid', 'style' => 'height: 200px; object-fit: cover;')); ?>
-                            </div>
-                        <?php else : ?>
+                                </div>
+                            <?php else : ?>
                             <div class="card-img-top bg-light text-center py-4" style="height: 200px; display: flex; align-items: center; justify-content: center;">
                                 <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px; color: #aaa;"></span>
-                            </div>
+                                </div>
                         <?php endif; ?>
                         
                         <div class="<?php echo esc_attr($card_content_class); ?>">
@@ -482,13 +482,13 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                                     }
                                     ?>
                                 </p>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($industry)) : ?>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($industry)) : ?>
                                 <div class="<?php echo $use_bootstrap ? 'badge bg-primary' : 'bpp-professional-industry'; ?>" style="<?php echo !$use_bootstrap ? 'display: inline-block; background: #0d6efd; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;' : ''; ?>">
                                     <?php echo esc_html($industry); ?>
                                 </div>
-                            <?php endif; ?>
+                                <?php endif; ?>
                         </div>
                     </div>
                 </a>

@@ -59,6 +59,9 @@ class BPP_Post_Types {
      * @since    1.0.0
      */
     public function register_post_types() {
+        // Debug - log when this function runs
+        error_log('BPP: Running register_post_types in class-bpp-post-types.php');
+        
         // Custom Post Type: Applicant
         $labels = array(
             'name'                  => _x('Applicants', 'Post type general name', 'black-potential-pipeline'),
@@ -95,7 +98,7 @@ class BPP_Post_Types {
             'show_in_menu'       => 'bpp-dashboard', // Custom parent menu slug
             'query_var'          => true,
             'rewrite'            => array(
-                'slug' => 'applicant',
+                'slug' => 'professionals',  // Changed from 'applicant' to 'professionals' for better user-facing URL
                 'with_front' => true,
                 'pages' => true,
                 'feeds' => true,
@@ -109,7 +112,31 @@ class BPP_Post_Types {
             'show_in_rest'       => true,
         );
 
-        register_post_type('bpp_applicant', $args);
+        // Add debugging to help diagnose issue
+        if (function_exists('register_post_type')) {
+            error_log('BPP: About to register post type bpp_applicant - register_post_type function exists');
+            register_post_type('bpp_applicant', $args);
+            error_log('BPP: Post type registration done');
+            
+            // Verify the post type was registered successfully
+            if (post_type_exists('bpp_applicant')) {
+                error_log('BPP: Post type bpp_applicant now exists after registration');
+            } else {
+                error_log('BPP: Post type bpp_applicant still does not exist after registration attempt');
+            }
+        } else {
+            error_log('BPP: register_post_type function does not exist');
+        }
+        
+        // Flush rewrite rules only when needed
+        // Do not do this on every page load as it's expensive
+        if (get_option('bpp_flush_rewrite_rules', false)) {
+            if (function_exists('flush_rewrite_rules')) {
+                error_log('BPP: Flushing rewrite rules');
+                flush_rewrite_rules();
+            }
+            delete_option('bpp_flush_rewrite_rules');
+        }
     }
 
     /**
