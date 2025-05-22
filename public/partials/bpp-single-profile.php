@@ -204,7 +204,7 @@ get_header();
                                 <?php endif; ?>
                                 
                                 <?php if (!empty($years_experience) && !empty($visibility['years_experience'])) : ?>
-                                    <div class="badge bg-secondary text-dark p-2">
+                                    <div class="badge bg-primary p-2">
                                         <i class="dashicons dashicons-businessman me-1" style="line-height: 1.2;"></i>
                                         <?php printf(_n('%s year experience', '%s years experience', (int)$years_experience, 'black-potential-pipeline'), esc_html($years_experience)); ?>
                                     </div>
