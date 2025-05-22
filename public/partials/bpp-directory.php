@@ -72,13 +72,119 @@ if (!empty($search_query)) {
 
 // Add industry filter if selected
 if (!empty($industry_filter)) {
-    $args['tax_query'] = array(
+    // Create a comprehensive query that checks for the industry in all possible places
+    $tax_meta_query = array(
+        'relation' => 'OR',
+        // Query 1: Taxonomy term by slug
         array(
             'taxonomy' => 'bpp_industry',
-            'field' => 'slug',
-            'terms' => $industry_filter,
-        ),
+            'field'    => 'slug',
+            'terms'    => $industry_filter,
+        )
     );
+
+    // Add meta query options for various ways the category might be stored
+    // Check by name from the lookup array (for meta fields using names instead of slugs)
+    if (isset($default_industry_names[$industry_filter])) {
+        $term_name = $default_industry_names[$industry_filter];
+        $tax_meta_query[] = array(
+            'key'     => 'bpp_industry',
+            'value'   => $term_name,
+            'compare' => '=',
+        );
+        $tax_meta_query[] = array(
+            'key'     => 'industry',
+            'value'   => $term_name,
+            'compare' => '=',
+        );
+    }
+
+    // Add queries for the original slug value
+    $tax_meta_query[] = array(
+        'key'     => 'bpp_industry',
+        'value'   => $industry_filter,
+        'compare' => '=',
+    );
+    $tax_meta_query[] = array(
+        'key'     => 'industry',
+        'value'   => $industry_filter,
+        'compare' => '=',
+    );
+
+    // Debug log
+    error_log("BPP Directory: Filtering by industry '{$industry_filter}'");
+    
+    // Set the combined query for tax/meta integration
+    $args['_tax_meta_query'] = $tax_meta_query;
+    
+    // Use WordPress query integration for combining tax and meta queries
+    add_filter('posts_clauses', function($clauses, $wp_query) {
+        if (!empty($wp_query->query_vars['_tax_meta_query'])) {
+            global $wpdb;
+            
+            $tax_meta_query = $wp_query->query_vars['_tax_meta_query'];
+            $tax_query_parts = array();
+            $meta_query_parts = array();
+            
+            // Handle taxonomy conditions
+            foreach ($tax_meta_query as $key => $query) {
+                if (isset($query['taxonomy'])) {
+                    // This is a taxonomy query
+                    $term_id = 0;
+                    if (isset($query['terms'])) {
+                        $term = get_term_by($query['field'] ?? 'slug', $query['terms'], $query['taxonomy']);
+                        if ($term && !is_wp_error($term)) {
+                            $term_id = $term->term_id;
+                        }
+                    }
+                    
+                    if ($term_id > 0) {
+                        $tax_query_parts[] = $wpdb->prepare(
+                            "EXISTS (
+                                SELECT 1 FROM {$wpdb->term_relationships} tr
+                                JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                                WHERE tr.object_id = {$wpdb->posts}.ID
+                                AND tt.taxonomy = %s
+                                AND tt.term_id = %d
+                            )",
+                            $query['taxonomy'],
+                            $term_id
+                        );
+                    }
+                } elseif (isset($query['key'])) {
+                    // This is a meta query
+                    $meta_query_parts[] = $wpdb->prepare(
+                        "EXISTS (
+                            SELECT 1 FROM {$wpdb->postmeta} pm
+                            WHERE pm.post_id = {$wpdb->posts}.ID
+                            AND pm.meta_key = %s
+                            AND pm.meta_value = %s
+                        )",
+                        $query['key'],
+                        $query['value']
+                    );
+                } elseif ($key === 'relation') {
+                    // Skip relation
+                    continue;
+                }
+            }
+            
+            if (!empty($tax_query_parts) || !empty($meta_query_parts)) {
+                $all_parts = array_merge($tax_query_parts, $meta_query_parts);
+                $or_clause = implode(' OR ', $all_parts);
+                
+                // Add to the WHERE clause
+                if (!empty($or_clause)) {
+                    $clauses['where'] .= " AND ({$or_clause})";
+                    
+                    // Debug output
+                    error_log('BPP Directory: Modified SQL WHERE clause: ' . $or_clause);
+                }
+            }
+        }
+        
+        return $clauses;
+    }, 10, 2);
 }
 
 // Add experience filter if selected
