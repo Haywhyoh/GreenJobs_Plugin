@@ -21,6 +21,14 @@ $title = sanitize_text_field($atts['title']);
 $count = intval($atts['count']);
 $layout = sanitize_text_field($atts['layout']);
 
+// Default industry names lookup array for formatting industry slugs
+$default_industry_names = array(
+    'nature-based-work' => __('Nature-based work', 'black-potential-pipeline'),
+    'environmental-policy' => __('Environmental policy', 'black-potential-pipeline'),
+    'climate-science' => __('Climate science', 'black-potential-pipeline'),
+    'green-construction' => __('Green construction & infrastructure', 'black-potential-pipeline'),
+);
+
 // Get featured applicants query
 $args = array(
     'post_type' => 'bpp_applicant',
@@ -79,6 +87,7 @@ if ($featured_query->post_count < $count) {
                         while ($featured_query->have_posts()) : $featured_query->the_post();
                             $post_id = get_the_ID();
                             $job_title = get_post_meta($post_id, 'bpp_job_title', true);
+                            $years_experience = get_post_meta($post_id, 'bpp_years_experience', true);
                             $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
                             $industry = '';
                             if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
@@ -89,30 +98,12 @@ if ($featured_query->post_count < $count) {
                             if (empty($industry)) {
                                 $industry_meta = get_post_meta($post_id, 'bpp_industry', true);
                                 if (!empty($industry_meta)) {
-                                    // Get all available industries for comparison
-                                    $all_industries = get_terms(array(
-                                        'taxonomy' => 'bpp_industry',
-                                        'hide_empty' => false,
-                                    ));
-                                    
-                                    // If terms couldn't be retrieved, use default industry list
-                                    if (empty($all_industries) || is_wp_error($all_industries)) {
-                                        $all_industries = array(
-                                            array('slug' => 'nature-based-work', 'term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
-                                            array('slug' => 'environmental-policy', 'term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
-                                            array('slug' => 'climate-science', 'term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
-                                            array('slug' => 'green-construction', 'term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
-                                        );
-                                    }
-                                    
-                                    foreach ($all_industries as $ind) {
-                                        if (is_array($ind) && isset($ind['slug']) && $ind['slug'] === $industry_meta) {
-                                            $industry = $ind['name'];
-                                            break;
-                                        } elseif (is_object($ind) && isset($ind->slug) && $ind->slug === $industry_meta) {
-                                            $industry = $ind->name;
-                                            break;
-                                        }
+                                    // Check if this is a known slug and convert to readable name
+                                    if (isset($default_industry_names[$industry_meta])) {
+                                        $industry = $default_industry_names[$industry_meta];
+                                    } else {
+                                        // Format as readable text
+                                        $industry = ucwords(str_replace('-', ' ', $industry_meta));
                                     }
                                 }
                             }
@@ -121,27 +112,41 @@ if ($featured_query->post_count < $count) {
                         ?>
                             <div class="bpp-carousel-slide">
                                 <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
-                                    <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
-                                        <div class="bpp-professional-content text-center">
-                                            <?php if (has_post_thumbnail()) : ?>
-                                                <div class="bpp-professional-photo mb-3 text-center">
-                                                    <?php the_post_thumbnail('thumbnail', array('class' => 'mx-auto d-block', 'style' => 'width: 120px; height: 120px; object-fit: cover;')); ?>
-                                                </div>
-                                            <?php else : ?>
-                                                <div class="bpp-professional-photo bpp-no-photo mb-3 text-center">
-                                                    <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px;"></span>
-                                                </div>
+                                    <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                        <?php if (has_post_thumbnail()) : ?>
+                                            <div class="bpp-card-image">
+                                                <?php the_post_thumbnail('medium', array('class' => 'w-100', 'style' => 'height: 200px; object-fit: cover;')); ?>
+                                            </div>
+                                        <?php else : ?>
+                                            <div class="bpp-card-image" style="height: 200px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+                                                <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px; color: #aaa;"></span>
+                                            </div>
+                                        <?php endif; ?>
+                                        
+                                        <div class="bpp-professional-content" style="padding: 1rem;">
+                                            <h3 class="bpp-professional-name" style="margin: 0 0 0.5rem; font-size: 1.2rem; font-weight: 600;"><?php the_title(); ?></h3>
+                                            <?php if (!empty($job_title)) : ?>
+                                                <p class="bpp-professional-title" style="margin: 0 0 0.5rem; color: #666;"><?php echo esc_html($job_title); ?></p>
                                             <?php endif; ?>
                                             
-                                            <div class="bpp-professional-info">
-                                                <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
-                                                <?php if (!empty($job_title)) : ?>
-                                                    <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
-                                                <?php endif; ?>
-                                                <?php if (!empty($industry)) : ?>
-                                                    <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
-                                                <?php endif; ?>
-                                            </div>
+                                            <?php if (!empty($years_experience)) : ?>
+                                                <p class="bpp-professional-experience" style="margin: 0 0 0.5rem; font-size: 0.9rem; color: #777;">
+                                                    <?php 
+                                                    // Display experience in a readable format
+                                                    if (is_numeric($years_experience)) {
+                                                        echo sprintf(_n('%d year experience', '%d years experience', $years_experience, 'black-potential-pipeline'), $years_experience);
+                                                    } else {
+                                                        echo esc_html($years_experience) . ' ' . esc_html__('experience', 'black-potential-pipeline');
+                                                    }
+                                                    ?>
+                                                </p>
+                                            <?php endif; ?>
+                                            
+                                            <?php if (!empty($industry)) : ?>
+                                                <div class="bpp-professional-industry" style="display: inline-block; background: #0d6efd; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">
+                                                    <?php echo esc_html($industry); ?>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </a>
@@ -154,6 +159,7 @@ if ($featured_query->post_count < $count) {
                             while ($additional_query->have_posts()) : $additional_query->the_post();
                                 $post_id = get_the_ID();
                                 $job_title = get_post_meta($post_id, 'bpp_job_title', true);
+                                $years_experience = get_post_meta($post_id, 'bpp_years_experience', true);
                                 $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
                                 $industry = '';
                                 if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
@@ -164,30 +170,12 @@ if ($featured_query->post_count < $count) {
                                 if (empty($industry)) {
                                     $industry_meta = get_post_meta($post_id, 'bpp_industry', true);
                                     if (!empty($industry_meta)) {
-                                        // Get all available industries for comparison
-                                        $all_industries = get_terms(array(
-                                            'taxonomy' => 'bpp_industry',
-                                            'hide_empty' => false,
-                                        ));
-                                        
-                                        // If terms couldn't be retrieved, use default industry list
-                                        if (empty($all_industries) || is_wp_error($all_industries)) {
-                                            $all_industries = array(
-                                                array('slug' => 'nature-based-work', 'term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
-                                                array('slug' => 'environmental-policy', 'term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
-                                                array('slug' => 'climate-science', 'term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
-                                                array('slug' => 'green-construction', 'term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
-                                            );
-                                        }
-                                        
-                                        foreach ($all_industries as $ind) {
-                                            if (is_array($ind) && isset($ind['slug']) && $ind['slug'] === $industry_meta) {
-                                                $industry = $ind['name'];
-                                                break;
-                                            } elseif (is_object($ind) && isset($ind->slug) && $ind->slug === $industry_meta) {
-                                                $industry = $ind->name;
-                                                break;
-                                            }
+                                        // Check if this is a known slug and convert to readable name
+                                        if (isset($default_industry_names[$industry_meta])) {
+                                            $industry = $default_industry_names[$industry_meta];
+                                        } else {
+                                            // Format as readable text
+                                            $industry = ucwords(str_replace('-', ' ', $industry_meta));
                                         }
                                     }
                                 }
@@ -196,27 +184,41 @@ if ($featured_query->post_count < $count) {
                         ?>
                             <div class="bpp-carousel-slide">
                                 <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
-                                    <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
-                                        <div class="bpp-professional-content text-center">
-                                            <?php if (has_post_thumbnail()) : ?>
-                                                <div class="bpp-professional-photo mb-3 text-center">
-                                                    <?php the_post_thumbnail('thumbnail', array('class' => 'mx-auto d-block', 'style' => 'width: 120px; height: 120px; object-fit: cover;')); ?>
-                                                </div>
-                                            <?php else : ?>
-                                                <div class="bpp-professional-photo bpp-no-photo mb-3 text-center">
-                                                    <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px;"></span>
-                                                </div>
+                                    <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                        <?php if (has_post_thumbnail()) : ?>
+                                            <div class="bpp-card-image">
+                                                <?php the_post_thumbnail('medium', array('class' => 'w-100', 'style' => 'height: 200px; object-fit: cover;')); ?>
+                                            </div>
+                                        <?php else : ?>
+                                            <div class="bpp-card-image" style="height: 200px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+                                                <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px; color: #aaa;"></span>
+                                            </div>
+                                        <?php endif; ?>
+                                        
+                                        <div class="bpp-professional-content" style="padding: 1rem;">
+                                            <h3 class="bpp-professional-name" style="margin: 0 0 0.5rem; font-size: 1.2rem; font-weight: 600;"><?php the_title(); ?></h3>
+                                            <?php if (!empty($job_title)) : ?>
+                                                <p class="bpp-professional-title" style="margin: 0 0 0.5rem; color: #666;"><?php echo esc_html($job_title); ?></p>
                                             <?php endif; ?>
                                             
-                                            <div class="bpp-professional-info">
-                                                <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
-                                                <?php if (!empty($job_title)) : ?>
-                                                    <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
-                                                <?php endif; ?>
-                                                <?php if (!empty($industry)) : ?>
-                                                    <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
-                                                <?php endif; ?>
-                                            </div>
+                                            <?php if (!empty($years_experience)) : ?>
+                                                <p class="bpp-professional-experience" style="margin: 0 0 0.5rem; font-size: 0.9rem; color: #777;">
+                                                    <?php 
+                                                    // Display experience in a readable format
+                                                    if (is_numeric($years_experience)) {
+                                                        echo sprintf(_n('%d year experience', '%d years experience', $years_experience, 'black-potential-pipeline'), $years_experience);
+                                                    } else {
+                                                        echo esc_html($years_experience) . ' ' . esc_html__('experience', 'black-potential-pipeline');
+                                                    }
+                                                    ?>
+                                                </p>
+                                            <?php endif; ?>
+                                            
+                                            <?php if (!empty($industry)) : ?>
+                                                <div class="bpp-professional-industry" style="display: inline-block; background: #0d6efd; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">
+                                                    <?php echo esc_html($industry); ?>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </a>
@@ -244,6 +246,7 @@ if ($featured_query->post_count < $count) {
                 while ($featured_query->have_posts()) : $featured_query->the_post();
                     $post_id = get_the_ID();
                     $job_title = get_post_meta($post_id, 'bpp_job_title', true);
+                    $years_experience = get_post_meta($post_id, 'bpp_years_experience', true);
                     $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
                     $industry = '';
                     if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
@@ -254,30 +257,12 @@ if ($featured_query->post_count < $count) {
                     if (empty($industry)) {
                         $industry_meta = get_post_meta($post_id, 'bpp_industry', true);
                         if (!empty($industry_meta)) {
-                            // Get all available industries for comparison
-                            $all_industries = get_terms(array(
-                                'taxonomy' => 'bpp_industry',
-                                'hide_empty' => false,
-                            ));
-                            
-                            // If terms couldn't be retrieved, use default industry list
-                            if (empty($all_industries) || is_wp_error($all_industries)) {
-                                $all_industries = array(
-                                    array('slug' => 'nature-based-work', 'term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
-                                    array('slug' => 'environmental-policy', 'term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
-                                    array('slug' => 'climate-science', 'term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
-                                    array('slug' => 'green-construction', 'term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
-                                );
-                            }
-                            
-                            foreach ($all_industries as $ind) {
-                                if (is_array($ind) && isset($ind['slug']) && $ind['slug'] === $industry_meta) {
-                                    $industry = $ind['name'];
-                                    break;
-                                } elseif (is_object($ind) && isset($ind->slug) && $ind->slug === $industry_meta) {
-                                    $industry = $ind->name;
-                                    break;
-                                }
+                            // Check if this is a known slug and convert to readable name
+                            if (isset($default_industry_names[$industry_meta])) {
+                                $industry = $default_industry_names[$industry_meta];
+                            } else {
+                                // Format as readable text
+                                $industry = ucwords(str_replace('-', ' ', $industry_meta));
                             }
                         }
                     }
@@ -285,27 +270,41 @@ if ($featured_query->post_count < $count) {
                     $profile_url = get_permalink();
                 ?>
                     <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
-                        <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
-                            <div class="bpp-professional-content text-center">
-                                <?php if (has_post_thumbnail()) : ?>
-                                    <div class="bpp-professional-photo mb-3 text-center">
-                                        <?php the_post_thumbnail('thumbnail', array('class' => 'mx-auto d-block', 'style' => 'width: 120px; height: 120px; object-fit: cover;')); ?>
-                                    </div>
-                                <?php else : ?>
-                                    <div class="bpp-professional-photo bpp-no-photo mb-3 text-center">
-                                        <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px;"></span>
-                                    </div>
+                        <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <?php if (has_post_thumbnail()) : ?>
+                                <div class="bpp-card-image">
+                                    <?php the_post_thumbnail('medium', array('class' => 'w-100', 'style' => 'height: 200px; object-fit: cover;')); ?>
+                                </div>
+                            <?php else : ?>
+                                <div class="bpp-card-image" style="height: 200px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+                                    <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px; color: #aaa;"></span>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <div class="bpp-professional-content" style="padding: 1rem;">
+                                <h3 class="bpp-professional-name" style="margin: 0 0 0.5rem; font-size: 1.2rem; font-weight: 600;"><?php the_title(); ?></h3>
+                                <?php if (!empty($job_title)) : ?>
+                                    <p class="bpp-professional-title" style="margin: 0 0 0.5rem; color: #666;"><?php echo esc_html($job_title); ?></p>
                                 <?php endif; ?>
                                 
-                                <div class="bpp-professional-info">
-                                    <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
-                                    <?php if (!empty($job_title)) : ?>
-                                        <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
-                                    <?php endif; ?>
-                                    <?php if (!empty($industry)) : ?>
-                                        <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
-                                    <?php endif; ?>
-                                </div>
+                                <?php if (!empty($years_experience)) : ?>
+                                    <p class="bpp-professional-experience" style="margin: 0 0 0.5rem; font-size: 0.9rem; color: #777;">
+                                        <?php 
+                                        // Display experience in a readable format
+                                        if (is_numeric($years_experience)) {
+                                            echo sprintf(_n('%d year experience', '%d years experience', $years_experience, 'black-potential-pipeline'), $years_experience);
+                                        } else {
+                                            echo esc_html($years_experience) . ' ' . esc_html__('experience', 'black-potential-pipeline');
+                                        }
+                                        ?>
+                                    </p>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($industry)) : ?>
+                                    <div class="bpp-professional-industry" style="display: inline-block; background: #0d6efd; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">
+                                        <?php echo esc_html($industry); ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </a>
@@ -317,6 +316,7 @@ if ($featured_query->post_count < $count) {
                     while ($additional_query->have_posts()) : $additional_query->the_post();
                         $post_id = get_the_ID();
                         $job_title = get_post_meta($post_id, 'bpp_job_title', true);
+                        $years_experience = get_post_meta($post_id, 'bpp_years_experience', true);
                         $industry_terms = wp_get_post_terms($post_id, 'bpp_industry', array('fields' => 'names'));
                         $industry = '';
                         if (!is_wp_error($industry_terms) && !empty($industry_terms)) {
@@ -327,30 +327,12 @@ if ($featured_query->post_count < $count) {
                         if (empty($industry)) {
                             $industry_meta = get_post_meta($post_id, 'bpp_industry', true);
                             if (!empty($industry_meta)) {
-                                // Get all available industries for comparison
-                                $all_industries = get_terms(array(
-                                    'taxonomy' => 'bpp_industry',
-                                    'hide_empty' => false,
-                                ));
-                                
-                                // If terms couldn't be retrieved, use default industry list
-                                if (empty($all_industries) || is_wp_error($all_industries)) {
-                                    $all_industries = array(
-                                        array('slug' => 'nature-based-work', 'term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
-                                        array('slug' => 'environmental-policy', 'term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
-                                        array('slug' => 'climate-science', 'term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
-                                        array('slug' => 'green-construction', 'term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
-                                    );
-                                }
-                                
-                                foreach ($all_industries as $ind) {
-                                    if (is_array($ind) && isset($ind['slug']) && $ind['slug'] === $industry_meta) {
-                                        $industry = $ind['name'];
-                                        break;
-                                    } elseif (is_object($ind) && isset($ind->slug) && $ind->slug === $industry_meta) {
-                                        $industry = $ind->name;
-                                        break;
-                                    }
+                                // Check if this is a known slug and convert to readable name
+                                if (isset($default_industry_names[$industry_meta])) {
+                                    $industry = $default_industry_names[$industry_meta];
+                                } else {
+                                    // Format as readable text
+                                    $industry = ucwords(str_replace('-', ' ', $industry_meta));
                                 }
                             }
                         }
@@ -358,27 +340,41 @@ if ($featured_query->post_count < $count) {
                         $profile_url = get_permalink();
                 ?>
                     <a href="<?php echo esc_url($profile_url); ?>" class="bpp-card-link" style="text-decoration: none; color: inherit;">
-                        <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
-                            <div class="bpp-professional-content text-center">
-                                <?php if (has_post_thumbnail()) : ?>
-                                    <div class="bpp-professional-photo mb-3 text-center">
-                                        <?php the_post_thumbnail('thumbnail', array('class' => 'mx-auto d-block', 'style' => 'width: 120px; height: 120px; object-fit: cover;')); ?>
-                                    </div>
-                                <?php else : ?>
-                                    <div class="bpp-professional-photo bpp-no-photo mb-3 text-center">
-                                        <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px;"></span>
-                                    </div>
+                        <div class="bpp-professional-card" style="height: 100%; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <?php if (has_post_thumbnail()) : ?>
+                                <div class="bpp-card-image">
+                                    <?php the_post_thumbnail('medium', array('class' => 'w-100', 'style' => 'height: 200px; object-fit: cover;')); ?>
+                                </div>
+                            <?php else : ?>
+                                <div class="bpp-card-image" style="height: 200px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+                                    <span class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px; color: #aaa;"></span>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <div class="bpp-professional-content" style="padding: 1rem;">
+                                <h3 class="bpp-professional-name" style="margin: 0 0 0.5rem; font-size: 1.2rem; font-weight: 600;"><?php the_title(); ?></h3>
+                                <?php if (!empty($job_title)) : ?>
+                                    <p class="bpp-professional-title" style="margin: 0 0 0.5rem; color: #666;"><?php echo esc_html($job_title); ?></p>
                                 <?php endif; ?>
                                 
-                                <div class="bpp-professional-info">
-                                    <h3 class="bpp-professional-name"><?php the_title(); ?></h3>
-                                    <?php if (!empty($job_title)) : ?>
-                                        <p class="bpp-professional-title"><?php echo esc_html($job_title); ?></p>
-                                    <?php endif; ?>
-                                    <?php if (!empty($industry)) : ?>
-                                        <p class="bpp-professional-industry"><?php echo esc_html($industry); ?></p>
-                                    <?php endif; ?>
-                                </div>
+                                <?php if (!empty($years_experience)) : ?>
+                                    <p class="bpp-professional-experience" style="margin: 0 0 0.5rem; font-size: 0.9rem; color: #777;">
+                                        <?php 
+                                        // Display experience in a readable format
+                                        if (is_numeric($years_experience)) {
+                                            echo sprintf(_n('%d year experience', '%d years experience', $years_experience, 'black-potential-pipeline'), $years_experience);
+                                        } else {
+                                            echo esc_html($years_experience) . ' ' . esc_html__('experience', 'black-potential-pipeline');
+                                        }
+                                        ?>
+                                    </p>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($industry)) : ?>
+                                    <div class="bpp-professional-industry" style="display: inline-block; background: #0d6efd; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">
+                                        <?php echo esc_html($industry); ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </a>

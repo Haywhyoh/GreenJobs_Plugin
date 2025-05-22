@@ -34,6 +34,11 @@ if (!$term || is_wp_error($term)) {
 $term_slug = $term ? $term->slug : $category;
 $term_name = $term ? $term->name : '';
 
+// If term_name is still empty, try to format the category slug into a readable name
+if (empty($term_name)) {
+    $term_name = ucwords(str_replace('-', ' ', $category));
+}
+
 // Create a comprehensive query that checks for the category in all possible places
 $args = array(
     'post_type'      => 'bpp_applicant',
@@ -168,6 +173,14 @@ $description_class = $use_bootstrap ? 'lead text-muted mb-4' : 'bpp-featured-des
 $slider_class = $use_bootstrap ? 'carousel slide' : 'bpp-featured-slider';
 $slider_id = 'bppCategorySlider_' . str_replace('-', '_', $category);
 $card_class = $use_bootstrap ? 'card h-100 shadow-sm' : 'bpp-professional-card';
+
+// Default industry names lookup array for formatting industry slugs
+$default_industry_names = array(
+    'nature-based-work' => __('Nature-based work', 'black-potential-pipeline'),
+    'environmental-policy' => __('Environmental policy', 'black-potential-pipeline'),
+    'climate-science' => __('Climate science', 'black-potential-pipeline'),
+    'green-construction' => __('Green construction & infrastructure', 'black-potential-pipeline'),
+);
 ?>
 
 <!-- Category Featured Applicants -->
@@ -201,7 +214,16 @@ $card_class = $use_bootstrap ? 'card h-100 shadow-sm' : 'bpp-professional-card';
                         $industry = $industry_terms[0];
                     } else {
                         // Fallback to meta field if taxonomy not set
-                        $industry = get_post_meta($post_id, 'bpp_industry', true);
+                        $industry_meta = get_post_meta($post_id, 'bpp_industry', true);
+                        if (!empty($industry_meta)) {
+                            // Check if this is a known slug and convert to readable name
+                            if (isset($default_industry_names[$industry_meta])) {
+                                $industry = $default_industry_names[$industry_meta];
+                            } else {
+                                // Format as readable text
+                                $industry = ucwords(str_replace('-', ' ', $industry_meta));
+                            }
+                        }
                     }
                     
                     // Start a new slide
@@ -217,7 +239,7 @@ $card_class = $use_bootstrap ? 'card h-100 shadow-sm' : 'bpp-professional-card';
                             <div class="card h-100 shadow-sm" style="transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;">
                                 <?php if (has_post_thumbnail()) : ?>
                                     <div class="card-img-top">
-                                        <?php the_post_thumbnail('medium', array('class' => 'w-100 img-fluid', 'style' => 'max-height: 200px; object-fit: cover;')); ?>
+                                        <?php the_post_thumbnail('medium', array('class' => 'w-100 img-fluid', 'style' => 'height: 200px; object-fit: cover;')); ?>
                                     </div>
                                 <?php else : ?>
                                     <div class="card-img-top bg-light text-center py-4">
@@ -295,7 +317,16 @@ $card_class = $use_bootstrap ? 'card h-100 shadow-sm' : 'bpp-professional-card';
                         $industry = $industry_terms[0];
                     } else {
                         // Fallback to meta field if taxonomy not set
-                        $industry = get_post_meta($post_id, 'bpp_industry', true);
+                        $industry_meta = get_post_meta($post_id, 'bpp_industry', true);
+                        if (!empty($industry_meta)) {
+                            // Check if this is a known slug and convert to readable name
+                            if (isset($default_industry_names[$industry_meta])) {
+                                $industry = $default_industry_names[$industry_meta];
+                            } else {
+                                // Format as readable text
+                                $industry = ucwords(str_replace('-', ' ', $industry_meta));
+                            }
+                        }
                     }
                 ?>
                     <div class="bpp-slide">
