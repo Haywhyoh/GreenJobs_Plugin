@@ -168,7 +168,6 @@
                 if (yearsExpValue !== '') {
                     // Make sure it's stored as a number
                     formData.set('years_experience', parseInt(yearsExpValue, 10));
-                    console.log('Prepared years_experience:', parseInt(yearsExpValue, 10));
                 }
             }
             
@@ -176,63 +175,13 @@
             const industryElement = document.getElementById('bpp_industry');
             if (industryElement && industryElement.value) {
                 formData.set('industry', industryElement.value);
-                console.log('Prepared industry:', industryElement.value);
-                // Add extra debugging information about the industry
-                console.log('Industry element details:', {
-                    id: industryElement.id,
-                    name: industryElement.name,
-                    value: industryElement.value,
-                    selectedIndex: industryElement.selectedIndex,
-                    selectedOption: industryElement.options[industryElement.selectedIndex] ? 
-                        industryElement.options[industryElement.selectedIndex].text : 'None selected'
-                });
-            } else {
-                console.log('Industry field not found or has no value:', 
-                    industryElement ? 'Element exists but no value' : 'Element not found');
             }
             
             // Handle professional photo
             const professionalPhotoInput = document.getElementById('bpp_photo');
             if (professionalPhotoInput && professionalPhotoInput.files.length > 0) {
-                // Log before setting the photo in FormData
-                console.log('Processing photo file in prepareFormData...');
-                console.log('Photo file before setting in FormData:', {
-                    name: professionalPhotoInput.files[0].name,
-                    size: professionalPhotoInput.files[0].size,
-                    type: professionalPhotoInput.files[0].type
-                });
-                
                 // Make sure to explicitly add the file to FormData with correct name
                 formData.set('professional_photo', professionalPhotoInput.files[0]);
-                
-                // Verify the file was added to FormData
-                const verifyPhoto = formData.get('professional_photo');
-                console.log('Photo file after setting in FormData:', verifyPhoto ? {
-                    name: verifyPhoto.name,
-                    size: verifyPhoto.size,
-                    type: verifyPhoto.type
-                } : 'Missing from FormData');
-                
-                console.log('Prepared professional photo:', professionalPhotoInput.files[0].name);
-                // Add extra debugging information about the photo file
-                console.log('Professional photo details:', {
-                    name: professionalPhotoInput.files[0].name,
-                    size: professionalPhotoInput.files[0].size,
-                    type: professionalPhotoInput.files[0].type,
-                    lastModified: new Date(professionalPhotoInput.files[0].lastModified).toISOString()
-                });
-            } else {
-                console.log('Professional photo field not found or has no files:', 
-                    professionalPhotoInput ? 'Element exists but no files selected' : 'Element not found');
-                if (professionalPhotoInput) {
-                    console.log('Professional photo input properties:', {
-                        id: professionalPhotoInput.id,
-                        name: professionalPhotoInput.name,
-                        type: professionalPhotoInput.type,
-                        required: professionalPhotoInput.required,
-                        files: professionalPhotoInput.files.length
-                    });
-                }
             }
             
             return formData;
@@ -276,99 +225,6 @@
             // Prepare form data before submission
             const preparedFormData = prepareFormData(formData);
             
-            // Debug: Log form data being submitted
-            console.log('Form submission started');
-            console.log('AJAX URL:', bpp_form_obj.ajax_url);
-            console.log('Action:', 'bpp_submit_application');
-            console.log('Nonce:', bpp_form_obj.nonce);
-            
-            // Debug file inputs
-            console.log('File Input Debug:');
-            
-            // Debug resume file input
-            const resumeInputDebug = document.getElementById('bpp_resume');
-            if (resumeInputDebug) {
-                console.log('Resume Input: Found');
-                console.log('Resume Required:', resumeInputDebug.hasAttribute('required'));
-                console.log('Resume Files Selected:', resumeInputDebug.files.length > 0);
-                if (resumeInputDebug.files.length > 0) {
-                    console.log('Resume File Name:', resumeInputDebug.files[0].name);
-                    console.log('Resume File Size:', resumeInputDebug.files[0].size, 'bytes');
-                    console.log('Resume File Type:', resumeInputDebug.files[0].type);
-                    // Log FormData entry for resume
-                    const resumeFormDataEntry = preparedFormData.get('resume');
-                    console.log('Resume in FormData:', resumeFormDataEntry ? 'Present' : 'Missing', 
-                        resumeFormDataEntry ? `(${resumeFormDataEntry.name}, ${resumeFormDataEntry.size} bytes)` : '');
-                }
-            } else {
-                console.log('Resume Input: Not found in DOM');
-            }
-            
-            // Debug professional photo input
-            const photoInputDebug = document.getElementById('bpp_photo');
-            if (photoInputDebug) {
-                console.log('Professional Photo Input: Found');
-                console.log('Professional Photo Required:', photoInputDebug.hasAttribute('required'));
-                console.log('Professional Photo Files Selected:', photoInputDebug.files.length > 0);
-                if (photoInputDebug.files.length > 0) {
-                    console.log('Professional Photo File Name:', photoInputDebug.files[0].name);
-                    console.log('Professional Photo File Size:', photoInputDebug.files[0].size, 'bytes');
-                    console.log('Professional Photo File Type:', photoInputDebug.files[0].type);
-                    // Log FormData entry for photo
-                    const photoFormDataEntry = preparedFormData.get('professional_photo');
-                    console.log('Professional Photo in FormData:', photoFormDataEntry ? 'Present' : 'Missing',
-                        photoFormDataEntry ? `(${photoFormDataEntry.name}, ${photoFormDataEntry.size} bytes)` : '');
-                } else if (photoInputDebug.hasAttribute('required')) {
-                    console.log('Professional Photo is required but no file selected');
-                    showFieldError('bpp_photo', bpp_form_obj.i18n.required_field || 'Professional photo is required.');
-                    return false; // Prevent form submission
-                }
-            } else {
-                console.log('Professional Photo Input: Not found in DOM');
-            }
-            
-            // Ensure industry and years_experience are properly included in form data
-            const industryValue = $('#bpp_industry').val();
-            const yearsExpValue = $('#years_experience').val();
-            
-            console.log('Industry value:', industryValue);
-            console.log('Years of experience value:', yearsExpValue);
-            
-            // Log all form fields for debugging
-            console.log('Form data being submitted:');
-            for (let pair of preparedFormData.entries()) {
-                console.log(pair[0] + ': ' + (pair[0] === 'nonce' ? '[HIDDEN]' : pair[1]));
-            }
-            
-            // Final file upload verification before AJAX request
-            console.log('=== FINAL FILE VERIFICATION BEFORE SUBMISSION ===');
-            
-            // Check resume file
-            const finalResumeCheck = preparedFormData.get('resume');
-            if (finalResumeCheck && finalResumeCheck instanceof File) {
-                console.log('Resume file READY for submission:', {
-                    name: finalResumeCheck.name,
-                    size: finalResumeCheck.size,
-                    type: finalResumeCheck.type
-                });
-            } else {
-                console.log('Resume file NOT READY for submission:', finalResumeCheck);
-            }
-            
-            // Check photo file
-            const finalPhotoCheck = preparedFormData.get('professional_photo');
-            if (finalPhotoCheck && finalPhotoCheck instanceof File) {
-                console.log('Professional photo READY for submission:', {
-                    name: finalPhotoCheck.name,
-                    size: finalPhotoCheck.size,
-                    type: finalPhotoCheck.type
-                });
-            } else {
-                console.log('Professional photo NOT READY for submission:', finalPhotoCheck);
-            }
-            
-            console.log('========================================');
-            
             // Send AJAX request
             $.ajax({
                 type: 'POST',
@@ -381,11 +237,8 @@
                     $submitButton.prop('disabled', false);
                     $spinner.hide();
                     
-                    console.log('AJAX Response:', response);
-                    
                     // Check if response is properly formatted
                     if (typeof response !== 'object') {
-                        console.error('Invalid response format:', response);
                         displayMessage(bpp_form_obj.i18n.submit_error, false);
                         return;
                     }
@@ -408,12 +261,8 @@
                         message = response.data.message || '';
                     }
                     
-                    console.log('Processed response:', { success: success, message: message });
-                    
                     // Handle success or error
                     if (success) {
-                        console.log('Form submission successful!');
-                        
                         // Show success message
                         displayMessage(message || bpp_form_obj.i18n.submit_success, true);
                         
@@ -429,8 +278,6 @@
                             scrollTop: $successMessage.offset().top - 100
                         }, 500);
                     } else {
-                        console.log('Form submission failed with message:', message || 'Unknown error');
-                        
                         // Show error message
                         if (message) {
                             displayMessage(message, false);
@@ -441,7 +288,6 @@
                         // Show field-specific errors if available
                         let errors = response.errors || (response.data ? response.data.errors : null);
                         if (errors) {
-                            console.log('Specific errors:', errors);
                             $.each(errors, function(fieldId, errorMessage) {
                                 showFieldError(fieldId, errorMessage);
                             });
@@ -457,9 +303,6 @@
                     // Re-enable submit button and hide spinner
                     $submitButton.prop('disabled', false);
                     $spinner.hide();
-                    
-                    console.error('AJAX Error:', status, error);
-                    console.log('Response Text:', xhr.responseText);
                     
                     // Show error message
                     displayMessage(bpp_form_obj.i18n.submit_error, false);
