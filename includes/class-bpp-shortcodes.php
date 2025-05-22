@@ -126,43 +126,32 @@ class BPP_Shortcodes {
      * @return   string    HTML content to display the category directory.
      */
     public function render_category_directory($atts) {
-        // Extract shortcode attributes
+        // Extract and validate shortcode attributes
         $atts = shortcode_atts(
             array(
                 'category' => '',
                 'title' => '',
                 'per_page' => 12,
-                'layout' => 'grid', // grid or list
-            ),
-            $atts,
+                'layout' => 'grid',
+                'use_bootstrap' => 'no',
+            ), 
+            $atts, 
             'black_potential_pipeline_category'
         );
-
-        // Validate category
+        
+        // Validate the category attribute
         if (empty($atts['category'])) {
-            return '<p>' . __('Error: No category specified.', 'black-potential-pipeline') . '</p>';
+            return '<p>' . __('Error: Category parameter is required for the category directory shortcode.', 'black-potential-pipeline') . '</p>';
         }
-
-        // Set default title based on category
-        if (empty($atts['title'])) {
-            $category_term = get_term_by('slug', $atts['category'], 'bpp_industry');
-            $atts['title'] = sprintf(__('Black Professionals in %s', 'black-potential-pipeline'), $category_term ? $category_term->name : $atts['category']);
-        }
-
-        // Enqueue directory-specific scripts and styles
-        wp_enqueue_style('bpp-directory-style');
-        wp_enqueue_script('bpp-directory-script');
-
-        // Start output buffering
-        ob_start();
-
-        // Include the category directory template
-        include(BPP_PLUGIN_DIR . 'public/partials/bpp-category-directory.php');
-
-        // Get the buffered content
-        $output = ob_get_clean();
-
-        return $output;
+        
+        // Log the shortcode being processed for debugging
+        error_log('BPP Category Shortcode: Processing [black_potential_pipeline_category] with category=' . $atts['category']);
+        
+        // Get the public instance
+        $public = new BPP_Public($this->plugin_name, $this->version);
+        
+        // Call the method to display the category directory
+        return $public->display_category_directory($atts);
     }
 
     /**

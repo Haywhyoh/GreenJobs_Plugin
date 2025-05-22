@@ -502,47 +502,52 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
                 'category' => '',
                 'title' => '',
                 'per_page' => 12,
-                'layout' => 'grid', // grid or list
-                'use_bootstrap' => 'yes', // Enable Bootstrap styling by default
+                'layout' => 'grid',
+                'use_bootstrap' => 'no',
             ),
             $atts,
             'black_potential_pipeline_category'
         );
-
-        // Validate category
+        
+        // Check if category is provided
         if (empty($atts['category'])) {
             return '<p>' . __('Error: No category specified.', 'black-potential-pipeline') . '</p>';
         }
-
-        // Set default title based on category
-        if (empty($atts['title'])) {
-            $category_term = get_term_by('slug', $atts['category'], 'bpp_industry');
-            $atts['title'] = sprintf(__('Black Professionals in %s', 'black-potential-pipeline'), $category_term ? $category_term->name : $atts['category']);
+        
+        // Try to get the term by slug first, then by name if slug fails
+        $term = get_term_by('slug', $atts['category'], 'bpp_industry');
+        if (!$term || is_wp_error($term)) {
+            // Try to get by name
+            $term = get_term_by('name', $atts['category'], 'bpp_industry');
         }
-
+        
+        // If we found a valid term, use it for the title if not explicitly provided
+        if ($term && !is_wp_error($term) && empty($atts['title'])) {
+            $atts['title'] = $term->name . ' ' . __('Professionals', 'black-potential-pipeline');
+        } elseif (empty($atts['title'])) {
+            // Default title if no term found and no title provided
+            $atts['title'] = ucfirst($atts['category']) . ' ' . __('Professionals', 'black-potential-pipeline');
+        }
+        
+        // Enqueue required assets
+        wp_enqueue_style('bpp-directory-style');
+        wp_enqueue_script('bpp-directory-script');
+        
         // Check if Bootstrap styling is enabled
         if (isset($atts['use_bootstrap']) && $atts['use_bootstrap'] === 'yes') {
             wp_enqueue_style('bpp-bootstrap-style');
             wp_enqueue_style('bpp-bootstrap-custom-style');
             wp_enqueue_script('bpp-bootstrap-script');
-        } else {
-            // Enqueue regular directory-specific styles
-            wp_enqueue_style('bpp-directory-style');
         }
         
-        // Enqueue directory-specific scripts
-        wp_enqueue_script('bpp-directory-script');
-
         // Start output buffering
         ob_start();
-
-        // Include the category directory template
-        include(plugin_dir_path(dirname(__FILE__)) . 'public/partials/bpp-category-directory.php');
-
-        // Get the buffered content
-        $output = ob_get_clean();
-
-        return $output;
+        
+        // Include the template
+        include BPP_PLUGIN_DIR . 'public/partials/bpp-category-directory.php';
+        
+        // Return the buffered content
+        return ob_get_clean();
     }
 
     /**

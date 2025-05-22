@@ -16,36 +16,223 @@ if (!defined('WPINC')) {
     die;
 }
 
+// Debug: Add logging for troubleshooting
+error_log("BPP CATEGORY DIRECTORY DEBUGGING:");
+error_log("Shortcode Attributes: " . print_r($atts, true));
+
 // Extract shortcode attributes
 $category = sanitize_text_field($atts['category']);
 $per_page = intval($atts['per_page']);
 $layout = sanitize_text_field($atts['layout']);
 
+// Debug: Log the category being queried
+error_log("Searching for category: " . $category);
+
+// Add more detailed industry debugging
+error_log("Checking industry as both taxonomy term and meta field");
+
+// Get all possible term variations
+$term = get_term_by('slug', $category, 'bpp_industry');
+if (!$term || is_wp_error($term)) {
+    $term = get_term_by('name', $category, 'bpp_industry');
+}
+$term_slug = $term ? $term->slug : $category;
+$term_name = $term ? $term->name : '';
+
+// Debug: Check for approved applicants with this industry
+$debug_args = array(
+    'post_type' => 'bpp_applicant',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+);
+$debug_query = new WP_Query($debug_args);
+$found_approved = $debug_query->found_posts;
+error_log("Total approved applicants: " . $found_approved);
+
+// Debug: Look for applicants with this industry as taxonomy
+$tax_debug_args = array(
+    'post_type' => 'bpp_applicant',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'tax_query' => array(
+        array(
+            'taxonomy' => 'bpp_industry',
+            'field' => 'slug',
+            'terms' => $term_slug,
+        )
+    )
+);
+$tax_debug_query = new WP_Query($tax_debug_args);
+$found_tax = $tax_debug_query->found_posts;
+error_log("Applicants with slug '{$term_slug}' as taxonomy term: " . $found_tax);
+
+// Debug: Look for applicants with this industry as meta field
+$meta_debug_args = array(
+    'post_type' => 'bpp_applicant',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'meta_query' => array(
+        array(
+            'key' => 'bpp_industry',
+            'value' => $category,
+            'compare' => '=',
+        )
+    )
+);
+$meta_debug_query = new WP_Query($meta_debug_args);
+$found_meta = $meta_debug_query->found_posts;
+error_log("Applicants with '{$category}' as meta field: " . $found_meta);
+
+// Now try directly with 'industry' meta key (without bpp_ prefix)
+$direct_meta_args = array(
+    'post_type' => 'bpp_applicant',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'meta_query' => array(
+        array(
+            'key' => 'industry',
+            'value' => $category,
+            'compare' => '=',
+        )
+    )
+);
+$direct_meta_query = new WP_Query($direct_meta_args);
+$found_direct_meta = $direct_meta_query->found_posts;
+error_log("Applicants with '{$category}' as direct 'industry' meta field: " . $found_direct_meta);
+
 // Get current page
 $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 
-// Get applicants query for specific category
+// Get search parameters
+$search_query = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
+
+// Create a more comprehensive query that combines both approaches
 $args = array(
     'post_type' => 'bpp_applicant',
     'post_status' => 'publish',
     'posts_per_page' => $per_page,
     'paged' => $paged,
-    'orderby' => 'date',
+    'orderby' => 'meta_value',
+    'meta_key' => 'bpp_featured',
     'order' => 'DESC',
-    'tax_query' => array(
-        array(
-            'taxonomy' => 'bpp_industry',
-            'field' => 'slug',
-            'terms' => $category,
-        ),
-    ),
 );
 
-// Apply search filter if set
-$search_query = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
+// IMPORTANT FIX: Create queries for all possible industry representation formats
+// This is a critical change - we need to structure the query differently
+
+// Create a combined query with OR relationship at the outer level
+$tax_meta_query = array(
+    'relation' => 'OR',
+    // Query 1: Taxonomy term by slug
+    array(
+        'taxonomy' => 'bpp_industry',
+        'field' => 'slug',
+        'terms' => $term_slug,
+    )
+);
+
+// If we found a term by slug, also try to query by its name as meta value
+if (!empty($term_name)) {
+    $tax_meta_query[] = array(
+        'key' => 'bpp_industry',
+        'value' => $term_name,
+        'compare' => '=',
+    );
+    $tax_meta_query[] = array(
+        'key' => 'industry',
+        'value' => $term_name,
+        'compare' => '=',
+    );
+}
+
+// Add queries for the original category value (which might be a slug)
+$tax_meta_query[] = array(
+    'key' => 'bpp_industry',
+    'value' => $category,
+    'compare' => '=',
+);
+$tax_meta_query[] = array(
+    'key' => 'industry',
+    'value' => $category,
+    'compare' => '=',
+);
+
+// Set the combined query
+$args['_tax_meta_query'] = $tax_meta_query;
+
+// Use the WordPress query integration for combining tax and meta queries
+add_filter('posts_clauses', function($clauses, $wp_query) {
+    if (!empty($wp_query->query_vars['_tax_meta_query'])) {
+        global $wpdb;
+        
+        $tax_meta_query = $wp_query->query_vars['_tax_meta_query'];
+        $tax_query_parts = array();
+        $meta_query_parts = array();
+        
+        // Handle taxonomy conditions
+        foreach ($tax_meta_query as $key => $query) {
+            if (isset($query['taxonomy'])) {
+                // This is a taxonomy query
+                $term_id = 0;
+                if (isset($query['terms'])) {
+                    $term = get_term_by($query['field'] ?? 'slug', $query['terms'], $query['taxonomy']);
+                    if ($term && !is_wp_error($term)) {
+                        $term_id = $term->term_id;
+                    }
+                }
+                
+                if ($term_id > 0) {
+                    $tax_query_parts[] = $wpdb->prepare(
+                        "EXISTS (
+                            SELECT 1 FROM {$wpdb->term_relationships} tr
+                            JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                            WHERE tr.object_id = {$wpdb->posts}.ID
+                            AND tt.taxonomy = %s
+                            AND tt.term_id = %d
+                        )",
+                        $query['taxonomy'],
+                        $term_id
+                    );
+                }
+            } elseif (isset($query['key'])) {
+                // This is a meta query
+                $meta_query_parts[] = $wpdb->prepare(
+                    "EXISTS (
+                        SELECT 1 FROM {$wpdb->postmeta} pm
+                        WHERE pm.post_id = {$wpdb->posts}.ID
+                        AND pm.meta_key = %s
+                        AND pm.meta_value = %s
+                    )",
+                    $query['key'],
+                    $query['value']
+                );
+            } elseif ($key === 'relation') {
+                // Skip relation
+                continue;
+            }
+        }
+        
+        if (!empty($tax_query_parts) || !empty($meta_query_parts)) {
+            $all_parts = array_merge($tax_query_parts, $meta_query_parts);
+            $or_clause = implode(' OR ', $all_parts);
+            
+            // Add to the WHERE clause
+            if (!empty($or_clause)) {
+                $clauses['where'] .= " AND ({$or_clause})";
+            }
+        }
+    }
+    
+    return $clauses;
+}, 10, 2);
+
+// Add search if provided
 if (!empty($search_query)) {
     $args['s'] = $search_query;
 }
+
+// Debug the final query
+error_log('FINAL Category Query: ' . print_r($args, true));
 
 $applicants_query = new WP_Query($args);
 ?>

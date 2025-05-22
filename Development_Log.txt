@@ -51,8 +51,7 @@ COMPLETED TASKS:
 ✅ Fixed list view to take full width of container
 
 
-Important Next Steps:
-- Fix the years of experience error for the filter. before, years of experience were in ranges, but now there are are single digit. the filter seems to still work with ranges. fix that error.
+
 
 NEXT STEPS:
 🔲 Create unit tests

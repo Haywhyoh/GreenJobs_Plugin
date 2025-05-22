@@ -867,12 +867,22 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         // Handle industry with extra validation and debugging
         if (!empty($industry)) {
             error_log('BPP Debug - Setting industry: ' . print_r($industry, true));
-            // The industry value from the form is already a slug, so use it directly
+            
+            // Store industry value as meta (both with and without prefix for backward compatibility)
+            update_post_meta($applicant_id, 'industry', $industry);
+            update_post_meta($applicant_id, 'bpp_industry', $industry);
+            
+            // Set taxonomy term
             wp_set_object_terms($applicant_id, $industry, 'bpp_industry', false);
             
             // Add extra log to check what's actually stored
             $terms = wp_get_object_terms($applicant_id, 'bpp_industry');
             error_log('BPP Debug - Industry terms after saving: ' . print_r($terms, true));
+            
+            // Double-check meta values
+            $industry_meta = get_post_meta($applicant_id, 'industry', true);
+            $bpp_industry_meta = get_post_meta($applicant_id, 'bpp_industry', true);
+            error_log('BPP Debug - Industry meta values: industry=' . $industry_meta . ', bpp_industry=' . $bpp_industry_meta);
         }
         
         // Handle resume attachment if uploaded
