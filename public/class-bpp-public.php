@@ -551,7 +551,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
     }
 
     /**
-     * Display featured candidates via shortcode.
+     * Display featured applicants via shortcode.
      *
      * @since    1.0.0
      * @param    array    $atts    Shortcode attributes.
@@ -583,6 +583,68 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         $output = ob_get_clean();
 
         return $output;
+    }
+
+    /**
+     * Display featured applicants from a specific category in a slider/carousel format.
+     *
+     * @since    1.0.0
+     * @param    array    $atts    Shortcode attributes.
+     * @return   string    HTML content to display category featured candidates.
+     */
+    public function display_category_featured($atts) {
+        // Extract shortcode attributes
+        $atts = shortcode_atts(
+            array(
+                'category'       => '',
+                'title'          => '',
+                'count'          => 12,
+                'items_per_slide' => 4,
+                'use_bootstrap'  => 'yes',
+            ),
+            $atts,
+            'black_potential_pipeline_category_featured'
+        );
+        
+        // Check if category is provided
+        if (empty($atts['category'])) {
+            return '<p>' . __('Error: No category specified for featured display.', 'black-potential-pipeline') . '</p>';
+        }
+        
+        // Try to get the term by slug first, then by name if slug fails
+        $term = get_term_by('slug', $atts['category'], 'bpp_industry');
+        if (!$term || is_wp_error($term)) {
+            // Try to get by name
+            $term = get_term_by('name', $atts['category'], 'bpp_industry');
+        }
+        
+        // If we found a valid term, use it for the title if not explicitly provided
+        if ($term && !is_wp_error($term) && empty($atts['title'])) {
+            $atts['title'] = $term->name . ' ' . __('Professionals', 'black-potential-pipeline');
+        } elseif (empty($atts['title'])) {
+            // Default title if no term found and no title provided
+            $atts['title'] = ucfirst($atts['category']) . ' ' . __('Professionals', 'black-potential-pipeline');
+        }
+        
+        // Enqueue required assets
+        wp_enqueue_style('bpp-featured-style');
+        wp_enqueue_script('bpp-featured-script');
+        
+        // Check if Bootstrap styling is enabled
+        if (isset($atts['use_bootstrap']) && $atts['use_bootstrap'] === 'yes') {
+            wp_enqueue_style('bpp-bootstrap-style');
+            wp_enqueue_style('bpp-bootstrap-custom-style');
+            wp_enqueue_script('bpp-bootstrap-script');
+        }
+        
+        // Start output buffering
+        ob_start();
+        
+        // Include the template
+        include BPP_PLUGIN_DIR . 'public/partials/bpp-category-featured.php';
+        
+        // Return the buffered content
+        return ob_get_clean();
     }
 
     /**

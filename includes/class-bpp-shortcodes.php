@@ -155,6 +155,42 @@ class BPP_Shortcodes {
     }
 
     /**
+     * Render featured candidates from a specific category in a slider format.
+     *
+     * @since    1.0.0
+     * @param    array    $atts    Shortcode attributes.
+     * @return   string    HTML content to display featured candidates from a category.
+     */
+    public function render_category_featured($atts) {
+        // Extract and validate shortcode attributes
+        $atts = shortcode_atts(
+            array(
+                'category' => '',
+                'title' => '',
+                'count' => 12,
+                'items_per_slide' => 4,
+                'use_bootstrap' => 'yes',
+            ), 
+            $atts, 
+            'black_potential_pipeline_category_featured'
+        );
+        
+        // Validate the category attribute
+        if (empty($atts['category'])) {
+            return '<p>' . __('Error: Category parameter is required for the category featured shortcode.', 'black-potential-pipeline') . '</p>';
+        }
+        
+        // Log the shortcode being processed for debugging
+        error_log('BPP Category Featured Shortcode: Processing [black_potential_pipeline_category_featured] with category=' . $atts['category']);
+        
+        // Get the public instance
+        $public = new BPP_Public($this->plugin_name, $this->version);
+        
+        // Call the method to display the category featured carousel
+        return $public->display_category_featured($atts);
+    }
+
+    /**
      * Render featured candidates.
      *
      * @since    1.0.0
