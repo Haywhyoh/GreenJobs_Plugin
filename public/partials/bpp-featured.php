@@ -403,7 +403,7 @@ jQuery(document).ready(function($) {
     const $nextBtn = $('.bpp-carousel-next');
     
     let currentIndex = 0;
-    let slidesToShow = 3;
+    let slidesToShow = 4; // Change to 4 items on large screens to match category-featured
     
     // Adjust slides to show based on window width
     function adjustSlidesToShow() {
@@ -412,7 +412,7 @@ jQuery(document).ready(function($) {
         } else if (window.innerWidth < 992) {
             slidesToShow = 2;
         } else {
-            slidesToShow = 3;
+            slidesToShow = 4; // 4 items on large screens to match category-featured
         }
         
         // Update slide widths and positioning
@@ -525,8 +525,9 @@ jQuery(document).ready(function($) {
 
 .bpp-carousel-nav {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     margin-top: 1.5rem;
+
 }
 
 .bpp-carousel-prev,
@@ -554,6 +555,29 @@ jQuery(document).ready(function($) {
 .bpp-carousel-next:disabled {
     background: #ccc;
     cursor: not-allowed;
+}
+
+/* Bootstrap-like row/column styles for the carousel to match category-featured */
+@media (min-width: 992px) {
+    .bpp-featured-carousel .bpp-carousel-container {
+        margin: 0 -10px;
+    }
+    
+    .bpp-featured-carousel .bpp-carousel-slide {
+        width: 25%; /* 4 items per row on large screens */
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .bpp-featured-carousel .bpp-carousel-slide {
+        width: 50%; /* 2 items per row on medium screens */
+    }
+}
+
+@media (max-width: 767px) {
+    .bpp-featured-carousel .bpp-carousel-slide {
+        width: 100%; /* 1 item per row on small screens */
+    }
 }
 </style>
 <?php endif; ?> 

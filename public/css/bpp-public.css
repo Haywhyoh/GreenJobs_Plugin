@@ -375,7 +375,7 @@
     flex-direction: row;
     align-items: center;
     width: 100%;
-    text-align: left !important;
+    text-align: center !important;
 }
 
 .bpp-directory-content.bpp-layout-list .bpp-professional-photo,
@@ -530,21 +530,22 @@
 .bpp-carousel-nav {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
+    /* transform: translateY(-50%); */
+    width: 100vw;
+    left: -2%;
     height: 40px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 50%;
+    /* background-color: rgba(255, 255, 255, 0.8); */
+    /* border-radius: 50%; */
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     cursor: pointer;
     z-index: 10;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .bpp-carousel-prev {
-    left: -20px;
+    /* position: absolute; */
+    left: -80px;
 }
 
 .bpp-carousel-next {
