@@ -415,14 +415,23 @@ jQuery(document).ready(function($) {
             slidesToShow = 3;
         }
         
+        // Update slide widths and positioning
+        const slideWidth = 100 / slidesToShow;
+        $slides.css('width', slideWidth + '%');
+        
+        // Reset position if needed
+        if (currentIndex > $slides.length - slidesToShow) {
+            currentIndex = Math.max(0, $slides.length - slidesToShow);
+        }
+        
         updateCarousel();
     }
     
     // Update carousel display
     function updateCarousel() {
         const slideWidth = 100 / slidesToShow;
-        $slides.css('width', slideWidth + '%');
         $carousel.css('transform', `translateX(-${currentIndex * slideWidth}%)`);
+        $carousel.css('transition', 'transform 0.4s ease');
         
         // Enable/disable buttons
         $prevBtn.prop('disabled', currentIndex === 0);
@@ -447,8 +456,104 @@ jQuery(document).ready(function($) {
         }
     });
     
+    // Add swipe support for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    $carousel.on('touchstart', function(e) {
+        touchStartX = e.originalEvent.touches[0].clientX;
+    });
+    
+    $carousel.on('touchend', function(e) {
+        touchEndX = e.originalEvent.changedTouches[0].clientX;
+        handleSwipe();
+    });
+    
+    function handleSwipe() {
+        if (touchStartX - touchEndX > 50) {
+            // Swipe left - go to next slide
+            $nextBtn.trigger('click');
+        }
+        
+        if (touchEndX - touchStartX > 50) {
+            // Swipe right - go to previous slide
+            $prevBtn.trigger('click');
+        }
+    }
+    
+    // Add hover effect to cards
+    $('.bpp-professional-card').hover(
+        function() {
+            $(this).css({
+                'transform': 'translateY(-5px)',
+                'box-shadow': '0 10px 20px rgba(0,0,0,0.1)'
+            });
+        },
+        function() {
+            $(this).css({
+                'transform': 'translateY(0)',
+                'box-shadow': '0 2px 10px rgba(0,0,0,0.1)'
+            });
+        }
+    );
+    
     // Responsive
     $(window).on('resize', adjustSlidesToShow);
 });
 </script>
+
+<style type="text/css">
+.bpp-featured-carousel {
+    position: relative;
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+}
+
+.bpp-carousel-wrapper {
+    overflow: hidden;
+}
+
+.bpp-carousel-container {
+    display: flex;
+    transition: transform 0.4s ease;
+}
+
+.bpp-carousel-slide {
+    flex: 0 0 auto;
+    padding: 0 10px;
+}
+
+.bpp-carousel-nav {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.bpp-carousel-prev,
+.bpp-carousel-next {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0.5rem;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.bpp-carousel-prev:hover,
+.bpp-carousel-next:hover {
+    background: #0b5ed7;
+}
+
+.bpp-carousel-prev:disabled,
+.bpp-carousel-next:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+</style>
 <?php endif; ?> 
