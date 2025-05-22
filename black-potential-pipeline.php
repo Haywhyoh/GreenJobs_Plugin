@@ -85,117 +85,12 @@ function bpp_add_rewrite_rules() {
 add_action('init', 'bpp_add_rewrite_rules', 10);
 
 /**
- * Debug function to check post type registration
- */
-function bpp_debug_post_types() {
-    // Check if the bpp_applicant post type exists
-    $post_type_exists = post_type_exists('bpp_applicant');
-    error_log('BPP Debug: bpp_applicant post type exists: ' . ($post_type_exists ? 'Yes' : 'No'));
-    
-    // Get post type object
-    if ($post_type_exists) {
-        $post_type_obj = get_post_type_object('bpp_applicant');
-        error_log('BPP Debug: Post type rewrite slug: ' . $post_type_obj->rewrite['slug']);
-        error_log('BPP Debug: Post type has archive: ' . ($post_type_obj->has_archive ? 'Yes' : 'No'));
-        error_log('BPP Debug: Post type publicly queryable: ' . ($post_type_obj->publicly_queryable ? 'Yes' : 'No'));
-    }
-    
-    // Get post with ID 120
-    $post = get_post(120);
-    if ($post) {
-        error_log('BPP Debug: Post 120 exists - Type: ' . $post->post_type . ', Status: ' . $post->post_status);
-        error_log('BPP Debug: Post 120 permalink: ' . get_permalink(120));
-    } else {
-        error_log('BPP Debug: Post 120 does not exist or is not accessible');
-    }
-}
-add_action('init', 'bpp_debug_post_types', 999);
-
-/**
- * Special fix for post ID 120
- * This adds a dedicated template redirect for post ID 120
- */
-function bpp_fix_post_120_template() {
-    global $wp_query, $post;
-    
-    // Check if we're querying post with ID 120
-    if (is_singular() && isset($wp_query->query['p']) && $wp_query->query['p'] == 120) {
-        error_log('BPP: Intercepted query for post ID 120');
-        
-        // Check if post exists and is of our type
-        $post_120 = get_post(120);
-        if ($post_120 && $post_120->post_type === 'bpp_applicant') {
-            error_log('BPP: Post 120 is a bpp_applicant, loading custom template');
-            
-            // Set the global post to ensure it's available in the template
-            $post = $post_120;
-            setup_postdata($post);
-            
-            // Load and include our template
-            $template = BPP_PLUGIN_DIR . 'public/partials/bpp-single-profile.php';
-            if (file_exists($template)) {
-                error_log('BPP: Loading custom template: ' . $template);
-                include($template);
-                exit;
-            } else {
-                error_log('BPP: Custom template not found: ' . $template);
-            }
-        }
-    }
-}
-add_action('template_redirect', 'bpp_fix_post_120_template', 1);
-
-/**
- * Fallback for viewing bpp_applicant posts even if post type registration fails
- * This ensures posts are still accessible to users
- */
-function bpp_direct_view_handler() {
-    global $wp_query, $post;
-    
-    // Check if a post is being viewed with a numeric ID parameter
-    if (isset($_GET['p']) && is_numeric($_GET['p'])) {
-        $post_id = intval($_GET['p']);
-        $post_obj = get_post($post_id);
-        
-        // Check if this is one of our post types but the post type isn't registered or not publicly queryable
-        if ($post_obj && $post_obj->post_type === 'bpp_applicant') {
-            $post_type_obj = get_post_type_object('bpp_applicant');
-            
-            if (!$post_type_obj || !$post_type_obj->publicly_queryable) {
-                error_log('BPP: Direct View Handler activating for post ID ' . $post_id);
-                
-                // Setup the global post and query vars to mimic a normal WordPress template
-                $post = $post_obj;
-                setup_postdata($post);
-                $wp_query->is_single = true;
-                $wp_query->is_singular = true;
-                
-                // Set the title for the page
-                add_filter('wp_title', function($title) use ($post_obj) {
-                    return $post_obj->post_title . ' | ' . get_bloginfo('name');
-                }, 10);
-                
-                // Output a complete page with header and footer
-                get_header();
-                echo '<div class="bpp-direct-view-container">';
-                include_once(BPP_PLUGIN_DIR . 'public/partials/bpp-single-profile.php');
-                echo '</div>';
-                get_footer();
-                exit;
-            }
-        }
-    }
-}
-add_action('template_redirect', 'bpp_direct_view_handler', 5);
-
-/**
- * Register bpp_applicant post type directly to ensure it's always available
- * This is a failsafe in case the main plugin's registration fails
+ * Emergency fallback to ensure bpp_applicant post type is always registered
+ * This is a safety measure that will only run if the main registration fails
  */
 function bpp_emergency_post_type_registration() {
     if (!post_type_exists('bpp_applicant')) {
-        error_log('BPP: Emergency post type registration activating');
-        
+        // Register the post type as a fallback
         register_post_type('bpp_applicant', array(
             'labels' => array(
                 'name' => 'Professionals',
@@ -214,8 +109,6 @@ function bpp_emergency_post_type_registration() {
             'hierarchical' => false,
             'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
         ));
-        
-        error_log('BPP: Emergency post type registration complete');
     }
 }
 add_action('init', 'bpp_emergency_post_type_registration', 999);

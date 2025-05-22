@@ -695,47 +695,14 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
     public function load_applicant_template($template) {
         global $post;
         
-        // Debug logging - start
-        error_log('BPP: load_applicant_template called');
-        error_log('BPP: Current template: ' . $template);
-        
-        if (isset($post)) {
-            error_log('BPP: Post type: ' . $post->post_type);
-            error_log('BPP: Post ID: ' . $post->ID);
-            
-            // Special check for post ID 120 which is having issues
-            if ($post->ID == 120) {
-                error_log('BPP: Processing problematic post ID 120');
-                error_log('BPP: Post status: ' . $post->post_status);
-                error_log('BPP: Post name/slug: ' . $post->post_name);
-                
-                // Special direct handling for post 120
-                $custom_template = BPP_PLUGIN_DIR . 'public/partials/bpp-single-profile.php';
-                if (file_exists($custom_template)) {
-                    error_log('BPP: Custom template found for post 120, returning: ' . $custom_template);
-                    return $custom_template;
-                }
-            }
-        } else {
-            error_log('BPP: No post object available');
-            return $template;
-        }
-        
         // Check if this is post ID 120 or a post with type bpp_applicant
         if ((isset($post->ID) && $post->ID == 120) || (isset($post->post_type) && $post->post_type === 'bpp_applicant')) {
             $custom_template = BPP_PLUGIN_DIR . 'public/partials/bpp-single-profile.php';
             
-            error_log('BPP: Attempting to load custom template: ' . $custom_template);
-            
             // Use custom template if it exists
             if (file_exists($custom_template)) {
-                error_log('BPP: Custom template found, returning: ' . $custom_template);
                 return $custom_template;
-            } else {
-                error_log('BPP: Custom template not found: ' . $custom_template);
             }
-        } else {
-            error_log('BPP: Not a bpp_applicant post type or post 120, returning original template');
         }
         
         return $template;

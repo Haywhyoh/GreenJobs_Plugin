@@ -177,9 +177,6 @@ class BPP {
         // Register post types early to ensure they're available throughout the site
         $this->loader->add_action('init', $post_types, 'register_post_types', 5);
         $this->loader->add_action('init', $post_types, 'register_taxonomies', 5);
-        
-        // Log that we've set up the post type hooks
-        error_log('BPP: Post type hooks have been registered with priority 5');
     }
 
     /**
