@@ -635,4 +635,73 @@ jQuery(document).ready(function($) {
         }
     );
 });
-</script> 
+</script>
+
+<style>
+:root {
+    /* GreenJobs color variables - use WordPress theme colors first, then our green/brown scheme */
+    --bpp-primary-color: var(--wp--preset--color--primary, #61CE70);
+    --bpp-secondary-color: var(--wp--preset--color--secondary, #6F3802);
+    --bpp-info-color: var(--wp--preset--color--tertiary, #0dcaf0);
+    --bpp-warning-color: var(--wp--preset--color--warning, #ffc107);
+    --bpp-light-color: var(--wp--preset--color--light, #f8f9fa);
+    --bpp-dark-color: var(--wp--preset--color--dark, #212529);
+}
+
+/* Override Bootstrap color classes with theme colors */
+.bg-primary {
+    background-color: var(--bpp-primary-color) !important;
+}
+
+.bg-secondary {
+    background-color: var(--bpp-secondary-color) !important;
+}
+
+.bg-info {
+    background-color: var(--bpp-info-color) !important;
+}
+
+.bg-warning {
+    background-color: var(--bpp-warning-color) !important;
+}
+
+.bg-light {
+    background-color: var(--bpp-light-color) !important;
+}
+
+.text-dark {
+    color: var(--bpp-dark-color) !important;
+}
+
+/* Apply theme color to links and buttons */
+.bpp-directory-container a:not(.page-link):not(.btn-outline-secondary) {
+    color: var(--bpp-primary-color);
+}
+
+.btn-primary, .page-item.active .page-link {
+    background-color: var(--bpp-primary-color) !important;
+    border-color: var(--bpp-primary-color) !important;
+}
+
+.btn-outline-primary {
+    color: var(--bpp-primary-color) !important;
+    border-color: var(--bpp-primary-color) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--bpp-primary-color) !important;
+    color: white !important;
+}
+
+/* Search filter background */
+.bpp-filter-message {
+    background-color: rgba(97, 206, 112, 0.1);
+    border-left: 4px solid var(--bpp-primary-color);
+}
+
+/* Improve card hover effects */
+.bpp-card-link .card:hover, 
+.bpp-professional-card:hover {
+    border-color: var(--bpp-primary-color) !important;
+}
+</style> 

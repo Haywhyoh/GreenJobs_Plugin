@@ -174,7 +174,7 @@ get_header();
                                     <?php the_post_thumbnail('medium', array('class' => 'img-fluid w-100 h-100', 'style' => 'object-fit: cover;')); ?>
                                 <?php else : ?>
                                     <div class="d-flex align-items-center justify-content-center bg-light h-100">
-                                        <i class="dashicons dashicons-admin-users" style="font-size: 60px; width: 60px; height: 60px; color: #aaa;"></i>
+                                        <i class="dashicons dashicons-admin-users" style="font-size: 60px; width: 60px; height: 60px; color: var(--bpp-secondary-color);"></i>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -348,7 +348,7 @@ get_header();
                                                 </div>
                                             <?php else : ?>
                                                 <div class="card-img-top bg-light text-center py-4" style="height: 200px; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px; color: #aaa;"></i>
+                                                    <i class="dashicons dashicons-businessperson" style="font-size: 80px; width: 80px; height: 80px; color: var(--bpp-secondary-color);"></i>
                                                 </div>
                                             <?php endif; ?>
                                             <div class="card-body">
@@ -383,6 +383,16 @@ get_header();
 </div>
 
 <style>
+:root {
+    /* These variables will try to use WordPress theme colors first, then fall back to our new green/brown scheme */
+    --bpp-primary-color: var(--wp--preset--color--primary, #61CE70);
+    --bpp-secondary-color: var(--wp--preset--color--secondary, #6F3802);
+    --bpp-info-color: var(--wp--preset--color--tertiary, #0dcaf0);
+    --bpp-warning-color: var(--wp--preset--color--warning, #ffc107);
+    --bpp-light-color: var(--wp--preset--color--light, #f8f9fa);
+    --bpp-dark-color: var(--wp--preset--color--dark, #212529);
+}
+
 .dashicons {
     vertical-align: middle;
     line-height: 1.5;
@@ -403,10 +413,59 @@ get_header();
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
+/* Override Bootstrap color classes with theme colors */
+.bg-primary {
+    background-color: var(--bpp-primary-color) !important;
+}
+
+.bg-secondary {
+    background-color: var(--bpp-secondary-color) !important;
+}
+
+.bg-info {
+    background-color: var(--bpp-info-color) !important;
+}
+
+.bg-warning {
+    background-color: var(--bpp-warning-color) !important;
+}
+
+.bg-light {
+    background-color: var(--bpp-light-color) !important;
+}
+
+.text-dark {
+    color: var(--bpp-dark-color) !important;
+}
+
+/* Apply theme color to links */
+.card-body a:not(.btn) {
+    color: var(--bpp-primary-color);
+}
+
+.btn-primary {
+    background-color: var(--bpp-primary-color) !important;
+    border-color: var(--bpp-primary-color) !important;
+}
+
+.btn-outline-primary {
+    color: var(--bpp-primary-color) !important;
+    border-color: var(--bpp-primary-color) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--bpp-primary-color) !important;
+    color: white !important;
+}
+
+.bpp-contact-email i, .bpp-contact-phone i {
+    color: var(--bpp-primary-color) !important;
+}
+
 .bpp-contact-email, .bpp-contact-phone {
     padding: 10px;
     border-radius: 6px;
-    background-color: #f8f9fa;
+    background-color: var(--bpp-light-color);
 }
 
 .bio-content {

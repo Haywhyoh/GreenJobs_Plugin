@@ -474,4 +474,65 @@ $spinner_class = $use_bootstrap ? 'spinner-border spinner-border-sm text-light m
     
     // The form submission logic is handled by bpp-form.js
     // See the script enqueue in the main plugin file
-</script> 
+</script>
+
+<!-- Add GreenJobs color scheme -->
+<style>
+:root {
+    /* GreenJobs color variables - use WordPress theme colors first, then our green/brown scheme */
+    --bpp-primary-color: var(--wp--preset--color--primary, #61CE70);
+    --bpp-secondary-color: var(--wp--preset--color--secondary, #6F3802);
+    --bpp-info-color: var(--wp--preset--color--tertiary, #0dcaf0);
+    --bpp-warning-color: var(--wp--preset--color--warning, #ffc107);
+    --bpp-light-color: var(--wp--preset--color--light, #f8f9fa);
+    --bpp-dark-color: var(--wp--preset--color--dark, #212529);
+}
+
+/* Override Bootstrap color classes with theme colors */
+.card-header.bg-primary {
+    background-color: var(--bpp-primary-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--bpp-primary-color) !important;
+    border-color: var(--bpp-primary-color) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--bpp-secondary-color) !important;
+    border-color: var(--bpp-secondary-color) !important;
+}
+
+/* Customize form styles */
+.form-control:focus, .form-select:focus {
+    border-color: var(--bpp-primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(97, 206, 112, 0.25);
+}
+
+/* Success alert styling */
+.alert-success {
+    background-color: rgba(97, 206, 112, 0.1);
+    border-color: var(--bpp-primary-color);
+    color: var(--bpp-secondary-color);
+}
+
+/* Non-Bootstrap form customizations */
+.bpp-form-title {
+    color: var(--bpp-secondary-color);
+}
+
+.bpp-form-section h3 {
+    color: var(--bpp-primary-color);
+    border-bottom: 2px solid var(--bpp-primary-color);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+
+.bpp-success-message {
+    background-color: rgba(97, 206, 112, 0.1);
+    border-left: 4px solid var(--bpp-primary-color);
+    padding: 15px;
+    margin-bottom: 20px;
+    color: var(--bpp-secondary-color);
+}
+</style> 

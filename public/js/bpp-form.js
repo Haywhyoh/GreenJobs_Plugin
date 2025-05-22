@@ -321,5 +321,35 @@
         $form.find('input, textarea, select').on('change input', function() {
             clearFieldError($(this).attr('id'));
         });
+        
+        // Add hover effects for form fields using GreenJobs color scheme
+        if (isBootstrapForm) {
+            $form.find('input, textarea, select').hover(
+                function() {
+                    $(this).css('border-color', '#61CE70');
+                },
+                function() {
+                    if (!$(this).is(':focus')) {
+                        $(this).css('border-color', '');
+                    }
+                }
+            );
+            
+            // Add enhanced button effects
+            $submitButton.hover(
+                function() {
+                    $(this).css({
+                        'transform': 'translateY(-2px)',
+                        'box-shadow': '0 4px 12px rgba(97, 206, 112, 0.3)'
+                    });
+                },
+                function() {
+                    $(this).css({
+                        'transform': '',
+                        'box-shadow': ''
+                    });
+                }
+            );
+        }
     });
 })(jQuery); 

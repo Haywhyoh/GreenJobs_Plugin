@@ -669,4 +669,118 @@
     .bpp-stats-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/**
+ * Public-facing styles for the GreenJobs Plugin
+ */
+
+:root {
+    /* GreenJobs Plugin Color Scheme */
+    --bpp-primary-color: #61CE70;
+    --bpp-primary-hover: #52b961;
+    --bpp-secondary-color: #6F3802;
+    --bpp-secondary-hover: #5a2e02;
+    --bpp-info-color: #0dcaf0;
+    --bpp-warning-color: #ffc107;
+    --bpp-light-color: #f8f9fa;
+    --bpp-dark-color: #212529;
+    --bpp-focus-shadow: rgba(97, 206, 112, 0.25);
+}
+
+/* Global Overrides for Bootstrap Colors */
+.bg-primary {
+    background-color: var(--bpp-primary-color) !important;
+}
+
+.bg-secondary {
+    background-color: var(--bpp-secondary-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--bpp-primary-color) !important;
+    border-color: var(--bpp-primary-color) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:focus {
+    background-color: var(--bpp-secondary-color) !important;
+    border-color: var(--bpp-secondary-color) !important;
+}
+
+.btn-outline-primary {
+    color: var(--bpp-primary-color) !important;
+    border-color: var(--bpp-primary-color) !important;
+}
+
+.btn-outline-primary:hover {
+    color: white !important;
+    background-color: var(--bpp-primary-color) !important;
+}
+
+/* Card Styling */
+.card-header.bg-primary {
+    background-color: var(--bpp-primary-color) !important;
+}
+
+.card:hover {
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+}
+
+/* Badge Styling */
+.badge.bg-primary {
+    background-color: var(--bpp-primary-color) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--bpp-secondary-color) !important;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--bpp-secondary-color);
+}
+
+/* Links */
+a:not(.btn):not(.badge) {
+    color: var(--bpp-primary-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:not(.btn):not(.badge):hover {
+    color: var(--bpp-secondary-color);
+    text-decoration: underline;
+}
+
+/* Forms */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--bpp-primary-color);
+    box-shadow: 0 0 0 0.25rem var(--bpp-focus-shadow);
+}
+
+/* Active state of page items */
+.page-item.active .page-link {
+    background-color: var(--bpp-primary-color) !important;
+    border-color: var(--bpp-primary-color) !important;
+}
+
+/* Animation for elements */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.bpp-animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
 } 

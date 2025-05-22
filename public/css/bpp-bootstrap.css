@@ -1,6 +1,15 @@
 /**
- * Custom styles for the Bootstrap version of the Black Potential Pipeline submission form
+ * Custom styles for the Bootstrap version of the GreenJobs Plugin submission form
  */
+
+:root {
+    /* GreenJobs color scheme */
+    --bpp-primary-color: #61CE70;
+    --bpp-secondary-color: #6F3802;
+    --bpp-light-color: #f8f9fa;
+    --bpp-focus-shadow: rgba(97, 206, 112, 0.25);
+    --bpp-primary-hover: #52b961;
+}
 
 /* Card Styling */
 .bpp-submission-form .card {
@@ -19,7 +28,7 @@
 }
 
 .bpp-submission-form .card-header.bg-primary {
-    background-color: #2c6ebc !important;
+    background-color: var(--bpp-primary-color) !important;
 }
 
 .bpp-submission-form .card-body {
@@ -37,8 +46,8 @@
 
 .bpp-submission-form .form-control:focus,
 .bpp-submission-form .form-select:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: var(--bpp-primary-color);
+    box-shadow: 0 0 0 0.25rem var(--bpp-focus-shadow);
 }
 
 .bpp-submission-form .form-control.is-invalid,
@@ -100,13 +109,13 @@
 }
 
 .bpp-submission-form .form-check-input:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: var(--bpp-primary-color);
+    box-shadow: 0 0 0 0.25rem var(--bpp-focus-shadow);
 }
 
 .bpp-submission-form .form-check-input:checked {
-    background-color: #2c6ebc;
-    border-color: #2c6ebc;
+    background-color: var(--bpp-primary-color);
+    border-color: var(--bpp-primary-color);
 }
 
 .bpp-submission-form .form-check-label {
@@ -122,8 +131,8 @@
 
 /* Button Styling */
 .bpp-submission-form .btn-primary {
-    background-color: #2c6ebc;
-    border-color: #2c6ebc;
+    background-color: var(--bpp-primary-color);
+    border-color: var(--bpp-primary-color);
     padding: 0.75rem 1.5rem;
     font-weight: 500;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -131,25 +140,25 @@
 }
 
 .bpp-submission-form .btn-primary:hover {
-    background-color: #215ba0;
-    border-color: #215ba0;
+    background-color: var(--bpp-secondary-color);
+    border-color: var(--bpp-secondary-color);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     transform: translateY(-1px);
 }
 
 .bpp-submission-form .btn-primary:focus {
-    box-shadow: 0 0 0 0.25rem rgba(44, 110, 188, 0.25);
+    box-shadow: 0 0 0 0.25rem var(--bpp-focus-shadow);
 }
 
 .bpp-submission-form .btn-primary:active {
-    background-color: #1d5393;
-    border-color: #1d5393;
+    background-color: var(--bpp-secondary-color);
+    border-color: var(--bpp-secondary-color);
     transform: translateY(0);
 }
 
 .bpp-submission-form .btn-primary:disabled {
-    background-color: #6c99d0;
-    border-color: #6c99d0;
+    background-color: rgba(97, 206, 112, 0.6);
+    border-color: rgba(97, 206, 112, 0.6);
 }
 
 /* Spinner */
@@ -161,9 +170,9 @@
 
 /* Success Message Styling */
 .bpp-submission-form .alert-success {
-    background-color: #d1e7dd;
-    border-color: #badbcc;
-    color: #0f5132;
+    background-color: rgba(97, 206, 112, 0.1);
+    border-color: var(--bpp-primary-color);
+    color: var(--bpp-secondary-color);
     padding: 1.5rem;
     border-radius: 0.375rem;
     margin-top: 2rem;
@@ -171,7 +180,7 @@
 }
 
 .bpp-submission-form .alert-success h3 {
-    color: #0f5132;
+    color: var(--bpp-secondary-color);
     margin-bottom: 1rem;
 }
 

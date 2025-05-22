@@ -379,7 +379,7 @@ class BPP_Form_Handler {
             // Success response
             $response = array(
                 'success' => true,
-                'message' => __('Thank you! Your application has been submitted successfully and is pending review.', 'black-potential-pipeline')
+                'message' => __('Thank you! Your application has been submitted successfully to the GreenJobs Pipeline and is pending review.', 'black-potential-pipeline')
             );
             
             error_log('Sending success response: ' . print_r($response, true));
@@ -560,19 +560,19 @@ Black Potential Pipeline Plugin', 'black-potential-pipeline'),
         
         $first_name = explode(' ', $applicant->post_title)[0];
         
-        $subject = __('Thank You for Your Black Potential Pipeline Application', 'black-potential-pipeline');
+        $subject = __('Thank You for Your GreenJobs Pipeline Application', 'black-potential-pipeline');
         
         $message = sprintf(
             __('Hello %s,
 
-Thank you for submitting your application to the Black Potential Pipeline. We have received your information and will review it shortly.
+Thank you for submitting your application to the GreenJobs Pipeline. We have received your information and will review it shortly.
 
-Your application is currently under review by our team. Once approved, your profile will be visible in our directory of Black professionals in green industries.
+Your application is currently under review by our team. Once approved, your profile will be visible in our directory of professionals in green industries.
 
 If you have any questions or need to update your information, please contact us.
 
 Best regards,
-The Black Potential Pipeline Team', 'black-potential-pipeline'),
+The GreenJobs Pipeline Team', 'black-potential-pipeline'),
             $first_name
         );
         
@@ -1176,7 +1176,7 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
             // Success response
             return array(
                 'success' => true,
-                'message' => __('Thank you! Your application has been submitted successfully and is pending review.', 'black-potential-pipeline')
+                'message' => __('Thank you! Your application has been submitted successfully to the GreenJobs Pipeline and is pending review.', 'black-potential-pipeline')
             );
             
         } catch (Exception $e) {
