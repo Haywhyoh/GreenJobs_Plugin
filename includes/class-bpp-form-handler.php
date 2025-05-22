@@ -139,32 +139,80 @@ class BPP_Form_Handler {
                 error_log('Resume file upload validation passed');
             }
 
-            // Special validation for professional photo file upload
-            if (in_array('professional_photo', $required_fields)) {
-                error_log('Checking professional photo file upload...');
+            // Process photo file if provided
+            $photo_id = null;
+            error_log('Checking for professional photo file: ' . (isset($_FILES['professional_photo']) ? 'FOUND' : 'NOT FOUND'));
+            
+            if (!empty($_FILES['professional_photo']) && $_FILES['professional_photo']['error'] === UPLOAD_ERR_OK) {
+                error_log('Processing professional_photo file directly: ' . $_FILES['professional_photo']['name']);
                 
-                if (!isset($_FILES['professional_photo'])) {
-                    error_log('$_FILES["professional_photo"] is not set at all');
-                    $this->send_error_response(__('Professional photo is missing. Please select an image file.', 'black-potential-pipeline'));
+                // Check file type
+                $file_type = wp_check_filetype(basename($_FILES['professional_photo']['name']));
+                error_log('Professional photo file type: ' . print_r($file_type, true));
+                
+                if (empty($file_type['type']) || !preg_match('/^image\//', $file_type['type'])) {
+                    error_log('Invalid professional photo file type: ' . $file_type['type']);
+                    $this->send_error_response(__('Invalid file type. Please upload a JPG, PNG, or GIF image file.', 'black-potential-pipeline'));
                     return;
                 }
                 
-                error_log('Professional photo upload error code: ' . $_FILES['professional_photo']['error']);
+                // Upload the file
+                $upload_overrides = array('test_form' => false);
+                error_log('Calling wp_handle_upload for professional photo');
+                $uploaded_file = wp_handle_upload($_FILES['professional_photo'], $upload_overrides);
                 
-                if ($_FILES['professional_photo']['error'] !== UPLOAD_ERR_OK) {
-                    $error_message = $this->get_file_upload_error_message($_FILES['professional_photo']['error']);
-                    error_log('Professional photo upload error: ' . $error_message);
-                    $this->send_error_response(sprintf(__('Professional photo upload error: %s', 'black-potential-pipeline'), $error_message));
+                if (isset($uploaded_file['error'])) {
+                    error_log('Professional photo upload error from wp_handle_upload: ' . $uploaded_file['error']);
+                    $this->send_error_response(__('Professional photo upload error: ' . $uploaded_file['error'], 'black-potential-pipeline'));
                     return;
                 }
                 
-                if (empty($_FILES['professional_photo']['tmp_name']) || !is_uploaded_file($_FILES['professional_photo']['tmp_name'])) {
-                    error_log('Professional photo tmp_name is empty or not an uploaded file');
-                    $this->send_error_response(__('Professional photo upload failed. Please try again.', 'black-potential-pipeline'));
+                error_log('Professional photo uploaded successfully: ' . print_r($uploaded_file, true));
+                
+                // Create attachment
+                $attachment = array(
+                    'guid' => $uploaded_file['url'],
+                    'post_mime_type' => $uploaded_file['type'],
+                    'post_title' => preg_replace('/\.[^.]+$/', '', basename($_FILES['professional_photo']['name'])),
+                    'post_content' => '',
+                    'post_status' => 'inherit'
+                );
+                
+                error_log('Creating professional photo attachment with data: ' . print_r($attachment, true));
+                $attachment_id = wp_insert_attachment($attachment, $uploaded_file['file']);
+                
+                if (is_wp_error($attachment_id)) {
+                    error_log('Error creating professional photo attachment: ' . $attachment_id->get_error_message());
+                    $this->send_error_response(__('Failed to create professional photo attachment: ' . $attachment_id->get_error_message(), 'black-potential-pipeline'));
                     return;
                 }
                 
-                error_log('Professional photo file upload validation passed');
+                error_log('Professional photo attachment created with ID: ' . $attachment_id);
+                
+                // Generate metadata
+                $attachment_data = wp_generate_attachment_metadata($attachment_id, $uploaded_file['file']);
+                wp_update_attachment_metadata($attachment_id, $attachment_data);
+                
+                $photo_id = $attachment_id;
+                error_log('Professional photo processed successfully with ID: ' . $photo_id);
+            } else if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                // For backward compatibility - check if 'photo' exists
+                error_log('Processing photo file directly: ' . $_FILES['photo']['name']);
+                
+                // Similar processing for photo...
+                // (code omitted for brevity)
+            } else {
+                if (in_array('professional_photo', $required_fields)) {
+                    error_log('Professional photo is required but not found or has error');
+                    if (isset($_FILES['professional_photo'])) {
+                        error_log('Professional photo error code: ' . $_FILES['professional_photo']['error'] . ' - ' . 
+                                 $this->get_file_upload_error_message($_FILES['professional_photo']['error']));
+                    }
+                    $this->send_error_response(__('Professional photo is required. Please upload an image file.', 'black-potential-pipeline'));
+                    return;
+                } else {
+                    error_log('No professional photo provided, but it\'s not required.');
+                }
             }
 
             // Process file uploads
@@ -253,15 +301,6 @@ class BPP_Form_Handler {
                 return;
             }
             
-            // Process photo file if provided
-            $photo_id = null;
-            if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-                error_log('Processing photo file directly: ' . $_FILES['photo']['name']);
-                
-                // Similar processing for photo...
-                // (code omitted for brevity)
-            }
-            
             // Create applicant post
             error_log('Creating applicant post');
             
@@ -305,10 +344,21 @@ class BPP_Form_Handler {
             // Save resume and photo IDs
             if ($resume_id) {
                 update_post_meta($applicant_id, 'bpp_resume', $resume_id);
+                error_log('Saved resume ID ' . $resume_id . ' to post meta bpp_resume');
             }
             
             if ($photo_id) {
+                // Save with both meta keys for backward compatibility
                 update_post_meta($applicant_id, 'bpp_photo', $photo_id);
+                error_log('Saved photo ID ' . $photo_id . ' to post meta bpp_photo');
+                
+                // Also save as bpp_professional_photo for consistency with form field name
+                update_post_meta($applicant_id, 'bpp_professional_photo', $photo_id);
+                error_log('Saved photo ID ' . $photo_id . ' to post meta bpp_professional_photo');
+                
+                // Set as featured image
+                set_post_thumbnail($applicant_id, $photo_id);
+                error_log('Set photo ID ' . $photo_id . ' as post thumbnail');
             }
             
             // Save submission date
@@ -833,14 +883,18 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         // Handle professional photo attachment if uploaded
         if (isset($uploaded_files['professional_photo'])) {
             error_log('BPP Debug - Saving professional photo attachment with ID: ' . $uploaded_files['professional_photo']);
+            
+            // Save with both meta keys for consistency
             update_post_meta($applicant_id, 'bpp_professional_photo', $uploaded_files['professional_photo']);
+            update_post_meta($applicant_id, 'bpp_photo', $uploaded_files['professional_photo']);
             
             // Set as featured image if available
             set_post_thumbnail($applicant_id, $uploaded_files['professional_photo']);
             
             // Verify the attachment was saved
             $saved_photo = get_post_meta($applicant_id, 'bpp_professional_photo', true);
-            error_log('BPP Debug - Saved professional photo meta value: ' . $saved_photo);
+            $saved_photo_alt = get_post_meta($applicant_id, 'bpp_photo', true);
+            error_log('BPP Debug - Saved professional photo meta values: bpp_professional_photo=' . $saved_photo . ', bpp_photo=' . $saved_photo_alt);
             
             // Check if featured image was set
             $thumbnail_id = get_post_thumbnail_id($applicant_id);

@@ -194,7 +194,7 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
     <div class="<?php echo esc_attr($controls_class); ?>">
         <div class="<?php echo esc_attr($search_container_class); ?>">
             <form id="bpp-directory-filters" method="get" action="<?php echo $current_url; ?>" class="<?php echo esc_attr($form_class); ?>">
-                <div class="<?php echo $use_bootstrap ? 'col-md-5' : 'bpp-filter-row'; ?>">
+                <div class="<?php echo $use_bootstrap ? 'col-md-5 col-lg-12' : 'bpp-filter-row'; ?>">
                     <div class="<?php echo esc_attr($search_box_class); ?>">
                         <label for="bpp_search" class="<?php echo $use_bootstrap ? 'form-label' : ''; ?>"><?php _e('Search', 'black-potential-pipeline'); ?></label>
                         <input type="text" id="bpp_search" name="bpp_search" class="<?php echo esc_attr($input_class); ?>" placeholder="<?php _e('Search by name, skills or location', 'black-potential-pipeline'); ?>" value="<?php echo esc_attr($search_query); ?>">

@@ -127,24 +127,24 @@
             }
             
             // Validate photo file
-            const photoInput = document.getElementById('professional_photo');
+            const photoInput = document.getElementById('bpp_photo');
             if (photoInput && photoInput.hasAttribute('required')) {
                 if (!photoInput.files.length) {
                     // No file selected, but it's required
-                    showFieldError('professional_photo', bpp_form_obj.i18n.required_field || 'Professional photo is required.');
+                    showFieldError('bpp_photo', bpp_form_obj.i18n.required_field || 'Professional photo is required.');
                     isValid = false;
                 } else {
                     const photoFile = photoInput.files[0];
                     
                     // Max size: 2MB
                     if (!validateFileSize(photoFile, 2 * 1024 * 1024)) {
-                        showFieldError('professional_photo', bpp_form_obj.i18n.file_size_error || 'Photo file is too large. Maximum size is 2MB.');
+                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_size_error || 'Photo file is too large. Maximum size is 2MB.');
                         isValid = false;
                     }
                     
                     // Allowed file types: jpg, jpeg, png, gif
                     if (!validateFileType(photoFile, ['jpg', 'jpeg', 'png', 'gif'])) {
-                        showFieldError('professional_photo', bpp_form_obj.i18n.file_type_error || 'Invalid photo format. Please use JPG, PNG or GIF.');
+                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_type_error || 'Invalid photo format. Please use JPG, PNG or GIF.');
                         isValid = false;
                     }
                 }
@@ -192,10 +192,27 @@
             }
             
             // Handle professional photo
-            const professionalPhotoInput = document.getElementById('professional_photo');
+            const professionalPhotoInput = document.getElementById('bpp_photo');
             if (professionalPhotoInput && professionalPhotoInput.files.length > 0) {
+                // Log before setting the photo in FormData
+                console.log('Processing photo file in prepareFormData...');
+                console.log('Photo file before setting in FormData:', {
+                    name: professionalPhotoInput.files[0].name,
+                    size: professionalPhotoInput.files[0].size,
+                    type: professionalPhotoInput.files[0].type
+                });
+                
                 // Make sure to explicitly add the file to FormData with correct name
                 formData.set('professional_photo', professionalPhotoInput.files[0]);
+                
+                // Verify the file was added to FormData
+                const verifyPhoto = formData.get('professional_photo');
+                console.log('Photo file after setting in FormData:', verifyPhoto ? {
+                    name: verifyPhoto.name,
+                    size: verifyPhoto.size,
+                    type: verifyPhoto.type
+                } : 'Missing from FormData');
+                
                 console.log('Prepared professional photo:', professionalPhotoInput.files[0].name);
                 // Add extra debugging information about the photo file
                 console.log('Professional photo details:', {
@@ -207,6 +224,15 @@
             } else {
                 console.log('Professional photo field not found or has no files:', 
                     professionalPhotoInput ? 'Element exists but no files selected' : 'Element not found');
+                if (professionalPhotoInput) {
+                    console.log('Professional photo input properties:', {
+                        id: professionalPhotoInput.id,
+                        name: professionalPhotoInput.name,
+                        type: professionalPhotoInput.type,
+                        required: professionalPhotoInput.required,
+                        files: professionalPhotoInput.files.length
+                    });
+                }
             }
             
             return formData;
@@ -259,19 +285,42 @@
             // Debug file inputs
             console.log('File Input Debug:');
             
+            // Debug resume file input
+            const resumeInputDebug = document.getElementById('bpp_resume');
+            if (resumeInputDebug) {
+                console.log('Resume Input: Found');
+                console.log('Resume Required:', resumeInputDebug.hasAttribute('required'));
+                console.log('Resume Files Selected:', resumeInputDebug.files.length > 0);
+                if (resumeInputDebug.files.length > 0) {
+                    console.log('Resume File Name:', resumeInputDebug.files[0].name);
+                    console.log('Resume File Size:', resumeInputDebug.files[0].size, 'bytes');
+                    console.log('Resume File Type:', resumeInputDebug.files[0].type);
+                    // Log FormData entry for resume
+                    const resumeFormDataEntry = preparedFormData.get('resume');
+                    console.log('Resume in FormData:', resumeFormDataEntry ? 'Present' : 'Missing', 
+                        resumeFormDataEntry ? `(${resumeFormDataEntry.name}, ${resumeFormDataEntry.size} bytes)` : '');
+                }
+            } else {
+                console.log('Resume Input: Not found in DOM');
+            }
+            
             // Debug professional photo input
-            const professionalPhotoInput = document.getElementById('professional_photo');
-            if (professionalPhotoInput) {
+            const photoInputDebug = document.getElementById('bpp_photo');
+            if (photoInputDebug) {
                 console.log('Professional Photo Input: Found');
-                console.log('Professional Photo Required:', professionalPhotoInput.hasAttribute('required'));
-                console.log('Professional Photo Files Selected:', professionalPhotoInput.files.length > 0);
-                if (professionalPhotoInput.files.length > 0) {
-                    console.log('Professional Photo File Name:', professionalPhotoInput.files[0].name);
-                    console.log('Professional Photo File Size:', professionalPhotoInput.files[0].size, 'bytes');
-                    console.log('Professional Photo File Type:', professionalPhotoInput.files[0].type);
-                } else if (professionalPhotoInput.hasAttribute('required')) {
+                console.log('Professional Photo Required:', photoInputDebug.hasAttribute('required'));
+                console.log('Professional Photo Files Selected:', photoInputDebug.files.length > 0);
+                if (photoInputDebug.files.length > 0) {
+                    console.log('Professional Photo File Name:', photoInputDebug.files[0].name);
+                    console.log('Professional Photo File Size:', photoInputDebug.files[0].size, 'bytes');
+                    console.log('Professional Photo File Type:', photoInputDebug.files[0].type);
+                    // Log FormData entry for photo
+                    const photoFormDataEntry = preparedFormData.get('professional_photo');
+                    console.log('Professional Photo in FormData:', photoFormDataEntry ? 'Present' : 'Missing',
+                        photoFormDataEntry ? `(${photoFormDataEntry.name}, ${photoFormDataEntry.size} bytes)` : '');
+                } else if (photoInputDebug.hasAttribute('required')) {
                     console.log('Professional Photo is required but no file selected');
-                    showFieldError('professional_photo', bpp_form_obj.i18n.required_field || 'Professional photo is required.');
+                    showFieldError('bpp_photo', bpp_form_obj.i18n.required_field || 'Professional photo is required.');
                     return false; // Prevent form submission
                 }
             } else {
@@ -290,6 +339,35 @@
             for (let pair of preparedFormData.entries()) {
                 console.log(pair[0] + ': ' + (pair[0] === 'nonce' ? '[HIDDEN]' : pair[1]));
             }
+            
+            // Final file upload verification before AJAX request
+            console.log('=== FINAL FILE VERIFICATION BEFORE SUBMISSION ===');
+            
+            // Check resume file
+            const finalResumeCheck = preparedFormData.get('resume');
+            if (finalResumeCheck && finalResumeCheck instanceof File) {
+                console.log('Resume file READY for submission:', {
+                    name: finalResumeCheck.name,
+                    size: finalResumeCheck.size,
+                    type: finalResumeCheck.type
+                });
+            } else {
+                console.log('Resume file NOT READY for submission:', finalResumeCheck);
+            }
+            
+            // Check photo file
+            const finalPhotoCheck = preparedFormData.get('professional_photo');
+            if (finalPhotoCheck && finalPhotoCheck instanceof File) {
+                console.log('Professional photo READY for submission:', {
+                    name: finalPhotoCheck.name,
+                    size: finalPhotoCheck.size,
+                    type: finalPhotoCheck.type
+                });
+            } else {
+                console.log('Professional photo NOT READY for submission:', finalPhotoCheck);
+            }
+            
+            console.log('========================================');
             
             // Send AJAX request
             $.ajax({
