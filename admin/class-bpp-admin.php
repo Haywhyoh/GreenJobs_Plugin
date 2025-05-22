@@ -54,6 +54,7 @@ class BPP_Admin {
         add_action('wp_ajax_bpp_approve_applicant', array($this, 'approve_applicant'));
         add_action('wp_ajax_bpp_reject_applicant', array($this, 'reject_applicant'));
         add_action('wp_ajax_bpp_toggle_featured', array($this, 'toggle_featured'));
+        add_action('wp_ajax_bpp_delete_applicant', array($this, 'delete_applicant'));
         
         // Add action for profile update form submission
         add_action('admin_post_bpp_update_profile', array($this, 'handle_profile_update'));
@@ -96,14 +97,16 @@ class BPP_Admin {
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('bpp_admin_nonce'),
                 'i18n' => array(
-                    'approve_confirm' => __('Are you sure you want to approve this application?', 'black-potential-pipeline'),
-                    'error' => __('An error occurred. Please try again.', 'black-potential-pipeline'),
-                    'no_applications' => __('No new applications at this time.', 'black-potential-pipeline'),
-                    'no_professionals' => __('No approved professionals found.', 'black-potential-pipeline'),
-                    'feature_text' => __('Feature', 'black-potential-pipeline'),
-                    'unfeature_text' => __('Unfeature', 'black-potential-pipeline'),
-                    'featured_text' => __('Featured', 'black-potential-pipeline'),
-                    'approved_text' => __('Approved', 'black-potential-pipeline'),
+                    'confirm_approve'     => __('Are you sure you want to approve this application?', 'black-potential-pipeline'),
+                    'confirm_reject'      => __('Are you sure you want to reject this application?', 'black-potential-pipeline'),
+                    'confirm_remove'      => __('Are you sure you want to remove this professional from the approved list?', 'black-potential-pipeline'),
+                    'no_applications'     => __('No new applications found.', 'black-potential-pipeline'),
+                    'no_professionals'    => __('No approved professionals found.', 'black-potential-pipeline'),
+                    'no_rejected_applications' => __('No rejected applications found.', 'black-potential-pipeline'),
+                    'success'             => __('Success!', 'black-potential-pipeline'),
+                    'error'               => __('Error occurred. Please try again.', 'black-potential-pipeline'),
+                    'copied'              => __('Copied to clipboard!', 'black-potential-pipeline'),
+                    'copy_fail'           => __('Failed to copy. Please try again.', 'black-potential-pipeline'),
                 ),
             )
         );
@@ -719,5 +722,56 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
         $headers = array('Content-Type: text/html; charset=UTF-8');
         
         wp_mail($email, $subject, $message, $headers);
+    }
+
+    /**
+     * Permanently delete an applicant from the system
+     *
+     * @since 1.0.0
+     */
+    public function delete_applicant() {
+        // Check nonce for security
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'bpp_admin_nonce')) {
+            wp_send_json_error(__('Security check failed', 'black-potential-pipeline'));
+            return;
+        }
+        
+        // Check for required data
+        if (!isset($_POST['applicant_id']) || empty($_POST['applicant_id'])) {
+            wp_send_json_error(__('No applicant specified', 'black-potential-pipeline'));
+            return;
+        }
+        
+        $applicant_id = intval($_POST['applicant_id']);
+        
+        // Delete any uploaded files (resume, photo)
+        $resume_id = get_post_meta($applicant_id, 'bpp_resume', true);
+        if (!empty($resume_id)) {
+            wp_delete_attachment($resume_id, true);
+        }
+        
+        $photo_id = get_post_meta($applicant_id, 'bpp_photo', true);
+        if (!empty($photo_id)) {
+            wp_delete_attachment($photo_id, true);
+        }
+        
+        // Alternative photo ID field
+        $professional_photo_id = get_post_meta($applicant_id, 'bpp_professional_photo', true);
+        if (!empty($professional_photo_id) && $professional_photo_id != $photo_id) {
+            wp_delete_attachment($professional_photo_id, true);
+        }
+        
+        // Delete the applicant post (permanently, not to trash)
+        $result = wp_delete_post($applicant_id, true);
+        
+        if ($result) {
+            // Success
+            wp_send_json_success(array(
+                'message' => __('Applicant deleted successfully', 'black-potential-pipeline')
+            ));
+        } else {
+            // Error
+            wp_send_json_error(__('Failed to delete applicant', 'black-potential-pipeline'));
+        }
     }
 } 

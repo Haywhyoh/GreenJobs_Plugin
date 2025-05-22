@@ -162,14 +162,18 @@ if (!empty($selected_industry)) {
                             sprintf(_n('%d year', '%d years', $years_experience, 'black-potential-pipeline'), $years_experience) : 
                             '';
                     ?>
-                        <tr class="bpp-professional-row" data-id="<?php echo esc_attr($post_id); ?>">
+                        <tr class="bpp-professional-row" data-id="<?php echo esc_attr((string)$post_id); ?>">
                             <td class="bpp-name-column" data-label="<?php echo esc_attr__('Name', 'black-potential-pipeline'); ?>">
-                                <strong><?php the_title(); ?></strong>
                                 <?php if (has_post_thumbnail()) : ?>
                                     <div class="bpp-thumbnail-small">
                                         <?php the_post_thumbnail('thumbnail'); ?>
                                     </div>
+                                <?php else: ?>
+                                    <div class="bpp-thumbnail-small bpp-no-photo">
+                                        <span class="dashicons dashicons-admin-users"></span>
+                                    </div>
                                 <?php endif; ?>
+                                <strong><?php the_title(); ?></strong>
                             </td>
                             <td class="bpp-job-column" data-label="<?php echo esc_attr__('Job Title', 'black-potential-pipeline'); ?>"><?php echo esc_html($job_title); ?></td>
                             <td class="bpp-industry-column" data-label="<?php echo esc_attr__('Industry', 'black-potential-pipeline'); ?>"><?php echo esc_html($industry); ?></td>
@@ -208,9 +212,13 @@ if (!empty($selected_industry)) {
                                             <span class="dashicons dashicons-edit"></span>
                                             <?php echo esc_html__('Edit', 'black-potential-pipeline'); ?>
                                         </a>
-                                        <button type="button" class="bpp-dropdown-item bpp-remove-button" data-id="<?php echo esc_attr($post_id); ?>">
-                                            <span class="dashicons dashicons-no"></span>
-                                            <?php echo esc_html__('Remove', 'black-potential-pipeline'); ?>
+                                        <button type="button" class="bpp-dropdown-item bpp-remove-button" data-id="<?php echo esc_attr((string)$post_id); ?>">
+                                            <span class="dashicons dashicons-remove"></span>
+                                            <?php echo esc_html__('Remove from List', 'black-potential-pipeline'); ?>
+                                        </button>
+                                        <button type="button" class="bpp-dropdown-item bpp-delete-button" data-id="<?php echo esc_attr((string)$post_id); ?>">
+                                            <span class="dashicons dashicons-trash"></span>
+                                            <?php echo esc_html__('Delete', 'black-potential-pipeline'); ?>
                                         </button>
                                         <button type="button" class="bpp-dropdown-item bpp-<?php echo !empty($featured) ? 'unfeature' : 'feature'; ?>-button" data-id="<?php echo esc_attr($post_id); ?>">
                                             <span class="dashicons dashicons-<?php echo !empty($featured) ? 'star-filled' : 'star-empty'; ?>"></span>
@@ -300,6 +308,25 @@ if (!empty($selected_industry)) {
                     <?php echo esc_html__('Confirm Removal', 'black-potential-pipeline'); ?>
                 </button>
                 <button type="button" class="button" id="bpp-cancel-remove">
+                    <?php echo esc_html__('Cancel', 'black-potential-pipeline'); ?>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deletion Modal -->
+    <div id="bpp-deletion-modal" class="bpp-modal" style="display: none;">
+        <div class="bpp-modal-content">
+            <span class="bpp-modal-close">&times;</span>
+            <h2><?php echo esc_html__('Delete Professional', 'black-potential-pipeline'); ?></h2>
+            <p><?php echo esc_html__('Are you sure you want to permanently delete this professional?', 'black-potential-pipeline'); ?></p>
+            <p class="bpp-warning"><?php echo esc_html__('This action cannot be undone. All applicant data, including the resume and photo, will be permanently removed from the system.', 'black-potential-pipeline'); ?></p>
+            <input type="hidden" id="bpp-deletion-applicant-id" value="">
+            <div class="bpp-modal-actions">
+                <button type="button" class="button button-primary" id="bpp-confirm-delete">
+                    <?php echo esc_html__('Permanently Delete', 'black-potential-pipeline'); ?>
+                </button>
+                <button type="button" class="button" id="bpp-cancel-delete">
                     <?php echo esc_html__('Cancel', 'black-potential-pipeline'); ?>
                 </button>
             </div>
@@ -469,6 +496,71 @@ jQuery(document).ready(function($) {
             $(this).toggleClass('expanded');
         }
     });
+
+    // Delete button click handler
+    $('.bpp-delete-button').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const applicantId = $(this).data('id');
+        $('#bpp-deletion-applicant-id').val(applicantId);
+        $('#bpp-deletion-modal').show();
+    });
+    
+    // Modal close button for deletion
+    $('.bpp-modal-close, #bpp-cancel-delete').on('click', function() {
+        $('#bpp-deletion-modal').hide();
+    });
+    
+    // Confirm deletion
+    $('#bpp-confirm-delete').on('click', function() {
+        const applicantId = $('#bpp-deletion-applicant-id').val();
+        const $row = $('.bpp-professional-row[data-id="' + applicantId + '"]');
+        
+        $.ajax({
+            url: bpp_admin_obj.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'bpp_delete_applicant',
+                applicant_id: applicantId,
+                nonce: bpp_admin_obj.nonce
+            },
+            beforeSend: function() {
+                $row.addClass('bpp-loading');
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#bpp-deletion-modal').hide();
+                    $row.fadeOut(400, function() {
+                        // Also remove the details row
+                        $row.next('.bpp-details-row').remove();
+                        $row.remove();
+                        
+                        // Show message if no more professionals
+                        if ($('.bpp-professional-row').length === 0) {
+                            $('.bpp-table-container').html('<div class="bpp-no-professionals"><p>' + 
+                                bpp_admin_obj.i18n.no_professionals + '</p></div>');
+                        }
+                    });
+                } else {
+                    alert(response.data || bpp_admin_obj.i18n.error);
+                }
+            },
+            error: function() {
+                alert(bpp_admin_obj.i18n.error);
+            },
+            complete: function() {
+                $row.removeClass('bpp-loading');
+            }
+        });
+    });
+    
+    // Close deletion modal if clicked outside
+    $(window).on('click', function(event) {
+        if ($(event.target).is('#bpp-deletion-modal')) {
+            $('#bpp-deletion-modal').hide();
+        }
+    });
 });
 </script>
 
@@ -493,8 +585,9 @@ jQuery(document).ready(function($) {
 }
 
 .bpp-name-column {
-    font-weight: bold;
-    min-width: 150px;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
 }
 
 .bpp-thumbnail-small {
@@ -502,13 +595,27 @@ jQuery(document).ready(function($) {
     height: 40px;
     border-radius: 50%;
     overflow: hidden;
-    margin-top: 5px;
+    flex-shrink: 0;
 }
 
 .bpp-thumbnail-small img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.bpp-no-photo {
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bpp-no-photo .dashicons {
+    color: #999;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
 }
 
 .bpp-professional-row {
@@ -714,5 +821,10 @@ jQuery(document).ready(function($) {
         left: 0;
         right: auto;
     }
+}
+
+.bpp-warning {
+    color: #d63638;
+    font-weight: bold;
 }
 </style> 
