@@ -70,12 +70,12 @@ if (!empty($search_query)) {
     $args['s'] = $search_query;
 }
 
-// Add industry filter if selected
+// Industry filter query modifications
 if (!empty($industry_filter)) {
-    // Create a comprehensive query that checks for the industry in all possible places
+    // Create a query that checks for the industry in taxonomy and meta fields
     $tax_meta_query = array(
         'relation' => 'OR',
-        // Query 1: Taxonomy term by slug
+        // Taxonomy term by slug
         array(
             'taxonomy' => 'bpp_industry',
             'field'    => 'slug',
@@ -110,9 +110,6 @@ if (!empty($industry_filter)) {
         'value'   => $industry_filter,
         'compare' => '=',
     );
-
-    // Debug log
-    error_log("BPP Directory: Filtering by industry '{$industry_filter}'");
     
     // Set the combined query for tax/meta integration
     $args['_tax_meta_query'] = $tax_meta_query;
@@ -176,9 +173,6 @@ if (!empty($industry_filter)) {
                 // Add to the WHERE clause
                 if (!empty($or_clause)) {
                     $clauses['where'] .= " AND ({$or_clause})";
-                    
-                    // Debug output
-                    error_log('BPP Directory: Modified SQL WHERE clause: ' . $or_clause);
                 }
             }
         }
@@ -187,7 +181,7 @@ if (!empty($industry_filter)) {
     }, 10, 2);
 }
 
-// Add experience filter if selected
+// Experience filter
 if (!empty($experience_filter)) {
     $meta_query = array('relation' => 'OR');
     
@@ -199,14 +193,7 @@ if (!empty($experience_filter)) {
                 'compare' => 'IN',
                 'type' => 'NUMERIC'
             );
-            // Also check for legacy range format
-            $meta_query[] = array(
-                'key' => 'bpp_years_experience',
-                'value' => '0-2',
-                'compare' => '=',
-            );
             break;
-            
         case '3-5':
             $meta_query[] = array(
                 'key' => 'bpp_years_experience',
@@ -214,14 +201,7 @@ if (!empty($experience_filter)) {
                 'compare' => 'IN',
                 'type' => 'NUMERIC'
             );
-            // Also check for legacy range format
-            $meta_query[] = array(
-                'key' => 'bpp_years_experience',
-                'value' => '3-5',
-                'compare' => '=',
-            );
             break;
-            
         case '6-10':
             $meta_query[] = array(
                 'key' => 'bpp_years_experience',
@@ -229,38 +209,79 @@ if (!empty($experience_filter)) {
                 'compare' => 'IN',
                 'type' => 'NUMERIC'
             );
-            // Also check for legacy range format
-            $meta_query[] = array(
-                'key' => 'bpp_years_experience',
-                'value' => '6-10',
-                'compare' => '=',
-            );
             break;
-            
         case '10+':
             $meta_query[] = array(
                 'key' => 'bpp_years_experience',
                 'value' => 10,
-                'compare' => '>=',
+                'compare' => '>',
                 'type' => 'NUMERIC'
-            );
-            // Also check for legacy range format
-            $meta_query[] = array(
-                'key' => 'bpp_years_experience',
-                'value' => '10+',
-                'compare' => '=',
             );
             break;
     }
     
-    $args['meta_query'] = $meta_query;
+    if (!empty($args['meta_query'])) {
+        $args['meta_query'] = array_merge(array('relation' => 'AND'), array($args['meta_query'], $meta_query));
+    } else {
+        $args['meta_query'] = $meta_query;
+    }
 }
 
-// Execute the query
-$directory_query = new WP_Query($args);
+// Run the query
+$professionals_query = new WP_Query($args);
+
+// Get total count for stats
+$total_count = $professionals_query->found_posts;
+
+// Check if we have search/filter parameters to display a message
+$has_search_filter = !empty($search_query) || !empty($industry_filter) || !empty($experience_filter);
+$search_filter_message = '';
+
+if ($has_search_filter) {
+    $filter_parts = array();
+    
+    if (!empty($search_query)) {
+        $filter_parts[] = sprintf(__('Keywords: "%s"', 'black-potential-pipeline'), esc_html($search_query));
+    }
+    
+    if (!empty($industry_filter)) {
+        // Find the proper name for the filter
+        $industry_name = isset($default_industry_names[$industry_filter]) ? 
+            $default_industry_names[$industry_filter] : ucfirst(str_replace('-', ' ', $industry_filter));
+            
+        $filter_parts[] = sprintf(__('Industry: %s', 'black-potential-pipeline'), esc_html($industry_name));
+    }
+    
+    if (!empty($experience_filter)) {
+        $experience_labels = array(
+            '0-2' => __('0-2 years', 'black-potential-pipeline'),
+            '3-5' => __('3-5 years', 'black-potential-pipeline'),
+            '6-10' => __('6-10 years', 'black-potential-pipeline'),
+            '10+' => __('10+ years', 'black-potential-pipeline'),
+        );
+        
+        $experience_label = isset($experience_labels[$experience_filter]) ? 
+            $experience_labels[$experience_filter] : $experience_filter;
+            
+        $filter_parts[] = sprintf(__('Experience: %s', 'black-potential-pipeline'), esc_html($experience_label));
+    }
+    
+    if (count($filter_parts) > 0) {
+        $search_filter_message = sprintf(
+            _n(
+                'Found %s professional matching: %s',
+                'Found %s professionals matching: %s',
+                $total_count,
+                'black-potential-pipeline'
+            ),
+            '<strong>' . number_format_i18n($total_count) . '</strong>',
+            '<span class="bpp-filter-criteria">' . implode(', ', $filter_parts) . '</span>'
+        );
+    }
+}
 
 // Calculate total pages for pagination
-$total_pages = $directory_query->max_num_pages;
+$total_pages = $professionals_query->max_num_pages;
 
 // Current page URL for form submission
 $current_url = esc_url(add_query_arg(array(), get_permalink()));
@@ -375,11 +396,11 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                         _n(
                             'Showing %1$d of %2$d professional', 
                             'Showing %1$d of %2$d professionals', 
-                            $directory_query->found_posts, 
+                            $total_count, 
                             'black-potential-pipeline'
                         ),
-                        min($per_page, $directory_query->found_posts),
-                        $directory_query->found_posts
+                        min($per_page, $total_count),
+                        $total_count
                     ); 
                     ?>
                 </div>
@@ -392,11 +413,11 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                         _n(
                             'Showing %1$d of %2$d professional', 
                             'Showing %1$d of %2$d professionals', 
-                            $directory_query->found_posts, 
+                            $total_count, 
                             'black-potential-pipeline'
                         ),
-                        min($per_page, $directory_query->found_posts),
-                        $directory_query->found_posts
+                        min($per_page, $total_count),
+                        $total_count
                     ); 
                     ?>
                 </div>
@@ -414,10 +435,10 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
         </div>
     </div>
     
-    <?php if ($directory_query->have_posts()) : ?>
+    <?php if ($professionals_query->have_posts()) : ?>
         <div class="<?php echo esc_attr($content_container_class); ?> <?php echo !$use_bootstrap ? 'bpp-layout-' . esc_attr($layout) : ''; ?>">
             <?php 
-            while ($directory_query->have_posts()) : $directory_query->the_post();
+            while ($professionals_query->have_posts()) : $professionals_query->the_post();
                 $post_id = get_the_ID();
                 $job_title = get_post_meta($post_id, 'bpp_job_title', true);
                 $location = get_post_meta($post_id, 'bpp_location', true);

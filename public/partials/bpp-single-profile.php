@@ -200,25 +200,23 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
         
         <div class="bpp-profile-sidebar">
             <?php if ((!empty($email) && !empty($visibility['email'])) || (!empty($phone) && !empty($visibility['phone']))) : ?>
-            <div class="bpp-profile-section bpp-profile-contact">
-                <h3><?php _e('Contact Information', 'black-potential-pipeline'); ?></h3>
-                
-                <div class="bpp-contact-info">
+                <div class="bpp-profile-section bpp-profile-contact">
+                    <h3><?php _e('Contact Information', 'black-potential-pipeline'); ?></h3>
+                    
                     <?php if (!empty($email) && !empty($visibility['email'])) : ?>
-                        <div class="bpp-contact-item">
-                            <span class="dashicons dashicons-email"></span>
+                        <div class="bpp-contact-item bpp-contact-email">
+                            <span class="dashicons dashicons-email-alt"></span>
                             <a href="mailto:<?php echo esc_attr($email); ?>"><?php echo esc_html($email); ?></a>
                         </div>
                     <?php endif; ?>
                     
                     <?php if (!empty($phone) && !empty($visibility['phone'])) : ?>
-                        <div class="bpp-contact-item">
+                        <div class="bpp-contact-item bpp-contact-phone">
                             <span class="dashicons dashicons-phone"></span>
-                            <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9]/', '', $phone)); ?>"><?php echo esc_html($phone); ?></a>
+                            <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $phone)); ?>"><?php echo esc_html($phone); ?></a>
                         </div>
                     <?php endif; ?>
                 </div>
-            </div>
             <?php endif; ?>
             
             <?php if (!empty($contact_form_shortcode)) : ?>
@@ -231,66 +229,31 @@ $contact_form_shortcode = get_option('bpp_profile_contact_form', '');
     </div>
     
     <?php if ($related_query->have_posts()) : ?>
-        <div class="bpp-profile-related">
-            <h3><?php _e('Similar Professionals', 'black-potential-pipeline'); ?></h3>
-            
-            <div class="bpp-related-profiles">
-                <?php 
-                while ($related_query->have_posts()) : $related_query->the_post();
-                    $related_id = get_the_ID();
-                    $related_job_title = get_post_meta($related_id, 'bpp_job_title', true);
-                    
-                    // Get industry from taxonomy for related professional
-                    $related_industry_terms = wp_get_post_terms($related_id, 'bpp_industry', array('fields' => 'names'));
-                    $related_industry = '';
-                    if (!is_wp_error($related_industry_terms) && !empty($related_industry_terms)) {
-                        $related_industry = $related_industry_terms[0];
-                    }
-                ?>
-                    <div class="bpp-related-profile-card">
-                        <div class="bpp-related-profile-header">
-                            <?php if (has_post_thumbnail() && !empty($visibility['photo'])) : ?>
-                                <div class="bpp-related-profile-photo">
+        <div class="bpp-related-profiles">
+            <h3><?php _e('Related Professionals', 'black-potential-pipeline'); ?></h3>
+            <div class="bpp-related-profiles-grid">
+                <?php while ($related_query->have_posts()) : $related_query->the_post(); ?>
+                    <div class="bpp-related-profile">
+                        <a href="<?php the_permalink(); ?>" class="bpp-related-profile-link">
+                            <div class="bpp-related-profile-photo">
+                                <?php if (has_post_thumbnail()) : ?>
                                     <?php the_post_thumbnail('thumbnail'); ?>
-                                </div>
-                            <?php else : ?>
-                                <div class="bpp-related-profile-photo bpp-no-photo">
+                                <?php else : ?>
                                     <span class="dashicons dashicons-admin-users"></span>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <div class="bpp-related-profile-info">
-                                <h4 class="bpp-related-profile-name">
-                                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                                </h4>
-                                
-                                <?php if (!empty($related_job_title) && !empty($visibility['job_title'])) : ?>
-                                    <p class="bpp-related-profile-title"><?php echo esc_html($related_job_title); ?></p>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($related_industry) && !empty($visibility['industry'])) : ?>
-                                    <p class="bpp-related-profile-industry"><?php echo esc_html($related_industry); ?></p>
                                 <?php endif; ?>
                             </div>
-                        </div>
-                        
-                        <div class="bpp-related-profile-footer">
-                            <a href="<?php the_permalink(); ?>" class="bpp-view-profile">
-                                <?php _e('View Profile', 'black-potential-pipeline'); ?>
-                            </a>
-                        </div>
+                            <h4 class="bpp-related-profile-name"><?php the_title(); ?></h4>
+                            <?php 
+                            $related_job_title = get_post_meta(get_the_ID(), 'bpp_job_title', true);
+                            if (!empty($related_job_title)) : 
+                            ?>
+                                <div class="bpp-related-profile-job"><?php echo esc_html($related_job_title); ?></div>
+                            <?php endif; ?>
+                        </a>
                     </div>
                 <?php endwhile; ?>
             </div>
         </div>
     <?php endif; ?>
-    
-    <div class="bpp-profile-navigation">
-        <a href="javascript:history.back();" class="bpp-back-button">
-            <span class="dashicons dashicons-arrow-left-alt"></span>
-            <?php _e('Back to Directory', 'black-potential-pipeline'); ?>
-        </a>
-    </div>
-    
     <?php wp_reset_postdata(); ?>
 </div> 
