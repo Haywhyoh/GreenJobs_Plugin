@@ -60,7 +60,22 @@ The plugin provides several shortcodes for displaying different elements:
    - `per_page` - Number of professionals to display per page (default: 12)
    - `layout` - Display layout, either 'grid' or 'list' (default: 'grid')
 
-4. **Featured Professionals**
+4. **Category Featured Slider**
+   ```
+   [black_potential_pipeline_category_featured category="nature-based-work"]
+   ```
+   Displays professionals from a specific category in a responsive carousel/slider format without search filters. Each card is clickable and links to the professional's profile.
+
+   Required attributes:
+   - `category` - The slug of the industry category to display
+
+   Optional attributes:
+   - `title` - Custom title for the section
+   - `count` - Number of professionals to display (default: 12)
+   - `items_per_slide` - Number of items to show per slide on large screens (default: 4)
+   - `use_bootstrap` - Whether to use Bootstrap styling (yes/no, default: yes)
+
+5. **Featured Professionals**
    ```
    [black_potential_pipeline_featured]
    ```
@@ -71,7 +86,7 @@ The plugin provides several shortcodes for displaying different elements:
    - `count` - Number of featured professionals to display (default: 4)
    - `layout` - Display layout, either 'carousel', 'grid', or 'list' (default: 'carousel')
 
-5. **Statistics Display**
+6. **Statistics Display**
    ```
    [black_potential_pipeline_stats]
    ```
