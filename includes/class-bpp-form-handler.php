@@ -74,9 +74,36 @@ class BPP_Form_Handler {
             error_log('$_FILES contents: ' . print_r($_FILES, true));
             error_log('$_POST contents: ' . print_r($_POST, true));
             
-            // Check nonce for security
-            if (!check_ajax_referer('bpp_form_nonce', 'nonce', false)) {
-                $this->send_error_response(__('Security check failed. Please refresh the page and try again.', 'black-potential-pipeline'));
+            // Check nonce for security (try all possible nonce parameter names)
+            $nonce_verified = false;
+            
+            // Try 'nonce' parameter (from JS localization)
+            if (check_ajax_referer('bpp_form_nonce', 'nonce', false)) {
+                $nonce_verified = true;
+                error_log('Nonce verified using "nonce" parameter');
+            }
+            // Try 'security' parameter (alternative name)
+            else if (check_ajax_referer('bpp_form_nonce', 'security', false)) {
+                $nonce_verified = true;
+                error_log('Nonce verified using "security" parameter');
+            }
+            // Try 'bpp_nonce' parameter (from wp_nonce_field in form)
+            else if (check_ajax_referer('bpp_form_nonce', 'bpp_nonce', false)) {
+                $nonce_verified = true;
+                error_log('Nonce verified using "bpp_nonce" parameter');
+            }
+            
+            if (!$nonce_verified) {
+                error_log('Security check failed using all known nonce parameter names');
+                error_log('Available POST keys: ' . implode(', ', array_keys($_POST)));
+                
+                // Create a more detailed error message
+                $error_message = __('Security check failed. Please try the following:', 'black-potential-pipeline');
+                $error_message .= '<br>1. ' . __('Refresh the page and try again', 'black-potential-pipeline');
+                $error_message .= '<br>2. ' . __('Clear your browser cache and cookies', 'black-potential-pipeline');
+                $error_message .= '<br>3. ' . __('Try using a different browser', 'black-potential-pipeline');
+                
+                $this->send_error_response($error_message);
                 return;
             }
 
@@ -93,8 +120,12 @@ class BPP_Form_Handler {
             
             // If no configuration is found, use default required fields
             if (empty($required_fields)) {
-                $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume', 'professional_photo');
+                $required_fields = array('first_name', 'last_name', 'email', 'industry', 'bio', 'resume', 'professional_photo');
             }
+            
+            // Log required fields for debugging
+            error_log('Required fields: ' . print_r($required_fields, true));
+            error_log('Available POST fields: ' . implode(', ', array_keys($_POST)));
 
             // Validate required fields (except file uploads)
             foreach ($required_fields as $field) {
@@ -105,6 +136,7 @@ class BPP_Form_Handler {
                 
                 if (empty($_POST[$field])) {
                     $field_label = isset($form_fields[$field]['label']) ? $form_fields[$field]['label'] : $field;
+                    error_log('Missing required field: ' . $field . ' (Label: ' . $field_label . ')');
                     $this->send_error_response(sprintf(__('Missing required field: %s', 'black-potential-pipeline'), $field_label));
                     return;
                 }
@@ -307,7 +339,8 @@ class BPP_Form_Handler {
             // Prepare post data
             $post_data = array(
                 'post_title'    => sanitize_text_field($_POST['first_name'] . ' ' . $_POST['last_name']),
-                'post_content'  => sanitize_textarea_field($_POST['cover_letter']),
+                'post_content'  => isset($_POST['bio']) ? sanitize_textarea_field($_POST['bio']) : 
+                                  (isset($_POST['cover_letter']) ? sanitize_textarea_field($_POST['cover_letter']) : ''),
                 'post_status'   => 'draft',
                 'post_type'     => 'bpp_applicant',
             );
@@ -591,11 +624,19 @@ The GreenJobs Pipeline Team', 'black-potential-pipeline'),
     private function send_error_response($message) {
         $response = array(
             'success' => false,
-            'message' => $message  // Put message directly in the response
+            'message' => $message,
+            'data' => null
         );
         
         error_log('Sending error response: ' . print_r($response, true));
-        wp_send_json($response);
+        
+        // Ensure we're setting the correct content type header
+        header('Content-Type: application/json');
+        
+        // Send JSON response
+        echo json_encode($response);
+        
+        // Make sure we exit to prevent any additional output
         exit;
     }
 
@@ -715,14 +756,19 @@ The GreenJobs Pipeline Team', 'black-potential-pipeline'),
         
         // If no configuration is found, use default required fields
         if (empty($required_fields)) {
-            $required_fields = array('first_name', 'last_name', 'email', 'industry', 'cover_letter', 'resume', 'professional_photo');
+            $required_fields = array('first_name', 'last_name', 'email', 'industry', 'bio', 'resume', 'professional_photo');
         }
+        
+        // Debug log
+        error_log('Validating fields against required fields: ' . implode(', ', $required_fields));
+        error_log('Submitted data keys: ' . implode(', ', array_keys($data)));
         
         // Validate required fields
         foreach ($required_fields as $field) {
             if ($field !== 'resume' && $field !== 'photo' && $field !== 'professional_photo' && empty($data[$field])) {
                 $field_label = isset($form_fields[$field]['label']) ? $form_fields[$field]['label'] : $field;
                 $errors[$field] = sprintf(__('The %s field is required.', 'black-potential-pipeline'), $field_label);
+                error_log('Validation error - missing field: ' . $field);
             }
         }
         
@@ -830,22 +876,22 @@ The GreenJobs Pipeline Team', 'black-potential-pipeline'),
         $linkedin = isset($data['linkedin']) ? esc_url_raw($data['linkedin']) : '';
         $website = isset($data['website']) ? esc_url_raw($data['website']) : '';
         $skills = isset($data['skills']) ? sanitize_textarea_field($data['skills']) : '';
-        $cover_letter = isset($data['cover_letter']) ? sanitize_textarea_field($data['cover_letter']) : '';
+        $bio = isset($data['bio']) ? sanitize_textarea_field($data['bio']) : '';
         $job_type = isset($data['job_type']) ? sanitize_text_field($data['job_type']) : '';
         $location = isset($data['location']) ? sanitize_text_field($data['location']) : '';
         $consent = isset($data['consent']) && ($data['consent'] === 'yes' || $data['consent'] === 'on');
         
         // Prepare post data
-        $applicant_data = array(
-            'post_title' => $first_name . ' ' . $last_name,
-            'post_content' => $cover_letter,
-            'post_status' => 'draft',
-            'post_type' => 'bpp_applicant',
-            'comment_status' => 'closed'
+        $post_data = array(
+            'post_title'    => sanitize_text_field($_POST['first_name'] . ' ' . $_POST['last_name']),
+            'post_content'  => isset($_POST['bio']) ? sanitize_textarea_field($_POST['bio']) : 
+                              (isset($_POST['cover_letter']) ? sanitize_textarea_field($_POST['cover_letter']) : ''),
+            'post_status'   => 'draft',
+            'post_type'     => 'bpp_applicant',
         );
         
         // Insert the post into the database
-        $applicant_id = wp_insert_post($applicant_data);
+        $applicant_id = wp_insert_post($post_data);
         
         if (!$applicant_id || is_wp_error($applicant_id)) {
             return false;

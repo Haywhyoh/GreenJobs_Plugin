@@ -30,15 +30,10 @@ $industries = get_terms(array(
 // If industries are not properly formatted, provide default industries
 if (empty($industries) || is_wp_error($industries)) {
     $industries = array(
-        array('term_id' => 'technology', 'name' => __('Technology', 'black-potential-pipeline')),
-        array('term_id' => 'finance', 'name' => __('Finance', 'black-potential-pipeline')),
-        array('term_id' => 'healthcare', 'name' => __('Healthcare', 'black-potential-pipeline')),
-        array('term_id' => 'education', 'name' => __('Education', 'black-potential-pipeline')),
-        array('term_id' => 'manufacturing', 'name' => __('Manufacturing', 'black-potential-pipeline')),
-        array('term_id' => 'retail', 'name' => __('Retail', 'black-potential-pipeline')),
-        array('term_id' => 'media', 'name' => __('Media & Entertainment', 'black-potential-pipeline')),
-        array('term_id' => 'nonprofit', 'name' => __('Non-profit', 'black-potential-pipeline')),
-        array('term_id' => 'other', 'name' => __('Other', 'black-potential-pipeline')),
+        array('slug' => 'nature-based-work', 'term_id' => 'nature-based-work', 'name' => __('Nature-based work', 'black-potential-pipeline')),
+        array('slug' => 'environmental-policy', 'term_id' => 'environmental-policy', 'name' => __('Environmental policy', 'black-potential-pipeline')),
+        array('slug' => 'climate-science', 'term_id' => 'climate-science', 'name' => __('Climate science', 'black-potential-pipeline')),
+        array('slug' => 'green-construction', 'term_id' => 'green-construction', 'name' => __('Green construction & infrastructure', 'black-potential-pipeline')),
     );
 }
 
@@ -157,7 +152,7 @@ $nonce = wp_create_nonce('bpp_form_nonce');
                                     $term_id = $industry->slug;
                                     $name = $industry->name;
                                 } elseif (is_array($industry) && isset($industry['term_id']) && isset($industry['name'])) {
-                                    $term_id = $industry['term_id'];
+                                    $term_id = $industry['slug'];
                                     $name = $industry['name'];
                                 } else {
                                     continue; // Skip if neither format is valid
@@ -172,36 +167,31 @@ $nonce = wp_create_nonce('bpp_form_nonce');
                     </div>
                 </div>
                 
-                <?php if (in_array('years_experience', array_merge($required_fields, $optional_fields))) : ?>
-                    <div class="bpp-form-row">
+                <div class="bpp-form-row">
+                    <div class="bpp-form-field bpp-half-width">
+                        <label for="years_experience">
+                            <?php _e('Years of Experience', 'black-potential-pipeline'); ?>
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" id="years_experience" name="years_experience" min="0" required>
+                        <div id="years_experience_error" class="bpp-field-error"></div>
+                    </div>
+                    
+                    <?php if (in_array('website', array_merge($required_fields, $optional_fields))) : ?>
                         <div class="bpp-form-field bpp-half-width">
-                            <label for="bpp_years_experience">
-                                <?php _e('Years of Experience', 'black-potential-pipeline'); ?>
-                                <?php if (in_array('years_experience', $required_fields)) : ?>
+                            <label for="bpp_website">
+                                <?php _e('Website', 'black-potential-pipeline'); ?>
+                                <?php if (in_array('website', $required_fields)) : ?>
                                     <span class="required">*</span>
                                 <?php endif; ?>
                             </label>
-                            <input type="number" id="bpp_years_experience" name="years_experience" min="0" max="50" 
-                                   <?php echo in_array('years_experience', $required_fields) ? 'required' : ''; ?>>
-                            <div id="bpp_years_experience_error" class="bpp-field-error"></div>
+                            <input type="url" id="bpp_website" name="website" 
+                                   placeholder="https://" 
+                                   <?php echo in_array('website', $required_fields) ? 'required' : ''; ?>>
+                            <div id="bpp_website_error" class="bpp-field-error"></div>
                         </div>
-                        
-                        <?php if (in_array('website', array_merge($required_fields, $optional_fields))) : ?>
-                            <div class="bpp-form-field bpp-half-width">
-                                <label for="bpp_website">
-                                    <?php _e('Website', 'black-potential-pipeline'); ?>
-                                    <?php if (in_array('website', $required_fields)) : ?>
-                                        <span class="required">*</span>
-                                    <?php endif; ?>
-                                </label>
-                                <input type="url" id="bpp_website" name="website" 
-                                       placeholder="https://" 
-                                       <?php echo in_array('website', $required_fields) ? 'required' : ''; ?>>
-                                <div id="bpp_website_error" class="bpp-field-error"></div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
                 
                 <?php if (in_array('linkedin', array_merge($required_fields, $optional_fields))) : ?>
                     <div class="bpp-form-row">
@@ -230,8 +220,8 @@ $nonce = wp_create_nonce('bpp_form_nonce');
                                 <?php endif; ?>
                             </label>
                             <textarea id="bpp_skills" name="skills" rows="3" 
+                                      placeholder="<?php _e('List your skills separated by commas', 'black-potential-pipeline'); ?>"
                                       <?php echo in_array('skills', $required_fields) ? 'required' : ''; ?>></textarea>
-                            <p class="bpp-field-description"><?php _e('List your key skills, separated by commas.', 'black-potential-pipeline'); ?></p>
                             <div id="bpp_skills_error" class="bpp-field-error"></div>
                         </div>
                     </div>
@@ -246,9 +236,9 @@ $nonce = wp_create_nonce('bpp_form_nonce');
                                     <span class="required">*</span>
                                 <?php endif; ?>
                             </label>
-                            <textarea id="bpp_bio" name="bio" rows="5" 
+                            <textarea id="bpp_bio" name="cover_letter" rows="5" 
+                                      placeholder="<?php _e('Tell us about yourself and your professional background', 'black-potential-pipeline'); ?>"
                                       <?php echo in_array('bio', $required_fields) ? 'required' : ''; ?>></textarea>
-                            <p class="bpp-field-description"><?php _e('A brief professional bio about yourself.', 'black-potential-pipeline'); ?></p>
                             <div id="bpp_bio_error" class="bpp-field-error"></div>
                         </div>
                     </div>
@@ -265,7 +255,7 @@ $nonce = wp_create_nonce('bpp_form_nonce');
                     <div class="bpp-form-row">
                         <div class="bpp-form-field bpp-full-width">
                             <label for="bpp_resume">
-                                <?php _e('Resume/CV', 'black-potential-pipeline'); ?>
+                                <?php _e('Resume/CV (PDF format)', 'black-potential-pipeline'); ?>
                                 <?php if (in_array('resume', $required_fields)) : ?>
                                     <span class="required">*</span>
                                 <?php endif; ?>
@@ -273,38 +263,34 @@ $nonce = wp_create_nonce('bpp_form_nonce');
                             <input type="file" id="bpp_resume" name="resume" 
                                    accept=".pdf,.doc,.docx"
                                    <?php echo in_array('resume', $required_fields) ? 'required' : ''; ?>>
-                            <p class="bpp-field-description"><?php _e('Upload your resume (PDF, DOC, or DOCX format, max 5MB).', 'black-potential-pipeline'); ?></p>
+                            <p class="bpp-field-description"><?php _e('Maximum file size: 5MB. Accepted formats: PDF, DOC, DOCX', 'black-potential-pipeline'); ?></p>
                             <div id="bpp_resume_error" class="bpp-field-error"></div>
                         </div>
                     </div>
                 <?php endif; ?>
                 
-                <?php if (in_array('photo', array_merge($required_fields, $optional_fields))) : ?>
-                    <div class="bpp-form-row">
-                        <div class="bpp-form-field bpp-full-width">
-                            <label for="bpp_photo">
-                                <?php _e('Professional Photo', 'black-potential-pipeline'); ?>
-                                <?php if (in_array('photo', $required_fields)) : ?>
-                                    <span class="required">*</span>
-                                <?php endif; ?>
-                            </label>
-                            <input type="file" id="bpp_photo" name="photo" 
-                                   accept=".jpg,.jpeg,.png,.gif"
-                                   <?php echo in_array('photo', $required_fields) ? 'required' : ''; ?>>
-                            <p class="bpp-field-description"><?php _e('Upload a professional photo (JPG, PNG, or GIF format, max 2MB).', 'black-potential-pipeline'); ?></p>
-                            <div id="bpp_photo_error" class="bpp-field-error"></div>
-                        </div>
+                <div class="bpp-form-row">
+                    <div class="bpp-form-field bpp-full-width">
+                        <label for="bpp_photo">
+                            <?php _e('Professional Photo', 'black-potential-pipeline'); ?>
+                            <span class="required">*</span>
+                        </label>
+                        <input type="file" id="bpp_photo" name="professional_photo" 
+                               accept="image/*" 
+                               required>
+                        <p class="bpp-field-description"><?php _e('Upload a professional headshot or profile picture. Maximum file size: 2MB. Accepted formats: JPG, PNG, GIF', 'black-potential-pipeline'); ?></p>
+                        <div id="bpp_photo_error" class="bpp-field-error"></div>
                     </div>
-                <?php endif; ?>
+                </div>
             </div>
         </div>
         
         <div class="bpp-form-row">
             <div class="bpp-form-field bpp-full-width">
                 <div class="bpp-checkbox-field">
-                    <input type="checkbox" id="bpp_terms" name="terms" required>
+                    <input type="checkbox" id="bpp_terms" name="consent" required>
                     <label for="bpp_terms">
-                        <?php _e('I agree to have my information stored and displayed in the Black Potential Pipeline directory.', 'black-potential-pipeline'); ?>
+                        <?php _e('I agree to the terms and conditions and consent to having my information stored in the Black Potential Pipeline database.', 'black-potential-pipeline'); ?>
                         <span class="required">*</span>
                     </label>
                 </div>
@@ -320,11 +306,65 @@ $nonce = wp_create_nonce('bpp_form_nonce');
         </div>
     </form>
     
-    <div id="bpp-success-message" style="display: none;">
+    <div id="bpp-success-message" class="bpp-success-message" style="display: none;">
         <h3><?php _e('Thank You!', 'black-potential-pipeline'); ?></h3>
         <p><?php echo esc_html($success_message); ?></p>
     </div>
 </div>
+
+<style>
+.bpp-form-messages {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 4px;
+}
+.bpp-form-messages.bpp-success {
+    background-color: #dff0d8;
+    border: 1px solid #d6e9c6;
+    color: #3c763d;
+}
+.bpp-form-messages.bpp-error {
+    background-color: #f2dede;
+    border: 1px solid #ebccd1;
+    color: #a94442;
+}
+/* When shown, make sure the display is block */
+.bpp-form-messages.bpp-success:not([style*="display: none"]),
+.bpp-form-messages.bpp-error:not([style*="display: none"]) {
+    display: block !important;
+}
+
+/* Add GreenJobs color scheme */
+:root {
+    /* GreenJobs color variables - use WordPress theme colors first, then our green/brown scheme */
+    --bpp-primary-color: var(--wp--preset--color--primary, #61CE70);
+    --bpp-secondary-color: var(--wp--preset--color--secondary, #6F3802);
+    --bpp-info-color: var(--wp--preset--color--tertiary, #0dcaf0);
+    --bpp-warning-color: var(--wp--preset--color--warning, #ffc107);
+    --bpp-light-color: var(--wp--preset--color--light, #f8f9fa);
+    --bpp-dark-color: var(--wp--preset--color--dark, #212529);
+}
+
+/* Non-Bootstrap form customizations */
+.bpp-form-title {
+    color: var(--bpp-secondary-color);
+}
+
+.bpp-card-header h3 {
+    color: var(--bpp-primary-color);
+    border-bottom: 2px solid var(--bpp-primary-color);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+
+.bpp-success-message {
+    background-color: rgba(97, 206, 112, 0.1);
+    border-left: 4px solid var(--bpp-primary-color);
+    padding: 15px;
+    margin-bottom: 20px;
+    color: var(--bpp-secondary-color);
+}
+</style>
 
 <script>
 jQuery(document).ready(function($) {

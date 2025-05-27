@@ -150,6 +150,10 @@ class BPP_Public {
             array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('bpp_form_nonce'),
+                'debug' => WP_DEBUG, // Pass debug status to JS
+                'site_url' => get_site_url(),
+                'home_url' => home_url(),
+                'admin_url' => admin_url(),
                 'i18n' => array(
                     'submit_success' => __('Thank you for your submission! We will review your application shortly.', 'black-potential-pipeline'),
                     'submit_error' => __('Error occurred. Please try again.', 'black-potential-pipeline'),
