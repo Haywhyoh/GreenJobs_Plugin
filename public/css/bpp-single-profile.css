@@ -1,0 +1,413 @@
+/**
+ * Custom CSS for the single profile page without Bootstrap dependencies
+ */
+
+/* Root Variables */
+:root {
+    --bpp-primary-color: #61CE70;
+    --bpp-secondary-color: #6F3802;
+    --bpp-text-color: #333;
+    --bpp-text-light: #666;
+    --bpp-bg-light: #f8f9fa;
+    --bpp-border-radius: 8px;
+    --bpp-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    --bpp-transition: all 0.3s ease;
+}
+
+/* Main Container */
+.bpp-single-profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Breadcrumb Navigation */
+.bpp-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    padding: 10px 0;
+    font-size: 14px;
+}
+
+.bpp-breadcrumbs a {
+    color: var(--bpp-primary-color);
+    text-decoration: none;
+}
+
+.bpp-breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
+.bpp-breadcrumbs .separator {
+    margin: 0 8px;
+    color: var(--bpp-text-light);
+}
+
+.bpp-breadcrumbs .current {
+    color: var(--bpp-text-light);
+}
+
+/* Profile Grid Layout */
+.bpp-profile-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+}
+
+@media (min-width: 992px) {
+    .bpp-profile-grid {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+/* Card Styles */
+.bpp-card {
+    background-color: #fff;
+    border-radius: var(--bpp-border-radius);
+    box-shadow: var(--bpp-shadow);
+    overflow: hidden;
+    margin-bottom: 30px;
+    transition: var(--bpp-transition);
+}
+
+.bpp-card:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+}
+
+.bpp-card-header {
+    background-color: var(--bpp-primary-color);
+    color: white;
+    padding: 15px 20px;
+}
+
+.bpp-card-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.bpp-card-body {
+    padding: 20px;
+}
+
+/* Profile Header Card */
+.bpp-profile-header-card {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .bpp-profile-header-card {
+        flex-direction: row;
+    }
+}
+
+/* Featured Badge */
+.bpp-featured-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #ffc107;
+    color: #212529;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-weight: 500;
+    font-size: 14px;
+    width: fit-content;
+}
+
+.bpp-featured-badge i {
+    margin-right: 6px;
+}
+
+/* Profile Photo */
+.bpp-profile-photo {
+    width: 100%;
+    max-width: 180px;
+    margin: 0 auto 20px;
+}
+
+@media (min-width: 768px) {
+    .bpp-profile-photo {
+        margin: 0 30px 0 0;
+    }
+}
+
+.bpp-photo-wrapper {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 5px solid var(--bpp-bg-light);
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.bpp-photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bpp-no-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bpp-bg-light);
+    width: 100%;
+    height: 100%;
+}
+
+.bpp-no-photo i {
+    font-size: 60px;
+    color: var(--bpp-text-light);
+}
+
+/* Profile Info */
+.bpp-profile-info {
+    flex: 1;
+}
+
+.bpp-profile-name {
+    font-size: 28px;
+    margin: 0 0 5px;
+    color: var(--bpp-text-color);
+}
+
+.bpp-profile-title {
+    font-size: 18px;
+    margin: 0 0 15px;
+    color: var(--bpp-text-light);
+}
+
+/* Tags & Badges */
+.bpp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.bpp-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.bpp-tag i {
+    margin-right: 6px;
+}
+
+.bpp-industry-tag {
+    background-color: var(--bpp-primary-color);
+    color: white;
+}
+
+.bpp-location-tag {
+    background-color: #6c757d;
+    color: white;
+}
+
+.bpp-experience-tag {
+    background-color: var(--bpp-primary-color);
+    color: white;
+}
+
+.bpp-skill-tag {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+/* Social Links */
+.bpp-social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.bpp-social-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-decoration: none;
+    background-color: #f8f9fa;
+    color: var(--bpp-primary-color);
+    border: 1px solid #dee2e6;
+    transition: var(--bpp-transition);
+}
+
+.bpp-social-link:hover {
+    background-color: var(--bpp-primary-color);
+    color: white;
+}
+
+.bpp-social-link i {
+    margin-right: 6px;
+}
+
+/* Bio Content */
+.bpp-bio-content {
+    line-height: 1.8;
+    font-size: 16px;
+}
+
+.bpp-bio-content p {
+    margin-bottom: 1.2rem;
+}
+
+.bpp-bio-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Skills Section */
+.bpp-skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Contact Info */
+.bpp-contact-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background-color: var(--bpp-bg-light);
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.bpp-contact-item i {
+    font-size: 20px;
+    margin-right: 15px;
+    color: var(--bpp-primary-color);
+}
+
+.bpp-contact-item-content {
+    flex: 1;
+}
+
+.bpp-contact-label {
+    font-size: 12px;
+    color: var(--bpp-text-light);
+    margin-bottom: 2px;
+}
+
+.bpp-contact-value {
+    font-size: 16px;
+    color: var(--bpp-text-color);
+}
+
+.bpp-contact-value a {
+    color: var(--bpp-text-color);
+    text-decoration: none;
+}
+
+.bpp-contact-value a:hover {
+    color: var(--bpp-primary-color);
+}
+
+/* Download Resume Button */
+.bpp-resume-button {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 12px 20px;
+    background-color: var(--bpp-primary-color);
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 20px;
+    transition: var(--bpp-transition);
+}
+
+.bpp-resume-button:hover {
+    background-color: #52b961;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.bpp-resume-button i {
+    margin-right: 6px;
+}
+
+/* Related Professionals */
+.bpp-related-professionals {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.bpp-related-card {
+    height: 100%;
+    border: none;
+}
+
+.bpp-related-img {
+    height: 200px;
+    background-color: var(--bpp-bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bpp-related-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bpp-related-icon {
+    font-size: 80px;
+    color: #aaa;
+}
+
+/* Back Button */
+.bpp-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: transparent;
+    color: var(--bpp-primary-color);
+    border: 1px solid var(--bpp-primary-color);
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--bpp-transition);
+}
+
+.bpp-back-button:hover {
+    background-color: var(--bpp-primary-color);
+    color: white;
+}
+
+.bpp-back-button i {
+    margin-right: 6px;
+}
+
+/* Fix WP Admin Bar Interference */
+.admin-bar .bpp-single-profile-container {
+    margin-top: 32px;
+}
+
+@media (max-width: 782px) {
+    .admin-bar .bpp-single-profile-container {
+        margin-top: 46px;
+    }
+}
+
+/* Fix Dashicons Alignment */
+.dashicons {
+    vertical-align: middle;
+    line-height: 1;
+} 

@@ -105,6 +105,15 @@ class BPP_Public {
             'all'
         );
         
+        // Single profile styles
+        wp_register_style(
+            'bpp-single-profile-style',
+            BPP_PLUGIN_URL . 'public/css/bpp-single-profile.css',
+            array($this->plugin_name),
+            $this->version,
+            'all'
+        );
+        
         // We no longer use Bootstrap - removed Bootstrap CSS references
     }
 
@@ -654,8 +663,12 @@ The Black Potential Pipeline Team', 'black-potential-pipeline'),
     public function load_applicant_template($template) {
         global $post;
         
-        // Check if this is post ID 120 or a post with type bpp_applicant
-        if ((isset($post->ID) && $post->ID == 120) || (isset($post->post_type) && $post->post_type === 'bpp_applicant')) {
+        // Check if this is a post with type bpp_applicant
+        if (isset($post->post_type) && $post->post_type === 'bpp_applicant') {
+            // Ensure our CSS files are loaded
+            wp_enqueue_style('bpp-single-profile-style');
+            wp_enqueue_style('dashicons');
+            
             $custom_template = BPP_PLUGIN_DIR . 'public/partials/bpp-single-profile.php';
             
             // Use custom template if it exists
