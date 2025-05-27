@@ -16,20 +16,14 @@
         const $formMessages = $('#bpp-form-messages');
         const $successMessage = $('#bpp-success-message');
         const $spinner = $('#bpp-submit-spinner');
-        const isBootstrapForm = $form.hasClass('needs-validation');
-
+        
         // Function to show field error
         function showFieldError(fieldId, message) {
             const $field = $('#' + fieldId);
             const $errorSpan = $('#' + fieldId + '_error');
             
-            if (isBootstrapForm) {
-                $field.addClass('is-invalid');
-                $errorSpan.text(message).show();
-            } else {
-                $field.addClass('bpp-field-error');
-                $errorSpan.text(message).show();
-            }
+            $field.addClass('bpp-field-error');
+            $errorSpan.text(message).show();
         }
         
         // Function to clear field error
@@ -37,13 +31,8 @@
             const $field = $('#' + fieldId);
             const $errorSpan = $('#' + fieldId + '_error');
             
-            if (isBootstrapForm) {
-                $field.removeClass('is-invalid');
-                $errorSpan.text('').hide();
-            } else {
-                $field.removeClass('bpp-field-error');
-                $errorSpan.text('').hide();
-            }
+            $field.removeClass('bpp-field-error');
+            $errorSpan.text('').hide();
         }
 
         // Validate file size
@@ -72,7 +61,6 @@
             let isValid = true;
             
             // Clear previous errors
-            $form.find('.is-invalid').removeClass('is-invalid');
             $form.find('.bpp-field-error').removeClass('bpp-field-error');
             $form.find('[id$="_error"]').text('').hide();
             
@@ -90,7 +78,7 @@
                 // Validate based on field type
                 if ((fieldType === 'checkbox' && !$field.is(':checked')) || 
                     (fieldType !== 'checkbox' && !$field.val())) {
-                    showFieldError(fieldId, bpp_form_obj.i18n.required_field);
+                    showFieldError(fieldId, bpp_form_obj.i18n.required_field || 'This field is required');
                     isValid = false;
                 }
             });
@@ -98,7 +86,7 @@
             // Validate email format
             const $email = $('#bpp_email');
             if ($email.length && $email.val() && !validateEmail($email.val())) {
-                showFieldError('bpp_email', bpp_form_obj.i18n.invalid_email);
+                showFieldError('bpp_email', bpp_form_obj.i18n.invalid_email || 'Please enter a valid email address');
                 isValid = false;
             }
             
@@ -107,20 +95,20 @@
             if (resumeInput && resumeInput.hasAttribute('required')) {
                 if (!resumeInput.files.length) {
                     // No file selected, but it's required
-                    showFieldError('bpp_resume', bpp_form_obj.i18n.required_field || 'Resume file is required.');
+                    showFieldError('bpp_resume', bpp_form_obj.i18n.required_field || 'Resume file is required');
                     isValid = false;
                 } else {
                     const resumeFile = resumeInput.files[0];
                     
                     // Max size: 5MB
                     if (!validateFileSize(resumeFile, 5 * 1024 * 1024)) {
-                        showFieldError('bpp_resume', bpp_form_obj.i18n.file_size_error);
+                        showFieldError('bpp_resume', bpp_form_obj.i18n.file_size_error || 'File is too large. Maximum size is 5MB');
                         isValid = false;
                     }
                     
                     // Allowed file types: pdf, doc, docx
                     if (!validateFileType(resumeFile, ['pdf', 'doc', 'docx'])) {
-                        showFieldError('bpp_resume', bpp_form_obj.i18n.file_type_error);
+                        showFieldError('bpp_resume', bpp_form_obj.i18n.file_type_error || 'Invalid file format. Please use PDF, DOC, or DOCX');
                         isValid = false;
                     }
                 }
@@ -131,20 +119,20 @@
             if (photoInput && photoInput.hasAttribute('required')) {
                 if (!photoInput.files.length) {
                     // No file selected, but it's required
-                    showFieldError('bpp_photo', bpp_form_obj.i18n.required_field || 'Professional photo is required.');
+                    showFieldError('bpp_photo', bpp_form_obj.i18n.required_field || 'Professional photo is required');
                     isValid = false;
                 } else {
                     const photoFile = photoInput.files[0];
                     
                     // Max size: 2MB
                     if (!validateFileSize(photoFile, 2 * 1024 * 1024)) {
-                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_size_error || 'Photo file is too large. Maximum size is 2MB.');
+                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_size_error || 'Photo file is too large. Maximum size is 2MB');
                         isValid = false;
                     }
                     
                     // Allowed file types: jpg, jpeg, png, gif
                     if (!validateFileType(photoFile, ['jpg', 'jpeg', 'png', 'gif'])) {
-                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_type_error || 'Invalid photo format. Please use JPG, PNG or GIF.');
+                        showFieldError('bpp_photo', bpp_form_obj.i18n.file_type_error || 'Invalid photo format. Please use JPG, PNG or GIF');
                         isValid = false;
                     }
                 }
@@ -189,86 +177,59 @@
         
         // Display message
         function displayMessage(message, isSuccess) {
-            if (isBootstrapForm) {
-                $formMessages.removeClass('d-none alert-success alert-danger')
-                    .addClass(isSuccess ? 'alert alert-success' : 'alert alert-danger')
-                    .html(message)
-                    .show();
-            } else {
-                $formMessages.removeClass('bpp-success bpp-error')
-                    .addClass(isSuccess ? 'bpp-success' : 'bpp-error')
-                    .html(message)
-                    .show();
-            }
+            $formMessages.removeClass('bpp-success bpp-error')
+                .addClass(isSuccess ? 'bpp-success' : 'bpp-error')
+                .html(message)
+                .show();
+            
+            // Scroll to the message
+            $('html, body').animate({
+                scrollTop: $formMessages.offset().top - 100
+            }, 500);
         }
-
-        // Handle form submission
+        
+        // Handle form submission via AJAX
         $form.on('submit', function(e) {
             e.preventDefault();
             
             // Validate form
             if (!validateForm()) {
+                // Find the first error field
+                const $firstError = $form.find('.bpp-field-error').first();
+                if ($firstError.length) {
+                    // Scroll to the first error
+                    $('html, body').animate({
+                        scrollTop: $firstError.offset().top - 100
+                    }, 500);
+                }
                 return false;
             }
             
-            // Disable submit button and show spinner
+            // Show loading spinner
             $submitButton.prop('disabled', true);
             $spinner.show();
             
-            // Make FormData object
+            // Prepare form data
             const formData = new FormData(this);
-            
-            // Add action and nonce
             formData.append('action', 'bpp_submit_application');
-            formData.append('nonce', bpp_form_obj.nonce);
+            formData.append('security', bpp_form_obj.nonce);
             
-            // Prepare form data before submission
+            // Additional form data preparation
             const preparedFormData = prepareFormData(formData);
             
-            // Send AJAX request
+            // Submit form via AJAX
             $.ajax({
                 type: 'POST',
                 url: bpp_form_obj.ajax_url,
                 data: preparedFormData,
-                processData: false,
                 contentType: false,
+                processData: false,
                 success: function(response) {
-                    // Re-enable submit button and hide spinner
+                    // Hide spinner
                     $submitButton.prop('disabled', false);
                     $spinner.hide();
                     
-                    // Check if response is properly formatted
-                    if (typeof response !== 'object') {
-                        displayMessage(bpp_form_obj.i18n.submit_error, false);
-                        return;
-                    }
-                    
-                    // Extract message from response (handle both direct and nested structures)
-                    let message = '';
-                    let success = false;
-                    
-                    if (response.success !== undefined) {
-                        success = response.success;
-                        
-                        // Try to get message from different possible locations
-                        if (response.message) {
-                            message = response.message;
-                        } else if (response.data && response.data.message) {
-                            message = response.data.message;
-                        }
-                    } else if (response.data && response.data.success !== undefined) {
-                        success = response.data.success;
-                        message = response.data.message || '';
-                    }
-                    
-                    // Handle success or error
-                    if (success) {
-                        // Show success message
-                        displayMessage(message || bpp_form_obj.i18n.submit_success, true);
-                        
-                        // Reset form
-                        $form[0].reset();
-                        
+                    if (response.success) {
                         // Hide form and show success message
                         $form.hide();
                         $successMessage.show();
@@ -279,77 +240,22 @@
                         }, 500);
                     } else {
                         // Show error message
-                        if (message) {
-                            displayMessage(message, false);
-                        } else {
-                            displayMessage(bpp_form_obj.i18n.submit_error, false);
-                        }
-                        
-                        // Show field-specific errors if available
-                        let errors = response.errors || (response.data ? response.data.errors : null);
-                        if (errors) {
-                            $.each(errors, function(fieldId, errorMessage) {
-                                showFieldError(fieldId, errorMessage);
-                            });
-                        }
-                        
-                        // Scroll to error message
-                        $('html, body').animate({
-                            scrollTop: $formMessages.offset().top - 100
-                        }, 500);
+                        displayMessage(response.data || bpp_form_obj.i18n.submit_error || 'An error occurred. Please try again.', false);
                     }
                 },
                 error: function(xhr, status, error) {
-                    // Re-enable submit button and hide spinner
+                    // Hide spinner
                     $submitButton.prop('disabled', false);
                     $spinner.hide();
                     
                     // Show error message
-                    displayMessage(bpp_form_obj.i18n.submit_error, false);
+                    displayMessage(bpp_form_obj.i18n.submit_error || 'An error occurred. Please try again.', false);
                     
-                    // Scroll to error message
-                    $('html, body').animate({
-                        scrollTop: $formMessages.offset().top - 100
-                    }, 500);
+                    console.error('Form submission error:', xhr, status, error);
                 }
             });
             
             return false;
         });
-
-        // Clear error state on input change
-        $form.find('input, textarea, select').on('change input', function() {
-            clearFieldError($(this).attr('id'));
-        });
-        
-        // Add hover effects for form fields using GreenJobs color scheme
-        if (isBootstrapForm) {
-            $form.find('input, textarea, select').hover(
-                function() {
-                    $(this).css('border-color', '#61CE70');
-                },
-                function() {
-                    if (!$(this).is(':focus')) {
-                        $(this).css('border-color', '');
-                    }
-                }
-            );
-            
-            // Add enhanced button effects
-            $submitButton.hover(
-                function() {
-                    $(this).css({
-                        'transform': 'translateY(-2px)',
-                        'box-shadow': '0 4px 12px rgba(97, 206, 112, 0.3)'
-                    });
-                },
-                function() {
-                    $(this).css({
-                        'transform': '',
-                        'box-shadow': ''
-                    });
-                }
-            );
-        }
     });
 })(jQuery); 

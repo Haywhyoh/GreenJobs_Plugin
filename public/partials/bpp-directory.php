@@ -506,8 +506,21 @@ $pagination_class = $use_bootstrap ? 'pagination justify-content-center mt-4' : 
                                 <?php endif; ?>
                                 
                                 <?php if (!empty($industry)) : ?>
-                                <div class="<?php echo $use_bootstrap ? 'badge bg-primary' : 'bpp-professional-industry'; ?>" style="<?php echo !$use_bootstrap ? 'display: inline-block; background: #0d6efd; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;' : ''; ?>">
+                                <div class="<?php echo $use_bootstrap ? 'badge bg-primary' : 'bpp-professional-industry'; ?>" style="<?php echo !$use_bootstrap ? 'display: inline-block; background: #61CE70; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;' : ''; ?>">
                                     <?php echo esc_html($industry); ?>
+                                </div>
+                                <?php endif; ?>
+                                
+                                <?php 
+                                // Display skills in list view only
+                                if (!empty($skills_array) && $layout === 'list') : ?>
+                                <div class="bpp-professional-skills">
+                                    <?php foreach (array_slice($skills_array, 0, 5) as $skill) : ?>
+                                        <span class="bpp-skill-tag"><?php echo esc_html(trim($skill)); ?></span>
+                                    <?php endforeach; ?>
+                                    <?php if (count($skills_array) > 5) : ?>
+                                        <span class="bpp-skill-tag">+<?php echo count($skills_array) - 5; ?> more</span>
+                                    <?php endif; ?>
                                 </div>
                                 <?php endif; ?>
                         </div>
