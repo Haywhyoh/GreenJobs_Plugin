@@ -48,8 +48,12 @@
         function showFieldError(fieldId, message) {
             const $field = $('#' + fieldId);
             const $errorSpan = $('#' + fieldId + '_error');
+            const $parent = $field.closest('.bpp-form-field');
             
-            $field.addClass('bpp-field-error');
+            // Apply error class to the parent container, not the field
+            $parent.addClass('has-error');
+            // Also add the class to the field for styling
+            $field.addClass('field-error');
             $errorSpan.text(message).show();
         }
         
@@ -57,8 +61,10 @@
         function clearFieldError(fieldId) {
             const $field = $('#' + fieldId);
             const $errorSpan = $('#' + fieldId + '_error');
+            const $parent = $field.closest('.bpp-form-field');
             
-            $field.removeClass('bpp-field-error');
+            $parent.removeClass('has-error');
+            $field.removeClass('field-error');
             $errorSpan.text('').hide();
         }
 
@@ -88,7 +94,8 @@
             let isValid = true;
             
             // Clear previous errors
-            $form.find('.bpp-field-error').removeClass('bpp-field-error');
+            $form.find('.has-error').removeClass('has-error');
+            $form.find('.field-error').removeClass('field-error');
             $form.find('[id$="_error"]').text('').hide();
             
             // Validate required fields
@@ -185,8 +192,8 @@
                 console.log(`Form field: ${key} = ${value}`);
             }
             
-            // Handle years_experience field
-            const yearsExpElement = document.getElementById('bpp_years_experience');
+            // Handle years_experience field - using the correct ID from the form
+            const yearsExpElement = document.getElementById('years_experience');
             if (yearsExpElement) {
                 const yearsExpValue = yearsExpElement.value.trim();
                 if (yearsExpValue !== '') {
@@ -244,13 +251,17 @@
             // Validate form
             if (!validateForm()) {
                 // Find the first error field
-                const $firstError = $form.find('.bpp-field-error').first();
+                const $firstError = $form.find('.has-error').first();
                 if ($firstError.length) {
                     // Scroll to the first error
                     $('html, body').animate({
                         scrollTop: $firstError.offset().top - 100
                     }, 500);
                 }
+                
+                // Show general error message
+                displayMessage(bpp_form_obj.i18n.form_has_errors || 'Please correct the errors in the form before submitting.', false);
+                
                 return false;
             }
             
@@ -362,6 +373,11 @@
             });
             
             return false;
+        });
+        
+        // Clear field errors on input
+        $form.find('input, textarea, select').on('input change', function() {
+            clearFieldError($(this).attr('id'));
         });
     });
 })(jQuery); 
