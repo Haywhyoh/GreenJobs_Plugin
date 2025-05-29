@@ -178,7 +178,7 @@ class BPP_Public {
         wp_register_script(
             'bpp-featured-script',
             BPP_PLUGIN_URL . 'public/js/bpp-featured.js',
-            array('jquery', $this->plugin_name),
+            array('jquery', $this->plugin_name, 'wp-util'),
             $this->version,
             true
         );

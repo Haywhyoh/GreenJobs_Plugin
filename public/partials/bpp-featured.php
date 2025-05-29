@@ -385,3 +385,27 @@ if ($featured_query->post_count < $count) {
         </div>
     <?php endif; ?>
 </div> 
+
+<!-- Script to reinitialize carousel on page visibility change -->
+<script type="text/javascript">
+(function($) {
+    // Handle page visibility changes (when user switches tabs and comes back)
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && typeof window.bppInitCarousel === 'function') {
+            setTimeout(function() {
+                window.bppInitCarousel();
+            }, 100);
+        }
+    });
+    
+    // Additional initialization for handling history navigation
+    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
+        // Page was loaded from history (back/forward)
+        if (typeof window.bppInitCarousel === 'function') {
+            setTimeout(function() {
+                window.bppInitCarousel();
+            }, 200);
+        }
+    }
+})(jQuery);
+</script> 

@@ -136,22 +136,28 @@
 .bpp-carousel-container {
     position: relative;
     margin-bottom: 40px;
+    min-height: 200px; /* Ensure container has height during loading */
 }
 
 .bpp-carousel-wrapper {
     overflow: hidden;
     padding: 10px 0;
+    will-change: transform; /* Hardware acceleration hint */
 }
 
 .bpp-carousel-track {
     display: flex;
     transition: transform 0.5s ease;
+    backface-visibility: hidden; /* Improve performance */
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
 }
 
 .bpp-carousel-slide {
     flex: 0 0 calc(25% - 20px);
     padding: 0 10px;
     box-sizing: border-box;
+    transform: translateZ(0); /* Force GPU rendering */
 }
 
 /* Navigation Buttons */
@@ -187,6 +193,12 @@
     font-size: 20px;
     width: 20px;
     height: 20px;
+}
+
+/* Button states */
+.bpp-button-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Responsive */
