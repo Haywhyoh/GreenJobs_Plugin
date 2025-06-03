@@ -195,7 +195,7 @@ class BPP_Admin {
         // Register settings
         register_setting('bpp_options', 'bpp_email_notifications');
         register_setting('bpp_options', 'bpp_form_fields');
-        register_setting('bpp_options', 'bpp_directory_settings');
+        register_setting('bpp_options', 'bpp_directory_settings', array($this, 'sanitize_directory_settings'));
         register_setting('bpp_options', 'bpp_approval_workflow');
 
         // Add settings sections
@@ -252,6 +252,62 @@ class BPP_Admin {
         );
 
         // Add more settings fields as needed
+    }
+
+    /**
+     * Sanitize directory settings.
+     *
+     * @since    1.0.0
+     * @param    array    $input    The input array to sanitize.
+     * @return   array    The sanitized input.
+     */
+    public function sanitize_directory_settings($input) {
+        $sanitized = array();
+        
+        // Handle general directory settings
+        if (isset($input['per_page'])) {
+            $sanitized['per_page'] = absint($input['per_page']);
+        }
+        
+        if (isset($input['default_layout'])) {
+            $sanitized['default_layout'] = sanitize_text_field($input['default_layout']);
+        }
+        
+        if (isset($input['featured_count'])) {
+            $sanitized['featured_count'] = absint($input['featured_count']);
+        }
+        
+        // Handle profile visibility settings
+        if (isset($input['profile_visibility']) && is_array($input['profile_visibility'])) {
+            $sanitized['profile_visibility'] = array();
+            
+            // Get the default visibility settings for reference
+            $default_visibility = array(
+                'photo' => true,
+                'job_title' => true,
+                'industry' => true,
+                'location' => true,
+                'years_experience' => true,
+                'skills' => true,
+                'bio' => true,
+                'website' => true,
+                'linkedin' => true,
+                'email' => true,
+                'phone' => false,
+                'resume' => true,
+                'contact_form' => true,
+                'related' => true
+            );
+            
+            // Sanitize each visibility setting
+            foreach ($default_visibility as $field => $default_value) {
+                // If the field is in the input, set it to true (checkbox is checked)
+                // Otherwise, set it to false (checkbox is unchecked)
+                $sanitized['profile_visibility'][$field] = isset($input['profile_visibility'][$field]) ? true : false;
+            }
+        }
+        
+        return $sanitized;
     }
 
     /**

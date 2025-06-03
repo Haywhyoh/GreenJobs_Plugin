@@ -100,10 +100,17 @@ $default_visibility = array(
     'linkedin' => true,
     'email' => true,
     'phone' => false,
-    'resume' => true
+    'resume' => true,
+    'contact_form' => true,
+    'related' => true
 );
-// Merge with defaults
-$visibility = array_merge($default_visibility, $visibility_settings);
+
+// Properly merge with defaults - ensure all fields are properly initialized
+$visibility = array();
+foreach ($default_visibility as $key => $default_value) {
+    // Check if the setting exists in saved settings, otherwise use default
+    $visibility[$key] = isset($visibility_settings[$key]) ? (bool)$visibility_settings[$key] : $default_value;
+}
 
 // Get related professionals in the same industry (limit to 3)
 $related_args = array(
@@ -306,7 +313,7 @@ get_header();
                 </div>
             </div>
             
-            <?php if (!empty($contact_form_shortcode)) : ?>
+            <?php if (!empty($contact_form_shortcode) && !empty($visibility['contact_form'])) : ?>
                 <div class="bpp-card">
                     <div class="bpp-card-header">
                         <h3><?php _e('Contact This Professional', 'black-potential-pipeline'); ?></h3>
@@ -320,7 +327,7 @@ get_header();
     </div>
     
     <!-- Related Professionals Section -->
-    <?php if ($related_query->have_posts()) : ?>
+    <?php if ($related_query->have_posts() && !empty($visibility['related'])) : ?>
         <div class="bpp-card">
             <div class="bpp-card-header">
                 <h3><?php _e('Related Professionals', 'black-potential-pipeline'); ?></h3>
@@ -338,7 +345,7 @@ get_header();
                     ?>
                         <div class="bpp-card bpp-related-card">
                             <a href="<?php the_permalink(); ?>" class="bpp-card-link">
-                                <?php if (has_post_thumbnail()) : ?>
+                                <?php if (has_post_thumbnail() && !empty($visibility['photo'])) : ?>
                                     <div class="bpp-related-img">
                                         <?php the_post_thumbnail('medium'); ?>
                                     </div>
@@ -349,10 +356,10 @@ get_header();
                                 <?php endif; ?>
                                 <div class="bpp-card-body">
                                     <h4 class="bpp-profile-name"><?php the_title(); ?></h4>
-                                    <?php if (!empty($related_job_title)) : ?>
+                                    <?php if (!empty($related_job_title) && !empty($visibility['job_title'])) : ?>
                                         <p class="bpp-profile-title"><?php echo esc_html($related_job_title); ?></p>
                                     <?php endif; ?>
-                                    <?php if (!empty($related_industry)) : ?>
+                                    <?php if (!empty($related_industry) && !empty($visibility['industry'])) : ?>
                                         <div class="bpp-tag bpp-industry-tag"><?php echo esc_html($related_industry); ?></div>
                                     <?php endif; ?>
                                 </div>

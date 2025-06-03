@@ -232,10 +232,17 @@ if (!defined('WPINC')) {
                     'linkedin' => true,
                     'email' => true,
                     'phone' => false,
-                    'resume' => true
+                    'resume' => true,
+                    'contact_form' => true,
+                    'related' => true
                 );
-                // Merge with defaults
-                $visibility = array_merge($default_visibility, $visibility_settings);
+                
+                // Properly merge with defaults - ensure all fields are properly initialized
+                $visibility = array();
+                foreach ($default_visibility as $key => $default_value) {
+                    // Check if the setting exists in saved settings, otherwise use default
+                    $visibility[$key] = isset($visibility_settings[$key]) ? (bool)$visibility_settings[$key] : $default_value;
+                }
                 ?>
                 
                 <table class="widefat striped">
@@ -316,6 +323,18 @@ if (!defined('WPINC')) {
                             <td><strong><?php echo esc_html__('Resume/CV Download', 'black-potential-pipeline'); ?></strong></td>
                             <td>
                                 <input type="checkbox" id="visibility_resume" name="bpp_directory_settings[profile_visibility][resume]" value="1" <?php checked(true, $visibility['resume']); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Contact Form', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_contact_form" name="bpp_directory_settings[profile_visibility][contact_form]" value="1" <?php checked(true, isset($visibility['contact_form']) ? $visibility['contact_form'] : true); ?>>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><?php echo esc_html__('Related Professionals', 'black-potential-pipeline'); ?></strong></td>
+                            <td>
+                                <input type="checkbox" id="visibility_related" name="bpp_directory_settings[profile_visibility][related]" value="1" <?php checked(true, isset($visibility['related']) ? $visibility['related'] : true); ?>>
                             </td>
                         </tr>
                     </tbody>
